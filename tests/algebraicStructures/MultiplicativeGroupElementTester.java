@@ -17,56 +17,11 @@ import org.junit.jupiter.api.Test;
  * @param <T>   concrete type of {@link MultiplicativeGroupElement}.
  */
 public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupElement<T>>
-    extends SetElementTester<T>
+    extends MultiplicativeMagmaElementTester<T>
 {
     ////////////////////////////////////////////////////////////////
     // TEST METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Tests that {@link MultiplicativeGroupElement#multiply(Multipliable)} returns new instance.
-     */
-    @Test
-    default void multiplyReturnsNewInstance()
-    {
-        List<T> setElements = this.getElementList();
-        for( int i=0; i<setElements.size()-1; i++ ) {
-            T first = setElements.get( i );
-            T second = setElements.get( i+1 );
-            assertNotEquals( first , first.multiply( second ) );
-        }
-    }
-    
-    
-    /**
-     * Tests that {@link MultiplicativeGroupElement#multiplyInplace(MultiplicativeGroupElement)} is consistent with {@link MultiplicativeGroupElement#multiply(Multipliable)}.
-     */
-    @Test
-    default void multiplyInplaceConsistentWithMultiply()
-    {
-        List<T> setElements = this.getElementList();
-        for( int i=0; i<setElements.size()-1; i++ ) {
-            T first = setElements.get( i ).copy();  // "copy" avoids changing the value when using "multiplyInplace".
-            T second = setElements.get( i+1 );
-            T multiplyResult = first.multiply( second );
-            T multiplyInplaceResult = first.multiplyInplace( second );
-            assertTrue( multiplyResult.equals( multiplyInplaceResult ) );
-        }
-    }
-    
-    
-    /**
-     * Tests that {@link MultiplicativeGroupElement#multiplyInplace(MultiplicativeGroupElement)} returns same instance.
-     */
-    @Test
-    default void multiplyInplaceReturnsSameInstance()
-    {
-        List<T> setElements = this.getElementList();
-        for( T element : setElements ) {
-            assertEquals( element , element.multiplyInplace( element ) );
-        }
-    }
-    
     
     /**
      * Tests that multiplication is associative.
