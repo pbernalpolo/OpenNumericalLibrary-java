@@ -11,22 +11,11 @@ package algebraicStructures;
  */
 public interface AdditiveAbelianGroupElement<T extends AdditiveAbelianGroupElement<T>>
     extends
-        SetElement<T>
+        AdditiveMagmaElement<T>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Adds {@code other} to {@code this}.
-     * <p>
-     * Result is returned as a new instance.
-     * 
-     * @param other     {@code other} object to be added to {@code this}.
-     * @return  sum of {@code this} and {@code other} stored in a new instance.
-     */
-    public T add( T other );
-    
     
     /**
      * Subtracts {@code other} to {@code this}.
@@ -64,20 +53,6 @@ public interface AdditiveAbelianGroupElement<T extends AdditiveAbelianGroupEleme
     ////////////////////////////////////////////////////////////////
     // PUBLIC DEFAULT METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Adds in-place {@code other} to {@code this}.
-     * <p>
-     * Operation done in-place.
-     * 
-     * @param other     {@code other} object to be added to {@code this}.
-     * @return  sum of {@code this} and {@code other} stored in {@code this}.
-     */
-    default T addInplace( T other )
-    {
-        return this.setTo( this.add( other ) );
-    }
-    
     
     /**
      * Sets {@code this} to the zero element.

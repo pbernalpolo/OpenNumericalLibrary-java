@@ -11,22 +11,11 @@ package algebraicStructures;
  */
 public interface MultiplicativeGroupElement<T extends MultiplicativeGroupElement<T>>
 	extends
-        SetElement<T>
+        MultiplicativeMagmaElement<T>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Multiplies {@code this} times {@code other}.
-     * <p>
-     * Result is returned as a new instance.
-     * 
-     * @param other     multiplier: {@code other} object to be multiplied by {@code this}.
-     * @return  product of {@code this} times {@code other} stored in a new instance.
-     */
-    T multiply( T other );
-    
     
     /**
      * Returns the identity element under the multiplication operation.
@@ -53,20 +42,6 @@ public interface MultiplicativeGroupElement<T extends MultiplicativeGroupElement
     ////////////////////////////////////////////////////////////////
     // PUBLIC DEFAULT METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Multiplies in-place {@code this} times {@code other}.
-     * <p>
-     * Operation done in-place.
-     * 
-     * @param other     multiplier: {@code other} object to be multiplied by {@code this}.
-     * @return  product of {@code this} times {@code other} stored in {@code this}.
-     */
-    default T multiplyInplace( T other )
-    {
-        return this.setTo( this.multiply( other ) );
-    }
-    
     
     /**
      * Sets {@code this} to the identity under multiplication.
