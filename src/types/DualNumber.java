@@ -144,6 +144,19 @@ public class DualNumber
     
     /**
      * {@inheritDoc}
+     * <p>
+     * Overridden method to make it more efficient.
+     */
+    public DualNumber setToSum( DualNumber first , DualNumber second )
+    {
+        this.a = first.re() + second.re();
+        this.b = first.im() + second.im();
+        return this;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public DualNumber identityAdditive()
     {
@@ -217,7 +230,7 @@ public class DualNumber
     {
         return new DualNumber(
                 this.re() * other.re() ,
-                this.re() * other.im() + this.im() * other.re() );
+                this.re() * other.im()  +  this.im() * other.re() );
     }
     
     
@@ -228,8 +241,21 @@ public class DualNumber
      */
     public DualNumber multiplyInplace( DualNumber other )
     {
-        this.b = this.re() * other.im() + this.im() * other.re();
+        this.b = this.re() * other.im()  +  this.im() * other.re();
         this.a = this.re() * other.re();
+        return this;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden method to make it more efficient.
+     */
+    public DualNumber setToProduct( DualNumber first , DualNumber second )
+    {
+        this.a = first.re() * second.re();
+        this.b = first.re() * second.im()  +  first.im() * second.re();
         return this;
     }
     

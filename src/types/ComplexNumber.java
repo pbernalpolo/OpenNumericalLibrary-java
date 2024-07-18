@@ -144,6 +144,19 @@ public class ComplexNumber
     
     /**
      * {@inheritDoc}
+     * <p>
+     * Overridden method to make it more efficient.
+     */
+    public ComplexNumber setToSum( ComplexNumber first , ComplexNumber second )
+    {
+        this.x = first.re() + second.re();
+        this.y = first.im() + second.im();
+        return this;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public ComplexNumber identityAdditive()
     {
@@ -230,6 +243,19 @@ public class ComplexNumber
         double imag = this.im();
         this.x = real * other.re()  -  imag * other.im();
         this.y = real * other.im()  +  imag * other.re();
+        return this;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden method to make it more efficient.
+     */
+    public ComplexNumber setToProduct( ComplexNumber first , ComplexNumber second )
+    {
+        this.x = first.re() * second.re()  -  first.im() * second.im();
+        this.y = first.re() * second.im()  +  first.im() * second.re();
         return this;
     }
     
