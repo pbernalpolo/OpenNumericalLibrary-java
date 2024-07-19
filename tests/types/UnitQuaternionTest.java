@@ -193,7 +193,7 @@ class UnitQuaternionTest
         List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
         for( int n=0; n<luq.size(); n++ ) {
             UnitQuaternion q0 = luq.get( n );
-            RealMatrix R = q0.toRotationMatrix();
+            Matrix R = q0.toRotationMatrix();
             UnitQuaternion q = UnitQuaternion.fromRotationMatrix( R );
             assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
         }
