@@ -10,7 +10,7 @@ import algebraicStructures.VectorSpaceElement;
 
 
 /**
- * {@link DualNumber} implements complex numbers.
+ * Implements complex numbers.
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Complex_number</a>
  */

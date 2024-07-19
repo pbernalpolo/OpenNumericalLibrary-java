@@ -10,7 +10,7 @@ import algebraicStructures.VectorSpaceElement;
 
 
 /**
- * {@link DualNumber} implements dual numbers.
+ * Implements dual numbers.
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Dual_number</a>
  */

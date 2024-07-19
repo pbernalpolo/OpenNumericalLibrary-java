@@ -24,6 +24,9 @@ class DualNumberTest
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * {@inheritDoc}
+     */
     public List<DualNumber> getElementList()
     {
         List<DualNumber> output = new ArrayList<DualNumber>();
