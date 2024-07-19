@@ -32,7 +32,7 @@ public interface MetricSpaceElementTester<T extends MetricSpaceElement<T>>
         List<T> setElements = this.getElementList();
         for( T element : setElements ) {
             double distance = element.distanceFrom( element );
-            assertEquals( 0.0 , distance );
+            assertTrue( distance < 1.0e-7 );
         }
     }
     

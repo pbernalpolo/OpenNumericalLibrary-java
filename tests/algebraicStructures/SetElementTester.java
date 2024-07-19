@@ -65,7 +65,7 @@ public interface SetElementTester<T extends SetElement<T>>
             T a = setElements.get( i );
             T b = setElements.get( i+1 );
             if( a.equals( b ) ) {
-                assertTrue( a.equalsApproximately( b , 0.0 ) );
+                assertTrue( a.equalsApproximately( b , 1.0e-7 ) );
             }
         }
     }

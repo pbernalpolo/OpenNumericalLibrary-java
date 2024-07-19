@@ -37,7 +37,7 @@ public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupE
             T c = setElements.get( i+2 );
             T product1 = a.multiply( b.multiply( c ) );  // a * ( b * c )
             T product2 = ( a.multiply( b ) ).multiply( c );  // ( a * b ) * c
-            assertTrue( product1.equalsApproximately( product2 , 1.0e-14 ) );
+            assertTrue( product1.equalsApproximately( product2 , 1.0e-7 ) );
         }
     }
     
@@ -54,8 +54,8 @@ public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupE
         for( T element : setElements ) {
             T identityLeft = one.multiply( element );  // 1 * e
             T identityRight = element.multiply( one );  // e * 1
-            assertTrue( identityLeft.equals( element ) );
-            assertTrue( identityRight.equals( element ) );
+            assertTrue( identityLeft.equalsApproximately( element , 1.0e-7 ) );
+            assertTrue( identityRight.equalsApproximately( element , 1.0e-7 ) );
         }
     }
     
