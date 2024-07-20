@@ -129,7 +129,7 @@ public class UnitQuaternion
     }
 
 
-    public UnitQuaternion inverseInplace()
+    public UnitQuaternion inverseMultiplicativeInplace()
     {
         this.q.conjugateInplace();
         return this;
