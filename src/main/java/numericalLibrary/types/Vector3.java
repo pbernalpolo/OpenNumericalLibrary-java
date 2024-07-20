@@ -1,10 +1,11 @@
-package types;
+package numericalLibrary.types;
+
 
 import java.util.Random;
 
-import algebraicStructures.AdditiveAbelianGroupElement;
-import algebraicStructures.MetricSpaceElement;
-import algebraicStructures.VectorSpaceElement;
+import numericalLibrary.algebraicStructures.AdditiveAbelianGroupElement;
+import numericalLibrary.algebraicStructures.MetricSpaceElement;
+import numericalLibrary.algebraicStructures.VectorSpaceElement;
 
 
 

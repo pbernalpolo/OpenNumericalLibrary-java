@@ -1,14 +1,14 @@
-package types;
+package numericalLibrary.types;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import algebraicStructures.AdditiveAbelianGroupElementTester;
-import algebraicStructures.MetricSpaceElementTester;
-import algebraicStructures.MultiplicativeGroupElementTester;
-import algebraicStructures.VectorSpaceElementTester;
+import numericalLibrary.algebraicStructures.AdditiveAbelianGroupElementTester;
+import numericalLibrary.algebraicStructures.MetricSpaceElementTester;
+import numericalLibrary.algebraicStructures.MultiplicativeGroupElementTester;
+import numericalLibrary.algebraicStructures.VectorSpaceElementTester;
 
 
 

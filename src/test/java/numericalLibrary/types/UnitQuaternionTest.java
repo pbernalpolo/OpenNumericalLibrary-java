@@ -1,6 +1,8 @@
-package types;
+package numericalLibrary.types;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +11,8 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import algebraicStructures.MetricSpaceElementTester;
-import algebraicStructures.MultiplicativeGroupElementTester;
+import numericalLibrary.algebraicStructures.MetricSpaceElementTester;
+import numericalLibrary.algebraicStructures.MultiplicativeGroupElementTester;
 
 
 

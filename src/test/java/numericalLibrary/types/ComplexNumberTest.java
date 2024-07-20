@@ -1,13 +1,13 @@
-package types;
+package numericalLibrary.types;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import algebraicStructures.FieldElementTester;
-import algebraicStructures.MetricSpaceElementTester;
-import algebraicStructures.VectorSpaceElementTester;
+import numericalLibrary.algebraicStructures.FieldElementTester;
+import numericalLibrary.algebraicStructures.MetricSpaceElementTester;
+import numericalLibrary.algebraicStructures.VectorSpaceElementTester;
 
 
 

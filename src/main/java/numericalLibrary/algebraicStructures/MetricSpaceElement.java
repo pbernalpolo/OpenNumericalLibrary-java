@@ -1,4 +1,4 @@
-package algebraicStructures;
+package numericalLibrary.algebraicStructures;
 
 
 

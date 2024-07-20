@@ -1,10 +1,10 @@
-package types;
+package numericalLibrary.types;
 
 
 import java.util.Random;
 
-import algebraicStructures.MetricSpaceElement;
-import algebraicStructures.MultiplicativeGroupElement;
+import numericalLibrary.algebraicStructures.MetricSpaceElement;
+import numericalLibrary.algebraicStructures.MultiplicativeGroupElement;
 
 
 
