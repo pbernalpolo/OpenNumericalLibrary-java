@@ -270,13 +270,13 @@ public class Vector3
     }
     
     
-    public Matrix toRealMatrixAsColumn()
+    public Matrix toMatrixAsColumn()
     {
         return Matrix.fromVector3AsColumn( this );
     }
     
     
-    public Matrix toRealMatrixAsRow()
+    public Matrix toMatrixAsRow()
     {
         return Matrix.fromVector3AsRow( this );
     }
