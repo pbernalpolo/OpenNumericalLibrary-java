@@ -307,37 +307,37 @@ public class Matrix
     }
     
     
-    /*public RealMatrix inverseMultiplicative()
+    /*public Matrix inverseMultiplicative()
     {
         
     }
 
 
-    public RealMatrix inverseMultiplicativeInplace()
+    public Matrix inverseMultiplicativeInplace()
     {
         return this.set( this.inverseMultiplicative() );
     }
 
 
-    public RealMatrix divideLeft( RealMatrix other )
+    public Matrix divideLeft( Matrix other )
     {
         return other.inverseMultiplicative().multiply( this );
     }
 
 
-    public RealMatrix divideLeftInplace( RealMatrix other )
+    public Matrix divideLeftInplace( Matrix other )
     {
         return this.set( this.divideLeft( other ) );
     }
     
     
-    public RealMatrix divideRight( RealMatrix other )
+    public Matrix divideRight( Matrix other )
     {
         return this.multiply( other.inverseMultiplicative() );
     }
 
 
-    public RealMatrix divideRightInplace( RealMatrix other )
+    public Matrix divideRightInplace( Matrix other )
     {
         return this.multiplyInplace( other.inverseMultiplicative() );
     }*/
@@ -366,7 +366,7 @@ public class Matrix
     }
     
     
-    /*public double dot( RealMatrix other )
+    /*public double dot( Matrix other )
     {
         return this.transpose().multiply( other ).trace();
     }*/

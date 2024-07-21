@@ -230,13 +230,13 @@ public class Vector2
     }
     
     
-    public Matrix toRealMatrixAsColumn()
+    public Matrix toMatrixAsColumn()
     {
         return Matrix.fromVector2AsColumn( this );
     }
     
     
-    public Matrix toRealMatrixAsRow()
+    public Matrix toMatrixAsRow()
     {
         return Matrix.fromVector2AsRow( this );
     }
