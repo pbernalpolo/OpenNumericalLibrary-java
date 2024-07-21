@@ -114,11 +114,11 @@ class UnitQuaternionTest
         // quaternion -1 -> null rotation vector
         assertTrue( UnitQuaternion.one().toRotationVector().equals( Vector3.zero() ) );
         // quaternion i^{-1} -> rotation of -pi around x
-        assertTrue( UnitQuaternion.i().inverseInplace().toRotationVector().equals( Vector3.i().scaleInplace( -Math.PI ) ) );
+        assertTrue( UnitQuaternion.i().inverseMultiplicativeInplace().toRotationVector().equals( Vector3.i().scaleInplace( -Math.PI ) ) );
         // quaternion j^{-1} -> rotation of -pi around y
-        assertTrue( UnitQuaternion.j().inverseInplace().toRotationVector().equals( Vector3.j().scaleInplace( -Math.PI ) ) );
+        assertTrue( UnitQuaternion.j().inverseMultiplicativeInplace().toRotationVector().equals( Vector3.j().scaleInplace( -Math.PI ) ) );
         // quaternion k^{-1} -> rotation of -pi around z
-        assertTrue( UnitQuaternion.k().inverseInplace().toRotationVector().equals( Vector3.k().scaleInplace( -Math.PI ) ) );
+        assertTrue( UnitQuaternion.k().inverseMultiplicativeInplace().toRotationVector().equals( Vector3.k().scaleInplace( -Math.PI ) ) );
     }
     
     
@@ -255,10 +255,10 @@ class UnitQuaternionTest
         luq.add( UnitQuaternion.i() );
         luq.add( UnitQuaternion.j() );
         luq.add( UnitQuaternion.k() );
-        luq.add( UnitQuaternion.one().inverseInplace() );
-        luq.add( UnitQuaternion.i().inverseInplace() );
-        luq.add( UnitQuaternion.j().inverseInplace() );
-        luq.add( UnitQuaternion.k().inverseInplace() );
+        luq.add( UnitQuaternion.one().inverseMultiplicativeInplace() );
+        luq.add( UnitQuaternion.i().inverseMultiplicativeInplace() );
+        luq.add( UnitQuaternion.j().inverseMultiplicativeInplace() );
+        luq.add( UnitQuaternion.k().inverseMultiplicativeInplace() );
         luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 1.0 , 0.0 ).scaleInplace( Math.PI/2.0 ) ) );
         luq.add( UnitQuaternion.fromRotationVector( new Vector3( 0.0 , 1.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
         luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 0.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
