@@ -100,30 +100,38 @@ class MatrixTest
         }
     }
 
-
+    
+    /**
+     * Tests the behavior of {@link Matrix#choleskyDecomposition()}.
+     */
     @Test
-    void choleskyBehavior()
+    void choleskyDecompositionBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we obtain the Cholesky decomposition
+            // Obtain the Cholesky decomposition.
             Matrix L = A.choleskyDecomposition();
-            // we rebuild the matrix doing L * L^T
+            // Rebuild the matrix doing L * L^T
             Matrix LLT = L.multiply( L.transpose() );
+            // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
     }
 
-
+    
+    /**
+     * Tests the behavior of {@link Matrix#choleskyDecompositionInplace()}.
+     */
     @Test
-    void choleskyAssignBehavior()
+    void choleskyDecompositionInplaceBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we obtain the Cholesky decomposition
+            // Obtain the Cholesky decomposition.
             Matrix L = A.copy().choleskyDecompositionInplace();
-            // we rebuild the matrix doing L * L^T
+            // Rebuild the matrix doing L * L^T
             Matrix LLT = L.multiply( L.transpose() );
+            // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
     }
@@ -163,34 +171,98 @@ class MatrixTest
     }
 
 
+    /**
+     * Tests the behavior of {@link Matrix#divideRightByPositiveDefiniteUsingItsCholeskyDecomposition(Matrix)}.
+     * <p>
+     * Having a matrix  XA = X * A, and being  A  a known positive definite matrix,
+     * we are looking for the matrix X.
+     */
     @Test
     void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+            // Get random positive definite matrix of dimension 10 x 10.
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we generate a random matrix
-            Matrix M = Matrix.random( 5 , 10 , this.randomNumberGenerator );
-            // we obtain the product
-            Matrix MA = M.multiply( A );
-            // and we divide using the Cholesky decomposition
-            Matrix Mrecomputed = MA.divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
-            assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-3 ) );
+            // Generate random matrix of dimension 5 x 10.
+            Matrix X = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            // Multiply  X * A  to obtain the matrix we want to divide.
+            Matrix XA = X.multiply( A );
+            // Divide using the Cholesky decomposition: XA * A^{-1} = X
+            Matrix Xrecomputed = XA.divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
+            // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
+            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
         }
     }
 
 
+    /**
+     * Tests the behavior of {@link Matrix#divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace(Matrix)}.
+     * <p>
+     * Having a matrix  XA = X * A, and being  A  a known positive definite matrix,
+     * we are looking for the matrix X.
+     */
     @Test
-    void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAssignBehavior()
+    void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplaceBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+            // Get random positive definite matrix of dimension 10 x 10.
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we generate a random matrix
-            Matrix M = Matrix.random( 5 , 10 , this.randomNumberGenerator );
-            // we obtain the product
-            Matrix MA = M.multiply( A );
-            // and we divide using the Cholesky decomposition
-            MA.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( A.choleskyDecompositionInplace() );
-            assertTrue( MA.equalsApproximately( M , 1.0e-3 ) );
+            // Generate random matrix of dimension 5 x 10.
+            Matrix X = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            // Multiply  X * A  to obtain the matrix we want to divide.
+            Matrix XA = X.multiply( A );
+            // Divide using the Cholesky decomposition: XA * A^{-1} = X
+            XA.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( A.choleskyDecompositionInplace() );
+            // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
+            assertTrue( XA.equalsApproximately( X , 1.0e-4 ) );
+        }
+    }
+    
+    
+    /**
+     * Tests the behavior of {@link Matrix#divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition(Matrix)}.
+     * <p>
+     * Having a matrix  AX = A * X, and being  A  a known positive definite matrix,
+     * we are looking for the matrix X.
+     */
+    @Test
+    void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionBehavior()
+    {
+        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+            // Get random positive definite matrix of dimension 10 x 10.
+            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            // Generate random matrix of dimension 10 x 5.
+            Matrix X = Matrix.random( 10 , 5 , this.randomNumberGenerator );
+            // Multiply  A * X  to obtain the matrix we want to divide.
+            Matrix AX = A.multiply( X );
+            // Divide using the Cholesky decomposition: A^{-1} * AX = X
+            Matrix Xrecomputed = AX.divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
+            // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
+            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
+        }
+    }
+
+
+    /**
+     * Tests the behavior of {@link Matrix#divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace(Matrix)}.
+     * <p>
+     * Having a matrix  AX = A * X, and being  A  a known positive definite matrix,
+     * we are looking for the matrix X.
+     */
+    @Test
+    void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplaceBehavior()
+    {
+        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+            // Get random positive definite matrix of dimension 10 x 10.
+            Matrix X = this.randomPositiveDefiniteMatrix( 10 );
+            // Generate random matrix of dimension 10 x 5.
+            Matrix A = Matrix.random( 10 , 5 , this.randomNumberGenerator );
+            // Multiply  A * X  to obtain the matrix we want to divide.
+            Matrix XA = X.multiply( A );
+            // Divide using the Cholesky decomposition: A^{-1} * AX = X
+            XA.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( X.choleskyDecompositionInplace() );
+            // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
+            assertTrue( XA.equalsApproximately( A , 1.0e-4 ) );
         }
     }
 
@@ -206,11 +278,11 @@ class MatrixTest
             Matrix MA = M.multiply( A );
             // and we divide using the LDLT decomposition
             Matrix Mrecomputed = MA.divideRightByPositiveDefiniteUsingItsLDLTDecomposition( A.LDLTDecompositionInplace() );
-            assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-3 ) );
+            assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-4 ) );
         }
     }
 
-
+    
     @Test
     void divideRightByPositiveDefiniteUsingItsLDLTDecompositionAssignBehavior()
     {
@@ -232,11 +304,17 @@ class MatrixTest
     // PRIVATE METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Generates a random positive definite {@link Matrix}.
+     * 
+     * @param dimension     dimension of the positive definite {@link Matrix} to be generated.
+     * @return  random positive definite {@link Matrix}.
+     */
     private Matrix randomPositiveDefiniteMatrix( int dimension )
     {
-        // we generate a random matrix
+        // Generate a random matrix.
         Matrix M = Matrix.random( dimension , dimension , this.randomNumberGenerator );
-        // we obtain a random positive definite matrix through M * M^T
+        // Obtain a random positive definite matrix through M * M^T
         return M.multiply( M.transpose() );
     }
 
