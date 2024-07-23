@@ -22,29 +22,86 @@ public class LevenbergMarquardtAlgorithm<T>
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Model function used to fit the data.
+     */
     private LevenbergMarquardtModelFunction<T> modelFunction;
     
+    /**
+     * List of empirical pairs of data to which {@link #modelFunction} will be fitted.
+     */
     private List<LevenbergMarquardtEmpiricalPair<T>> empiricalPairs;
     
+    /**
+     * Stopping criterion used to stop the iterative algorithm.
+     */
     private StoppingCriterion stoppingCriterion;
     
+    /**
+     * Initial value for the parameter vector.
+     * This is the point in the solution space from which the iterative algorithm starts.
+     */
     private Matrix thetaInitial;
     
+    /**
+     * Current value for the parameter vector.
+     * Updated in each {@link #step()} of the iterative algorithm.
+     */
     private Matrix theta;
     
+    /**
+     * Value of the parameter vector for which the minimum error is obtained.
+     * 
+     * @see #errorBest
+     */
     private Matrix thetaBest;
     
+    /**
+     * Vector of target values.
+     * Computed in {@link #initialize()}.
+     */
     private Matrix y;
     
+    /**
+     * Vector of output values from the {@link #modelFunction} at the current {@link #theta}.
+     * Recomputed in each {@link #step()}.
+     */
     private Matrix f;
+    
+    /**
+     * Jacobian of the {@link #modelFunction} at the current {@link #theta}.
+     * Recomputed in each {@link #step()}.
+     */
     private Matrix J;
     
+    /**
+     * Last increment obtained from the Levenberg-Marquardt algorithm.
+     * It is defined as a member variable so that we can provide it for a {@link StoppingCriterion}.
+     */
     private Matrix delta;
     
+    /**
+     * Error obtained with the last value of {@link #theta}.
+     */
     private double error;
+    
+    /**
+     * Minimum error obtained so far.
+     * 
+     * @see #thetaBest
+     */
     private double errorBest;
     
+    /**
+     * Number of iterations performed so far.
+     */
     private int iteration;
+    
+    /**
+     * Iteration number that produced the minimum error.
+     * 
+     * @see #errorBest
+     */
     private int iterationBest;
     
     
@@ -53,6 +110,9 @@ public class LevenbergMarquardtAlgorithm<T>
     // PUBLIC CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Constructs a {@link LevenbergMarquardtAlgorithm}.
+     */
     public LevenbergMarquardtAlgorithm()
     {
         // Default stopping criteria.
@@ -69,30 +129,66 @@ public class LevenbergMarquardtAlgorithm<T>
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Sets the list of empirical pairs used to fit the {@link #modelFunction}.
+     * 
+     * @param theEmpiricalPairs     list of empirical pairs used to fit the {@link #modelFunction}.
+     */
     public void setEmpiricalPairs( List<LevenbergMarquardtEmpiricalPair<T>> theEmpiricalPairs )
     {
         this.empiricalPairs = theEmpiricalPairs;
     }
     
     
+    /**
+     * Sets the {@link LevenbergMarquardtModelFunction} used to fit the empirical pairs.
+     * 
+     * @param theModelFunction  {@link LevenbergMarquardtModelFunction} used to fit the empirical pairs.
+     */
     public void setModelFunction( LevenbergMarquardtModelFunction<T> theModelFunction )
     {
         this.modelFunction = theModelFunction;
     }
     
     
+    /**
+     * Sets the starting point for the iterative algorithm.
+     * <p>
+     * This is the initial value of {@link #theta}.
+     * 
+     * @param initialGuess  starting point for the iterative algorithm.
+     */
     public void setInitialGuess( Matrix initialGuess )
     {
         this.thetaInitial = initialGuess;
     }
     
     
+    /**
+     * Sets the stopping criterion used to terminate the iterative algorithm.
+     * 
+     * @param theStoppingCriterion  stopping criterion used to terminate the iterative algorithm.
+     */
     public void setStoppingCriterion( StoppingCriterion theStoppingCriterion )
     {
         this.stoppingCriterion = theStoppingCriterion;
     }
     
     
+    /**
+     * Initializes the iterative algorithm.
+     * <p>
+     * This includes:
+     * <ul>
+     *  <li> Initialize the {@link #theta} parameter vector.
+     *  <li> Build the y vector.
+     *  <li> Allocate space for the model function output.
+     *  <li> Allocate space for the Jacobian of the model function.
+     *  <li> Initialize the number of iterations.
+     * </ul>
+     * 
+     * @see #step()
+     */
     public void initialize()
     {
         this.theta = thetaInitial.copy();
@@ -111,6 +207,12 @@ public class LevenbergMarquardtAlgorithm<T>
     }
     
     
+    /**
+     * Performs a step using the Levenberg-Marquardt algorithm.
+     * 
+     * @see #initialize()
+     * @see #iterate()
+     */
     public void step()
     {
         // Build the f vector and the Jacobian matrix.
@@ -142,6 +244,9 @@ public class LevenbergMarquardtAlgorithm<T>
     }
     
     
+    /**
+     * Iterates stepping according to the Levenberg-Marquardt algorithm until the stopping criterion is met.
+     */
     public void iterate()
     {
         this.initialize();
@@ -152,36 +257,66 @@ public class LevenbergMarquardtAlgorithm<T>
     }
     
     
+    /**
+     * Returns the last produced solution.
+     * 
+     * @return  last produced solution.
+     */
     public Matrix getSolutionLast()
     {
         return this.theta;
     }
     
     
+    /**
+     * Returns the best produced solution so far.
+     * 
+     * @return  best produced solution so far.
+     */
     public Matrix getSolutionBest()
     {
         return this.thetaBest;
     }
     
     
+    /**
+     * Returns the last iteration count.
+     * 
+     * @return  last iteration count.
+     */
     public int getIterationLast()
     {
         return this.iteration;
     }
     
     
+    /**
+     * Returns the iteration count when the best solution was found.
+     * 
+     * @return  iteration count when the best solution was found.
+     */
     public int getIterationBest()
     {
         return this.iterationBest;
     }
     
     
+    /**
+     * Returns the error associated to the last produced solution.
+     * 
+     * @return  error associated to the last produced solution.
+     */
     public double getErrorLast()
     {
         return this.error;
     }
     
     
+    /**
+     * Returns the error associated to the best produced solution.
+     * 
+     * @return  error associated to the best produced solution.
+     */
     public double getErrorBest()
     {
         return this.errorBest;

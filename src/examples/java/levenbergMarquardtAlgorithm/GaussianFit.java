@@ -13,15 +13,15 @@ import numericalLibrary.util.GaussianFunction;
 
 
 
+/**
+ * Example that shows how to set up and use the Levenberg-Marquardt algorithm to fit a Gaussian function to empirical data.
+ */
 public class GaussianFit
 {
-
-    public GaussianFit()
-    {
-        // TODO Auto-generated constructor stub
-    }
-
-
+    ////////////////////////////////////////////////////////////////
+    // ENTRY POINT
+    ////////////////////////////////////////////////////////////////
+    
     public static void main( String[] args )
     {
         // Generate a known Gaussian function.

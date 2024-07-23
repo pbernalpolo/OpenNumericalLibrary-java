@@ -6,21 +6,70 @@ import numericalLibrary.types.Matrix;
 
 
 
+/**
+ * Implements a Gaussian function to fit data using the {@link LevenbergMarquardtAlgorithm}.
+ * <p>
+ * Concretely, the Gaussian function is given by:
+ *      a exp( -( x - b )^2/( 2 * c^2 )
+ * 
+ * @see <a href>https://en.wikipedia.org/wiki/Gaussian_function</a>
+ */
 public class GaussianFunction
     implements LevenbergMarquardtModelFunction<Double>
 {
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE VARIABLES
+    ////////////////////////////////////////////////////////////////
     
+    /**
+     * Height of the curve's peak.
+     */
     private double a;
+    
+    /**
+     * Position of the peak.
+     */
     private double b;
+    
+    /**
+     * Standard deviation; controls the width of the "bell".
+     */
     private double c;
+    
+    /**
+     * Independent variable set by {@link #setInput(Double)}.
+     */
     private double x;
+    
+    /**
+     * Difference between {@link #x} and {@link #b}: that is  x - b .
+     */
     private double diff;
+    
+    /**
+     * One over {@link #c} squared: that is  1/c^2 .
+     */
     private double oneOverCSquared;
+    
+    /**
+     * Derivative of the function with respect to the parameter {@link #a}.
+     */
     private double dfda;
     
+    /**
+     * Flag used to implement the Dirty Flag Optimization Pattern.
+     */
     private boolean dirtyFlag;
-
     
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PUBLIC METHODS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * {@inheritDoc}
+     */
     public void setParameters( Matrix theta )
     {
         this.a = theta.entry( 0 , 0 );
@@ -29,6 +78,9 @@ public class GaussianFunction
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public void setInput( Double input )
     {
         this.x = input;
@@ -36,6 +88,9 @@ public class GaussianFunction
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public double getOutput()
     {
         this.clean();
@@ -43,6 +98,9 @@ public class GaussianFunction
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix getJacobian()
     {
         this.clean();
@@ -55,6 +113,16 @@ public class GaussianFunction
     }
     
     
+    
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE METHODS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Implements the Dirty Flag Optimization Pattern.
+     * <p>
+     * It computes common stuff and avoids to recompute it in other methods.
+     */
     private void clean()
     {
         if( this.dirtyFlag )

@@ -100,30 +100,38 @@ class MatrixTest
         }
     }
 
-
+    
+    /**
+     * Tests the behavior of {@link Matrix#choleskyDecomposition()}.
+     */
     @Test
-    void choleskyBehavior()
+    void choleskyDecompositionBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we obtain the Cholesky decomposition
+            // Obtain the Cholesky decomposition.
             Matrix L = A.choleskyDecomposition();
-            // we rebuild the matrix doing L * L^T
+            // Rebuild the matrix doing L * L^T
             Matrix LLT = L.multiply( L.transpose() );
+            // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
     }
 
-
+    
+    /**
+     * Tests the behavior of {@link Matrix#choleskyDecompositionInplace()}.
+     */
     @Test
-    void choleskyAssignBehavior()
+    void choleskyDecompositionInplaceBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             Matrix A = this.randomPositiveDefiniteMatrix( 10 );
-            // we obtain the Cholesky decomposition
+            // Obtain the Cholesky decomposition.
             Matrix L = A.copy().choleskyDecompositionInplace();
-            // we rebuild the matrix doing L * L^T
+            // Rebuild the matrix doing L * L^T
             Matrix LLT = L.multiply( L.transpose() );
+            // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
     }
@@ -296,11 +304,17 @@ class MatrixTest
     // PRIVATE METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Generates a random positive definite {@link Matrix}.
+     * 
+     * @param dimension     dimension of the positive definite {@link Matrix} to be generated.
+     * @return  random positive definite {@link Matrix}.
+     */
     private Matrix randomPositiveDefiniteMatrix( int dimension )
     {
-        // we generate a random matrix
+        // Generate a random matrix.
         Matrix M = Matrix.random( dimension , dimension , this.randomNumberGenerator );
-        // we obtain a random positive definite matrix through M * M^T
+        // Obtain a random positive definite matrix through M * M^T
         return M.multiply( M.transpose() );
     }
 
