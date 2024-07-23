@@ -454,9 +454,9 @@ public class Matrix
     public Matrix divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( Matrix L )
     {
         L.assertIsSquare();
-        Matrix m = Matrix.emptyWithSizeOf( this );
-        Matrix.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( this , L , m );
-        return m;
+        Matrix output = Matrix.emptyWithSizeOf( this );
+        Matrix.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( output , L , this );
+        return output;
     }
 
 
@@ -464,6 +464,23 @@ public class Matrix
     {
         L.assertIsSquare();
         Matrix.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( this , L , this );
+        return this;
+    }
+    
+    
+    public Matrix divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( Matrix L )
+    {
+        L.assertIsSquare();
+        Matrix output = Matrix.emptyWithSizeOf( this );
+        Matrix.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , output , this );
+        return output;
+    }
+
+
+    public Matrix divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( Matrix L )
+    {
+        L.assertIsSquare();
+        Matrix.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , this , this );
         return this;
     }
     
@@ -1061,6 +1078,15 @@ public class Matrix
     }
     
     
+    /**
+     * Performs a Cholesky decomposition of the form A = L * L^T.
+     * <p>
+     * This algorithm allows to perform an in-place decomposition.
+     * That means that both inputs can be the same {@link Matrix}, and the output would be stored in the input.
+     * 
+     * @param A     input square {@link Matrix} from which the Cholesky decomposition is requested.
+     * @param L     output square {@link Matrix} containing the Cholesky decomposition of input A.
+     */
     private static void choleskyDecompositionAlgorithm( Matrix A , Matrix L )
     {
         // for each column
@@ -1128,25 +1154,34 @@ public class Matrix
     }
     
     
-    private static void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( Matrix A , Matrix L , Matrix B )
+    /**
+     * Solves the equation  X * L * L^T = B  for X.
+     * <p>
+     * L must be a lower triangular square {@link Matrix}.
+     * 
+     * @param X     output {@link Matrix} that will contain the solution to  X * L * L^T = B . It must have the same size as B.
+     * @param L     Cholesky decomposition of positive definite {@link Matrix} that will right divide  B.
+     * @param B     {@link Matrix} to be right divided by the positive definite {@link Matrix} whose Cholesky decomposition is  L .
+     */
+    private static void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( Matrix X , Matrix L , Matrix B )
     {
-        // we take each row from K and M independently
-        for( int i=0; i<A.rows(); i++ ) {
-            // first we solve (y*L' = M)
-            for( int j=0; j<L.rows(); j++ ) {
-                double sum = A.entryUnchecked(i,j);
-                for( int k=0; k<j; k++ ) {
-                    sum -= B.entryUnchecked(i,k) * L.entryUnchecked(j,k);
-                }
-                B.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
-            }
-            // now we solve (K_i*L = y)
-            for( int j=L.cols()-1; j>-1; j-- ) {
+        // we take each row from X and B independently
+        for( int i=0; i<B.rows(); i++ ) {
+            // first we solve ( y * L^T = B_i )
+            for( int j=0; j<B.cols(); j++ ) {
                 double sum = B.entryUnchecked(i,j);
-                for( int k=j+1; k<L.rows(); k++ ) {
-                    sum -= B.entryUnchecked(i,k) * L.entryUnchecked(k,j);
+                for( int k=0; k<j; k++ ) {
+                    sum -= X.entryUnchecked(i,k) * L.entryUnchecked(j,k);
                 }
-                B.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
+                X.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
+            }
+            // now we solve ( X_i * L = y )
+            for( int j=X.cols()-1; j>-1; j-- ) {
+                double sum = X.entryUnchecked(i,j);
+                for( int k=j+1; k<X.cols(); k++ ) {
+                    sum -= X.entryUnchecked(i,k) * L.entryUnchecked(k,j);
+                }
+                X.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
             }
         }
     }
@@ -1171,6 +1206,39 @@ public class Matrix
                     sum -= B.entryUnchecked(i,k) * LD.entryUnchecked(k,j);
                 }
                 B.setEntryUnchecked( i,j , sum );
+            }
+        }
+    }
+    
+    
+    /**
+     * Solves the equation  L * L^T * X = B  for X.
+     * <p>
+     * L must be a lower triangular square {@link Matrix}.
+     * 
+     * @param X     output {@link Matrix} that will contain the solution to  L * L^T * X = B . It must have the same size as B.
+     * @param L     Cholesky decomposition of positive definite {@link Matrix} that will left divide  B.
+     * @param B     {@link Matrix} to be left divided by the positive definite {@link Matrix} whose Cholesky decomposition is  L .
+     */
+    private static void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( Matrix L , Matrix X , Matrix B )
+    {
+        // Take each column from X and B independently.
+        for( int j=0; j<B.cols(); j++ ) {
+            // Solve ( L * y = B_j ).
+            for( int i=0; i<B.rows(); i++ ) {
+                double sum = B.entryUnchecked(i,j);
+                for( int k=0; k<i; k++ ) {
+                    sum -= L.entryUnchecked(i,k) * X.entryUnchecked(k,j);
+                }
+                X.setEntryUnchecked( i,j , sum/L.entryUnchecked(i,i) );
+            }
+            // Solve ( y = L^T * X_j ).
+            for( int i=X.rows()-1; i>-1; i-- ) {
+                double sum = X.entryUnchecked(i,j);
+                for( int k=i+1; k<X.rows(); k++ ) {
+                    sum -= L.entryUnchecked(k,i) * X.entryUnchecked(k,j);
+                }
+                X.setEntryUnchecked( i,j , sum/L.entryUnchecked(i,i) );
             }
         }
     }
