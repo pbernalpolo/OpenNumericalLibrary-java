@@ -41,8 +41,9 @@ public class GaussianFit
         // Find a solution using the Levenberg-Marquardt algorithm.
         LevenbergMarquardtAlgorithm<Double> algorithm = new LevenbergMarquardtAlgorithm<Double>();
         algorithm.setEmpiricalPairs( empiricalPairs );
-        algorithm.setInitialGuess( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
-        algorithm.setModelFunction( new GaussianFunction() );
+        GaussianFunction gaussianUnknown = new GaussianFunction();
+        gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
+        algorithm.setModelFunction( gaussianUnknown );
         //algorithm.setStoppingCriterion( new IterationThresholdStoppingCriterion( 1000 ) );
         
         algorithm.iterate();

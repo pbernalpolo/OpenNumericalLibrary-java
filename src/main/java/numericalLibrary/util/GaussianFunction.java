@@ -81,6 +81,19 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
+    public Matrix getParameters()
+    {
+        Matrix output = Matrix.empty( 3 , 1 );
+        output.setEntry( 0,0 , this.a );
+        output.setEntry( 1,0 , this.b );
+        output.setEntry( 2,0 , this.c );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void setInput( Double input )
     {
         this.x = input;
