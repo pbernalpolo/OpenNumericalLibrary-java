@@ -38,12 +38,6 @@ public class LevenbergMarquardtAlgorithm<T>
     private StoppingCriterion stoppingCriterion;
     
     /**
-     * Initial value for the parameter vector.
-     * This is the point in the solution space from which the iterative algorithm starts.
-     */
-    private Matrix thetaInitial;
-    
-    /**
      * Current value for the parameter vector.
      * Updated in each {@link #step()} of the iterative algorithm.
      */
@@ -152,19 +146,6 @@ public class LevenbergMarquardtAlgorithm<T>
     
     
     /**
-     * Sets the starting point for the iterative algorithm.
-     * <p>
-     * This is the initial value of {@link #theta}.
-     * 
-     * @param initialGuess  starting point for the iterative algorithm.
-     */
-    public void setInitialGuess( Matrix initialGuess )
-    {
-        this.thetaInitial = initialGuess;
-    }
-    
-    
-    /**
      * Sets the stopping criterion used to terminate the iterative algorithm.
      * 
      * @param theStoppingCriterion  stopping criterion used to terminate the iterative algorithm.
@@ -191,8 +172,8 @@ public class LevenbergMarquardtAlgorithm<T>
      */
     public void initialize()
     {
-        this.theta = thetaInitial.copy();
-        this.thetaBest = thetaInitial.copy();
+        this.theta = this.modelFunction.getParameters().copy();
+        this.thetaBest = this.modelFunction.getParameters().copy();
         // Build y vector.
         this.y = Matrix.empty( this.empiricalPairs.size() , 1 );
         for( int i=0; i<this.empiricalPairs.size(); i++ )

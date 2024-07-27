@@ -25,6 +25,16 @@ public interface LevenbergMarquardtModelFunction<T>
     
     
     /**
+     * Returns the current parameters of the {@link LevenbergMarquardtModelFunction}.
+     * <p>
+     * Used to get the initial point in the solution space from which the iterative algorithm starts.
+     * 
+     * @return  current parameters of the {@link LevenbergMarquardtModelFunction}.
+     */
+    public Matrix getParameters();
+    
+    
+    /**
      * Sets the input to the {@link LevenbergMarquardtModelFunction}.
      * 
      * @param x     input of the {@link LevenbergMarquardtModelFunction}.
