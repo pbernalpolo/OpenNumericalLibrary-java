@@ -2,7 +2,9 @@ package numericalLibrary.optimization;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -67,6 +69,43 @@ public interface LevenbergMarquardtModelFunctionTest<T>
     
     
     /**
+     * Tests that {@link LevenbergMarquardtModelFunction#getParameters()} returns a column {@link Matrix}.
+     */
+    @Test
+    default void getParametersReturnColumnMatrix()
+    {
+        // Get parameters from model function.
+        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        Matrix parameters = modelFunction.getParameters();
+        // They must be a column matrix.
+        assertEquals( 1 , parameters.cols() );
+    }
+    
+    
+    /**
+     * Tests that calling {@link LevenbergMarquardtModelFunction#getParameters()}, then {@link LevenbergMarquardtModelFunction#setParameters(Matrix)}, and then {@link LevenbergMarquardtModelFunction#getParameters()} again returns same parameters we started with.
+     */
+    @Test
+    default void setParametersGetParametersDoesNotChangeParameters()
+    {
+        // Get model function.
+        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        // Get parameter list.
+        List<Matrix> parameterList = this.getParameterList();
+        for( int i=0; i<parameterList.size(); i++ ) {
+            // Take parameters.
+            Matrix parameters0 = parameterList.get( i );
+            // Set parameters in model function,
+            modelFunction.setParameters( parameters0 );
+            // and get parameters back.
+            Matrix parameters = modelFunction.getParameters();
+            // Check that we obtain same parameters again.
+            assertTrue( parameters.equals( parameters0 ) );
+        }
+    }
+    
+    
+    /**
      * Tests that different inputs and parameters produce a different output.
      */
     @Test
@@ -91,7 +130,7 @@ public interface LevenbergMarquardtModelFunctionTest<T>
     
     
     /**
-     * Tests that different inputs and parameters produce a different output.
+     * Tests that different inputs and parameters produce a different Jacobian.
      */
     @Test
     default void differentInputsProduceDifferentJacobian()
@@ -109,19 +148,35 @@ public interface LevenbergMarquardtModelFunctionTest<T>
             modelFunction.setInput( inputList.get( i+1 ) );
             Matrix jacobian2 = modelFunction.getJacobian();
             // Check that the Jacobians are different.
-            assertNotEquals( jacobian1 , jacobian2 );
+            assertFalse( jacobian1.equals( jacobian2 ) );
         }
     }
     
     
     /**
-     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} returns a row matrix.
+     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} returns a row {@link Matrix}.
      */
     @Test
     default void getJacobianReturnsRowMatrix()
     {
         LevenbergMarquardtModelFunction<?> modelFunction = this.getModelFunction();
         assertEquals( 1 , modelFunction.getJacobian().rows() );
+    }
+    
+    
+    /**
+     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
+     */
+    @Test
+    default void jacobianHasSameColumnsAsParameters()
+    {
+        // Get parameters from model function.
+        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        Matrix parameters = modelFunction.getParameters();
+        // Get the Jacobian.
+        Matrix jacobian = modelFunction.getJacobian();
+        // Check that the Jacobian has as many columns as the number of parameters.
+        assertEquals( parameters.rows() , jacobian.cols() );
     }
     
 }
