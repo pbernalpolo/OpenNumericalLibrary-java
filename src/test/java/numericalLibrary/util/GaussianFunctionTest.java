@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import numericalLibrary.optimization.LevenbergMarquardtModelFunction;
-import numericalLibrary.optimization.LevenbergMarquardtModelFunctionTest;
+import numericalLibrary.optimization.LevenbergMarquardtModelFunctionTester;
 import numericalLibrary.types.Matrix;
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  */
 class GaussianFunctionTest
     implements
-        LevenbergMarquardtModelFunctionTest<Double>
+        LevenbergMarquardtModelFunctionTester<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS

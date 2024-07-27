@@ -19,7 +19,7 @@ import numericalLibrary.types.Matrix;
  * 
  * @param <T>   concrete type of {@link LevenbergMarquardtModelFunction}.
  */
-public interface LevenbergMarquardtModelFunctionTest<T>
+public interface LevenbergMarquardtModelFunctionTester<T>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
