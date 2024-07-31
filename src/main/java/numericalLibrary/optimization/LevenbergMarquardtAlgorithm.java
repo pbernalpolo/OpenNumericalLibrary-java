@@ -38,8 +38,10 @@ public class LevenbergMarquardtAlgorithm<T>
     private StoppingCriterion stoppingCriterion;
     
     /**
-     * Current value for the parameter vector.
+     * Last value for the parameter vector.
      * Updated in each {@link #step()} of the iterative algorithm.
+     * Note that the actual parameters are stored in the {@link LevenbergMarquardtModelFunction}.
+     * The reason for doing so is that this allows further flexibility for the user to modify the parameters in the concrete context of the {@link LevenbergMarquardtModelFunction} while the algorithm is running.
      */
     private Matrix theta;
     
@@ -75,6 +77,13 @@ public class LevenbergMarquardtAlgorithm<T>
     private Matrix delta;
     
     /**
+     * Damping factor used to improve stability.
+     * 
+     * @see #setDampingFactor(double)
+     */
+    private double lambda;
+    
+    /**
      * Error obtained with the last value of {@link #theta}.
      */
     private double error;
@@ -98,6 +107,12 @@ public class LevenbergMarquardtAlgorithm<T>
      */
     private int iterationBest;
     
+    /**
+     * True if there was a call to the {@link #initialize()} method.
+     * Used to throw an {@link IllegalStateException} if {@link #step()} is called without having previously called {@link #initialize()}.
+     */
+    private boolean initialized;
+    
     
     
     ////////////////////////////////////////////////////////////////
@@ -113,8 +128,10 @@ public class LevenbergMarquardtAlgorithm<T>
         MaximumIterationsWithoutImprovementStoppingCriterion first = new MaximumIterationsWithoutImprovementStoppingCriterion( 20 );
         IterationThresholdStoppingCriterion second = new IterationThresholdStoppingCriterion( 1000 );
         this.stoppingCriterion = new OrOperatorOnStoppingCriteria( first , second );
-        // Initialize best error.
-        this.errorBest = Double.MAX_VALUE;
+        // Default lambda value.
+        this.lambda = 0.0;
+        // Initialize initialized flag.
+        this.initialized = false;
     }
     
     
@@ -131,6 +148,8 @@ public class LevenbergMarquardtAlgorithm<T>
     public void setEmpiricalPairs( List<LevenbergMarquardtEmpiricalPair<T>> theEmpiricalPairs )
     {
         this.empiricalPairs = theEmpiricalPairs;
+        // Now it will be necessary to call initialize().
+        this.initialized = false;
     }
     
     
@@ -142,6 +161,8 @@ public class LevenbergMarquardtAlgorithm<T>
     public void setModelFunction( LevenbergMarquardtModelFunction<T> theModelFunction )
     {
         this.modelFunction = theModelFunction;
+        // Now it will be necessary to call initialize().
+        this.initialized = false;
     }
     
     
@@ -157,6 +178,24 @@ public class LevenbergMarquardtAlgorithm<T>
     
     
     /**
+     * Sets the damping factor.
+     * <p>
+     * The damping factor controls makes the Levenberg-Marquardt algorithm transition to the gradient descent algorithm:
+     * <ul>
+     *  <li> A damping factor of 0 makes the algorithm to be purely Levenberg-Marquardt.
+     *  <li> The bigger the damping factor, the closer to a gradient descent algorithm.
+     * </ul>
+     * Introducing a small damping factor usually helps solving problems when matrices are ill-conditioned (producing failures in the Cholesky decomposition).
+     * 
+     * @param dampingFactor     damping factor to be set.
+     */
+    public void setDampingFactor( double dampingFactor )
+    {
+        this.lambda = dampingFactor;
+    }
+    
+    
+    /**
      * Initializes the iterative algorithm.
      * <p>
      * This includes:
@@ -167,13 +206,15 @@ public class LevenbergMarquardtAlgorithm<T>
      *  <li> Allocate space for the Jacobian of the model function.
      *  <li> Initialize the number of iterations.
      * </ul>
+     * <p>
+     * If an {@link IllegalArgumentException} is thrown because a {@link Matrix} not being positive-definite, try adding a damping factor with {@link #setDampingFactor(double)}.
      * 
      * @see #step()
      */
     public void initialize()
     {
-        this.theta = this.modelFunction.getParameters().copy();
-        this.thetaBest = this.modelFunction.getParameters().copy();
+        // Initialize parameter vector.
+        this.theta = this.modelFunction.getParameters();
         // Build y vector.
         this.y = Matrix.empty( this.empiricalPairs.size() , 1 );
         for( int i=0; i<this.empiricalPairs.size(); i++ )
@@ -183,43 +224,56 @@ public class LevenbergMarquardtAlgorithm<T>
         // Allocate space for f and J.
         this.f = Matrix.empty( this.empiricalPairs.size() , 1 );
         this.J = Matrix.empty( this.empiricalPairs.size() , this.theta.rows() );
+        // Initialize best error.
+        this.errorBest = Double.MAX_VALUE;
         // Initialize iterations.
         this.iteration = 0;
+        // Set initialized flag.
+        this.initialized = true;
     }
     
     
     /**
      * Performs a step using the Levenberg-Marquardt algorithm.
+     * <p>
+     * If an {@link IllegalArgumentException} is thrown because a {@link Matrix} not being positive-definite, try adding a damping factor with {@link #setDampingFactor(double)}.
      * 
      * @see #initialize()
      * @see #iterate()
      */
     public void step()
     {
+        if( !this.initialized ) {
+            throw new IllegalStateException( "Called step() without having previously called initialize(). That method needs to be called after calling setModelFunction or setEmpiricalPairs." );
+        }
         // Build the f vector and the Jacobian matrix.
-        this.modelFunction.setParameters( this.theta );
-        for( int i=0; i<this.empiricalPairs.size(); i++ )
-        {
+        for( int i=0; i<this.empiricalPairs.size(); i++ ) {
             this.modelFunction.setInput( this.empiricalPairs.get( i ).getX() );
             f.setEntry( i,0 , this.modelFunction.getOutput() );
             J.setSubmatrix( i,0 , this.modelFunction.getJacobian() );
         }
         // Compute delta.
         Matrix JT = J.transpose();
-        Matrix JTJ = JT.multiply( J );
+        Matrix lambdaIplusJTJ = Matrix.one( JT.rows() ).scaleInplace( this.lambda ).addProduct( JT , J );
         Matrix fMinusY = f.subtractInplace( y );
         Matrix JTfMinusY = JT.multiply( fMinusY );
-        JTJ.choleskyDecompositionInplace();
-        this.delta = JTfMinusY.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( JTJ );
+        try {
+            lambdaIplusJTJ.choleskyDecompositionInplace();
+        } catch( IllegalArgumentException e ) {
+            throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a small damping factor with setDampingFactor method can help." );
+        }
+        this.delta = JTfMinusY.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
         // Update theta.
+        this.theta = this.modelFunction.getParameters();
         this.theta.subtractInplace( this.delta );
+        this.modelFunction.setParameters( this.theta );
         // Update iteration.
         this.iteration++;
         // Update error.
         this.error = fMinusY.transpose().multiply( fMinusY ).entry( 0,0 );
         if( this.error < this.errorBest ) {
             this.errorBest = this.error;
-            this.thetaBest = this.theta;
+            this.thetaBest = this.theta.copy();
             this.iterationBest = this.iteration;
         }
     }
@@ -230,8 +284,6 @@ public class LevenbergMarquardtAlgorithm<T>
      */
     public void iterate()
     {
-        this.initialize();
-        // Iterate.
         do {
             this.step();
         } while( !this.stoppingCriterion.isFinished( this ) );
