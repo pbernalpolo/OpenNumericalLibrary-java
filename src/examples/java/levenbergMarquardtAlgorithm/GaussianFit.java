@@ -45,7 +45,9 @@ public class GaussianFit
         gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
         algorithm.setModelFunction( gaussianUnknown );
         //algorithm.setStoppingCriterion( new IterationThresholdStoppingCriterion( 1000 ) );
+        algorithm.setDampingFactor( 1.0e-8 );
         
+        algorithm.initialize();
         algorithm.iterate();
         
         System.out.println( "Last solution was obtained after " + algorithm.getIterationLast() + " iterations, and produces an error of " + algorithm.getErrorLast() );
