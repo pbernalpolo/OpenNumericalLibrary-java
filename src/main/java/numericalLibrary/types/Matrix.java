@@ -105,12 +105,30 @@ public class Matrix
         String s = "";
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                s += String.format( " %f" , this.entryUnchecked(i,j) );
+                s += String.format( " %15.6e" , this.entryUnchecked(i,j) );
             }
             s += "\n";
         }
         s += "\n";
         return s;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden method to make it more efficient.
+     */
+    public Matrix print()
+    {
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                System.out.print( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
+            }
+            System.out.println();
+        }
+        System.out.println();
+        return this;
     }
     
     
@@ -251,6 +269,32 @@ public class Matrix
     
     
     /**
+     * Adds the product of first {@link Matrix} and second {@link Matrix}.
+     * <p>
+     * The multiplication is performed as  {@code first * second}.
+     * {@code this} must have the same rows as {@code first}, and same columns as {@code second}.
+     * {@code this} must also be different from {@code first} and {@code second}.
+     * 
+     * @param first     first factor of the {@link Matrix} multiplication.
+     * @param second    second factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code first} and {@code second} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code first} or {@code second}.
+     * @throws IllegalArgumentException     if {@code second} does not have same rows as {@code first} columns.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code first}, or columns as {@code second}.
+     */
+    public Matrix addProduct( Matrix first , Matrix second )
+    {
+        if(  this == first  ||  this == second  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"first\" and \"second\"." );
+        }
+        second.assertRows( first.cols() );
+        this.assertSize( first.rows() , second.cols() );
+        return this.addProductPrivate( first , second );
+    }
+    
+    
+    /**
      * Computes matrix multiplication.
      * <p>
      * The multiplication is performed as  this * other.
@@ -263,34 +307,8 @@ public class Matrix
     public Matrix multiply( Matrix other )
     {
         other.assertRows( this.cols() );
-        Matrix output = Matrix.empty( this.rows() , other.cols() );
-        Matrix.multiplyAlgorithm( this , other , output );
-        return output;
-    }
-    
-    
-    /**
-     * Computes matrix multiplication in place.
-     * <p>
-     * The multiplication is performed as  this * other.
-     * Since the result could not be stored in any of the multiplication factors, another matrix with same rows as this, and same columns as other must be provided.
-     * 
-     * @param other     second factor in the matrix multiplication operation.
-     * @param output    {@link Matrix} in which the result will be stored. It must be different than {@code this} and {@code other}.
-     * @return  input parameter "output" that will contain the multiplication result.
-     * 
-     * @throws IllegalArgumentException     if {@code output} is {@code this} or {@code other}.
-     * @throws IllegalArgumentException     if {@code other} does not have same rows as {@code this} columns.
-     * @throws IllegalArgumentException     if {@code output} does not have same rows as {@code this}, or columns as {@code other}.
-     */
-    public Matrix multiplyInplace( Matrix other , Matrix output )
-    {
-        if(  output == this  ||  output == other  ) {
-            throw new IllegalArgumentException( "\"output\" must be different from \"this\" and \"other\"." );
-        }
-        other.assertRows( this.cols() );
-        output.assertSize( this.rows() , other.cols() );
-        Matrix.multiplyAlgorithm( this , other , output );
+        Matrix output = Matrix.zero( this.rows() , other.cols() );
+        output.addProductPrivate( this , other );
         return output;
     }
     
@@ -1051,32 +1069,35 @@ public class Matrix
     }
     
     
+    /**
+     * Adds the product of first {@link Matrix} and second {@link Matrix}.
+     * <p>
+     * The multiplication is performed as  {@code first * second}.
+     * {@code this} must have the same rows as {@code first}, and same columns as {@code second}.
+     * {@code this} must also be different from {@code first} and {@code second}.
+     * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
+     * 
+     * @param first     first factor of the {@link Matrix} multiplication.
+     * @param second    second factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code first} and {@code second} is added.
+     */
+    private Matrix addProductPrivate( Matrix first , Matrix second )
+    {
+        for( int i=0; i<first.rows(); i++ ) {
+            for( int j=0; j<second.cols(); j++ ) {
+                for( int k=0; k<first.cols(); k++ ) {
+                    this.x[i][j] += first.entryUnchecked(i,k) * second.entryUnchecked(k,j);
+                }
+            }
+        }
+        return this;
+    }
+    
+    
     
     ////////////////////////////////////////////////////////////////
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Implements the matrix multiplication algorithm.
-     * 
-     * @param first     first factor of the matrix multiplication.
-     * @param second    second factor of the matrix multiplication.
-     * @param output    {@link Matrix} that contains the multiplication result.
-     *                  It must have same rows as {@code first}, and same columns as {@code second}
-     *                  It must be different from {@code first} and {@code second}.
-     */
-    private static void multiplyAlgorithm( Matrix first , Matrix second , Matrix output )
-    {
-        for( int i=0; i<first.rows(); i++ ) {
-            for( int j=0; j<second.cols(); j++ ) {
-                output.x[i][j] = 0.0;
-                for( int k=0; k<first.cols(); k++ ) {
-                    output.x[i][j] += first.entryUnchecked(i,k) * second.entryUnchecked(k,j);
-                }
-            }
-        }
-    }
-    
     
     /**
      * Performs a Cholesky decomposition of the form A = L * L^T.
