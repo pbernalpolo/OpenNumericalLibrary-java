@@ -81,11 +81,11 @@ public class Matrix
     }
     
     
-    public Matrix transposeInplace()
+    /*public Matrix transposeInplace()
     {
         this.setTo( this.transpose() );
         return this;
-    }
+    }*/
     
     
     /*public double trace()
@@ -646,6 +646,12 @@ public class Matrix
     }
     
     
+    /**
+     * Returns result of applying the {@link Matrix} transformation to a {@link Vector3} in a new {@link Vector3}.
+     * 
+     * @param v     {@link Vector3} to which the {@link Matrix} transformation is applied.
+     * @return  result of applying the {@link Matrix} transformation to a {@link Vector3} in a new {@link Vector3}.
+     */
     public Vector3 applyToVector3( Vector3 v )
     {
         this.assertSize( 3 , 3 );
