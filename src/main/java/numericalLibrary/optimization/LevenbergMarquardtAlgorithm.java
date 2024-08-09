@@ -249,7 +249,7 @@ public class LevenbergMarquardtAlgorithm<T>
         // Build the f vector and the Jacobian matrix.
         for( int i=0; i<this.empiricalPairs.size(); i++ ) {
             this.modelFunction.setInput( this.empiricalPairs.get( i ).getX() );
-            f.setEntry( i,0 , this.modelFunction.getOutput() );
+            f.setSubmatrix( i,0 , this.modelFunction.getOutput() );
             J.setSubmatrix( i,0 , this.modelFunction.getJacobian() );
         }
         // Compute delta.
@@ -263,19 +263,19 @@ public class LevenbergMarquardtAlgorithm<T>
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a small damping factor with setDampingFactor method can help." );
         }
         this.delta = JTfMinusY.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
-        // Update theta.
-        this.theta = this.modelFunction.getParameters();
-        this.theta.subtractInplace( this.delta );
-        this.modelFunction.setParameters( this.theta );
-        // Update iteration.
-        this.iteration++;
         // Update error.
+        this.theta = this.modelFunction.getParameters();
         this.error = fMinusY.transpose().multiply( fMinusY ).entry( 0,0 );
         if( this.error < this.errorBest ) {
             this.errorBest = this.error;
             this.thetaBest = this.theta.copy();
             this.iterationBest = this.iteration;
         }
+        // Update theta.
+        this.theta.subtractInplace( this.delta );
+        this.modelFunction.setParameters( this.theta );
+        // Update iteration.
+        this.iteration++;
     }
     
     
