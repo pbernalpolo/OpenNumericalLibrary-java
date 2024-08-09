@@ -104,10 +104,10 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
-    public double getOutput()
+    public Matrix getOutput()
     {
         this.clean();
-        return ( a * this.dfda );
+        return Matrix.one( 1 ).scaleInplace( a * this.dfda );
     }
     
     
