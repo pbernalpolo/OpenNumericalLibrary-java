@@ -3,7 +3,6 @@ package numericalLibrary.optimization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -118,13 +117,13 @@ public interface LevenbergMarquardtModelFunctionTester<T>
             // Produce output with parameter and input 1.
             modelFunction.setParameters( parameterList.get( i ) );
             modelFunction.setInput( inputList.get( i ) );
-            double output1 = modelFunction.getOutput();
+            Matrix output1 = modelFunction.getOutput();
             // Produce output with parameter and input 2.
             modelFunction.setParameters( parameterList.get( i+1 ) );
             modelFunction.setInput( inputList.get( i+1 ) );
-            double output2 = modelFunction.getOutput();
+            Matrix output2 = modelFunction.getOutput();
             // Check that the outputs are different.
-            assertNotEquals( output1 , output2 );
+            assertFalse( output1.equals( output2 ) );
         }
     }
     
@@ -154,13 +153,25 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} returns a row {@link Matrix}.
+     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} and {@link LevenbergMarquardtModelFunction#getOutput()} return {@link Matrix}s with same number of rows.
      */
     @Test
-    default void getJacobianReturnsRowMatrix()
+    default void jacobianHasSameRowsAsOutput()
     {
-        LevenbergMarquardtModelFunction<?> modelFunction = this.getModelFunction();
-        assertEquals( 1 , modelFunction.getJacobian().rows() );
+        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        List<Matrix> parameterList = this.getParameterList();
+        List<T> inputList = this.getInputList();
+        for( int i=0; i<inputList.size(); i++ ) {
+            // Set inputs and parameters.
+            modelFunction.setParameters( parameterList.get( i ) );
+            modelFunction.setInput( inputList.get( i ) );
+            // Get output.
+            Matrix output = modelFunction.getOutput();
+            // Get jacobian.
+            Matrix jacobian = modelFunction.getJacobian();
+            // Check that jacobian and output have same number of rows.
+            assertEquals( output.rows() , jacobian.rows() );
+        }
     }
     
     
