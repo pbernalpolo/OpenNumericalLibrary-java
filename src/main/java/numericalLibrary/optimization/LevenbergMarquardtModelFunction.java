@@ -49,7 +49,7 @@ public interface LevenbergMarquardtModelFunction<T>
      * 
      * @return  output of the {@link LevenbergMarquardtModelFunction}.
      */
-    public double getOutput();
+    public Matrix getOutput();
     
     
     /**
