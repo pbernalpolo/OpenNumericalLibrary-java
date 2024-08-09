@@ -388,6 +388,18 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the {@link UnitQuaternion} that rotates a {@code first} unit {@link Vector3} into a {@code second} unit {@link Vector3}.
+     * <p>
+     * The {@link UnitQuaternion} will perform rotations around the axis that is orthogonal to both {@code first} and {@code second},
+     * so that the rotation angle will be minimum.
+     * 
+     * @param first     unit {@link Vector3} that the returned {@link UnitQuaternion} will rotate into the {@code second} one.
+     * @param second    unit {@link Vector3} into which the returned {@link UnitQuaternion} will rotate the {@code first} one.
+     * @return  {@link UnitQuaternion} that rotates {@code first} unit {@link Vector3} into {@code second} unit {@link Vector3}.
+     * 
+     * @throws IllegalArgumentException if any of the input unit {@link Vector3}s are zero or NaN.
+     */
     public static UnitQuaternion thatRotatesMinimumAngleFirstToSecondVector( Vector3 first , Vector3 second )
     {
         if(  first.norm() > 0.0  &&  second.norm() > 0.0  ) {
@@ -409,6 +421,17 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the {@link UnitQuaternion} that rotates (0,0,1) into a unit {@link Vector3}.
+     * <p>
+     * The {@link UnitQuaternion} will perform rotations around the axis that is orthogonal to both (0,0,1) and {@code v},
+     * so that the rotation angle will be minimum.
+     * 
+     * @param v     unit {@link Vector3} into which the returned {@link UnitQuaternion} will rotate the (0,0,1) {@link Vector3}.
+     * @return  {@link UnitQuaternion} that rotates (0,0,1) into the unit {@link Vector3} {@code v}.
+     * 
+     * @throws IllegalArgumentException if the input unit {@link Vector3} is zero or NaN.
+     */
     public static UnitQuaternion thatRotatesMinimumAngle001To( Vector3 v )
     {
         if( v.norm() > 0.0 ) {
@@ -429,6 +452,18 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the {@link UnitQuaternion} that rotates a {@code first} unit {@link Vector3} into a {@code second} unit {@link Vector3}.
+     * <p>
+     * The {@link UnitQuaternion} will perform rotations around the axis between {@code first} and {@code second},
+     * so that the rotation angle will be maximum and equal to pi.
+     * 
+     * @param first     unit {@link Vector3} that the returned {@link UnitQuaternion} will rotate into the {@code second} one.
+     * @param second    unit {@link Vector3} into which the returned {@link UnitQuaternion} will rotate the {@code first} one.
+     * @return  {@link UnitQuaternion} that rotates {@code first} unit {@link Vector3} into {@code second} unit {@link Vector3}.
+     * 
+     * @throws IllegalArgumentException if any of the input unit {@link Vector3}s are zero or NaN.
+     */
     public static UnitQuaternion thatRotatesMaximumAngleFirstToSecondVector( Vector3 first , Vector3 second )
     {
         double firstNormSquared = first.normSquared();
@@ -446,6 +481,17 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the {@link UnitQuaternion} that rotates (0,0,1) into a unit {@link Vector3}.
+     * <p>
+     * The {@link UnitQuaternion} will perform rotations around the axis between {@code first} and {@code second},
+     * so that the rotation angle will be maximum and equal to pi.
+     * 
+     * @param v     unit {@link Vector3} into which the returned {@link UnitQuaternion} will rotate the (0,0,1) {@link Vector3}.
+     * @return  {@link UnitQuaternion} that rotates (0,0,1) into the unit {@link Vector3} {@code v}.
+     * 
+     * @throws IllegalArgumentException if the input unit {@link Vector3} is zero or NaN.
+     */
     public static UnitQuaternion thatRotatesMaximumAngle001To( Vector3 v )
     {
         double vNormSquared = v.normSquared();
@@ -461,6 +507,22 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the {@link UnitQuaternion} that rotates (0,0,1) into a unit {@link Vector3}.
+     * <p>
+     * The {@link UnitQuaternion} will perform rotations around the axis defined by {@code axisParameter} which is defined in the interval [0,1]:
+     * <ul>
+     *  <li> A value of 0 will result in the rotation being performed around the axis orthogonal to both (0,0,1) and {@code v}, so that the rotation angle will be minimum.
+     *  <li> A value of 1 will result in the rotation being performed around the axis between (0,0,1) and {@code v}, so that the rotation angle will be maximum and equal to pi.
+     * </ul>
+     * Note that this method requires {@code v} to be a unit {@link Vector3}.
+     * 
+     * @param v     unit {@link Vector3} into which the returned {@link UnitQuaternion} will rotate the (0,0,1) {@link Vector3}.
+     * @param axisParameter     parameter used to select the rotation axis.
+     * @return  {@link UnitQuaternion} that rotates (0,0,1) into the unit {@link Vector3} {@code v}.
+     * 
+     * @throws IllegalArgumentException if the input unit {@link Vector3} is zero or NaN.
+     */
     public static UnitQuaternion thatRotates001To( Vector3 v , double axisParameter )
     {
         if(  axisParameter < 0.0  ||  1.0 < axisParameter  ) {
