@@ -35,7 +35,7 @@ public class GaussianFit
         {
             double x = m/5.0;
             gaussianKnown.setInput( x );
-            empiricalPairs.add( new LevenbergMarquardtEmpiricalPair<Double>( gaussianKnown.getOutput().entry(0,0) , x ) );
+            empiricalPairs.add( new LevenbergMarquardtEmpiricalPair<Double>( gaussianKnown.getOutput() , x ) );
         }
         
         // Find a solution using the Levenberg-Marquardt algorithm.
