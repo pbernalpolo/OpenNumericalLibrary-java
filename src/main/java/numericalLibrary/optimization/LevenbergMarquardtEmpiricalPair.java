@@ -1,11 +1,18 @@
 package numericalLibrary.optimization;
 
 
+import numericalLibrary.types.Matrix;
+
+
 
 /**
  * Represents a pair of values related through a {@link LevenbergMarquardtModelFunction}.
+ * <p>
+ * The process of defining the concrete {@link LevenbergMarquardtEmpiricalPair} helps the user to think about a natural definition of the concrete {@link LevenbergMarquardtModelFunction}.
+ * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link LevenbergMarquardtModelFunction}.
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
+ * @see LevenbergMarquardtModelFunction
  */
 public class LevenbergMarquardtEmpiricalPair<T>
 {
@@ -16,7 +23,7 @@ public class LevenbergMarquardtEmpiricalPair<T>
     /**
      * Target output of the {@link LevenbergMarquardtModelFunction} when {@link #x} is inputed.
      */
-    private double y;
+    private Matrix y;
     
     
     /**
@@ -36,14 +43,14 @@ public class LevenbergMarquardtEmpiricalPair<T>
      * @param target    target output of the {@link LevenbergMarquardtModelFunction}.
      * @param sample    input to the {@link LevenbergMarquardtModelFunction}.
      */
-    public LevenbergMarquardtEmpiricalPair( double target , T sample )
+    public LevenbergMarquardtEmpiricalPair( Matrix target , T sample )
     {
         this.y = target;
         this.x = sample;
     }
-
-
-
+    
+    
+    
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
@@ -53,7 +60,7 @@ public class LevenbergMarquardtEmpiricalPair<T>
      * 
      * @return  target of the {@link LevenbergMarquardtEmpiricalPair}.
      */
-    public double getY()
+    public Matrix getY()
     {
         return this.y;
     }
