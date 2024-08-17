@@ -9,6 +9,9 @@ import numericalLibrary.types.Matrix;
  * Represents a function to be used in the {@link LevenbergMarquardtAlgorithm}.
  * <p>
  * This function models the relation between {@link LevenbergMarquardtEmpiricalPair}s.
+ * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link LevenbergMarquardtModelFunction}.
+ * 
+ * @see LevenbergMarquardtEmpiricalPair
  */
 public interface LevenbergMarquardtModelFunction<T>
 {
