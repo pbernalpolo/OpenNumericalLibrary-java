@@ -215,15 +215,23 @@ public class LevenbergMarquardtAlgorithm<T>
     {
         // Initialize parameter vector.
         this.theta = this.modelFunction.getParameters();
-        // Build y vector.
-        this.y = Matrix.empty( this.empiricalPairs.size() , 1 );
-        for( int i=0; i<this.empiricalPairs.size(); i++ )
-        {
-            this.y.setEntry( i,0 , this.empiricalPairs.get( i ).getY() );
+        // Count number of rows.
+        int numberOfRows = 0;
+        for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
+            numberOfRows += empiricalPair.getY().rows();
         }
-        // Allocate space for f and J.
-        this.f = Matrix.empty( this.empiricalPairs.size() , 1 );
-        this.J = Matrix.empty( this.empiricalPairs.size() , this.theta.rows() );
+        // Allocate space for y, f, and J.
+        this.y = Matrix.empty( numberOfRows , 1 );
+        this.f = Matrix.empty( numberOfRows , 1 );
+        this.J = Matrix.empty( numberOfRows , this.theta.rows() );
+        // Set y vector.
+        this.y = Matrix.empty( numberOfRows , 1 );
+        int index = 0;
+        for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
+            Matrix yOfEmpiricalPair = empiricalPair.getY();
+            this.y.setSubmatrix( index,0 , yOfEmpiricalPair );
+            index += yOfEmpiricalPair.rows();
+        }
         // Initialize best error.
         this.errorBest = Double.MAX_VALUE;
         // Initialize iterations.
@@ -247,10 +255,13 @@ public class LevenbergMarquardtAlgorithm<T>
             throw new IllegalStateException( "Called step() without having previously called initialize(). That method needs to be called after calling setModelFunction or setEmpiricalPairs." );
         }
         // Build the f vector and the Jacobian matrix.
-        for( int i=0; i<this.empiricalPairs.size(); i++ ) {
-            this.modelFunction.setInput( this.empiricalPairs.get( i ).getX() );
-            f.setSubmatrix( i,0 , this.modelFunction.getOutput() );
-            J.setSubmatrix( i,0 , this.modelFunction.getJacobian() );
+        int index = 0;
+        for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
+            this.modelFunction.setInput( empiricalPair.getX() );
+            Matrix fOfEmpiricalPair = this.modelFunction.getOutput();
+            f.setSubmatrix( index,0 , fOfEmpiricalPair );
+            J.setSubmatrix( index,0 , this.modelFunction.getJacobian() );
+            index += fOfEmpiricalPair.rows();
         }
         // Compute delta.
         Matrix JT = J.transpose();
