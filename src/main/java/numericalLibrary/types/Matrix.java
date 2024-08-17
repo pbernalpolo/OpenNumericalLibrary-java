@@ -102,33 +102,15 @@ public class Matrix
     
     public String toString()
     {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                s += String.format( " %15.6e" , this.entryUnchecked(i,j) );
+                sb.append( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
             }
-            s += "\n";
+            sb.append( "\n" );
         }
-        s += "\n";
-        return s;
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Overridden method to make it more efficient.
-     */
-    public Matrix print()
-    {
-        for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
-                System.out.print( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
-            }
-            System.out.println();
-        }
-        System.out.println();
-        return this;
+        sb.append( "\n" );
+        return sb.toString();
     }
     
     
