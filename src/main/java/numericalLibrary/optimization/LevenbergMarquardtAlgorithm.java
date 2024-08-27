@@ -60,13 +60,19 @@ public class LevenbergMarquardtAlgorithm<T>
     
     /**
      * Vector of output values from the {@link #modelFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #step()}.
+     * Recomputed in each {@link #updateFJAndError()}.
      */
     private Matrix f;
     
     /**
+     * Difference between current {@link #y} and {@link #f}: y - f.
+     * Recomputed in each {@link #updateFJAndError()}.
+     */
+    private Matrix yMinusF;
+    
+    /**
      * Jacobian of the {@link #modelFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #step()}.
+     * Recomputed in each {@link #updateFJAndError()}.
      */
     private Matrix J;
     
@@ -225,20 +231,22 @@ public class LevenbergMarquardtAlgorithm<T>
             }
             numberOfRows += yOfEmpiricalPair.rows();
         }
-        // Allocate space for y, f, and J.
+        // Allocate space for y, f, y-f, and J.
         this.y = Matrix.empty( numberOfRows , 1 );
         this.f = Matrix.empty( numberOfRows , 1 );
+        this.yMinusF = Matrix.empty( numberOfRows , 1 );
         this.J = Matrix.empty( numberOfRows , this.theta.rows() );
         // Set y vector.
-        this.y = Matrix.empty( numberOfRows , 1 );
         int index = 0;
         for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
             Matrix yOfEmpiricalPair = empiricalPair.getY();
             this.y.setSubmatrix( index,0 , yOfEmpiricalPair );
             index += yOfEmpiricalPair.rows();
         }
+        // Compute initial error.
+        this.updateFJAndError();
         // Initialize best error.
-        this.errorBest = Double.MAX_VALUE;
+        this.errorBest = yMinusF.transpose().multiply( yMinusF ).entry( 0,0 );
         // Initialize iterations.
         this.iteration = 0;
         // Set initialized flag.
@@ -260,20 +268,10 @@ public class LevenbergMarquardtAlgorithm<T>
         if( !this.initialized ) {
             throw new IllegalStateException( "Called step() without having previously called initialize(). That method needs to be called after calling setModelFunction or setEmpiricalPairs." );
         }
-        // Build the f vector and the Jacobian matrix.
-        int index = 0;
-        for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
-            this.modelFunction.setInput( empiricalPair.getX() );
-            Matrix fOfEmpiricalPair = this.modelFunction.getOutput();
-            f.setSubmatrix( index,0 , fOfEmpiricalPair );
-            J.setSubmatrix( index,0 , this.modelFunction.getJacobian() );
-            index += fOfEmpiricalPair.rows();
-        }
-        // Compute delta.
-        Matrix JT = J.transpose();
-        Matrix lambdaIplusJTJ = Matrix.one( JT.rows() ).scaleInplace( this.lambda ).addProduct( JT , J );
-        Matrix yMinusF = y.subtract( f );
-        Matrix JTyMinusF = JT.multiply( yMinusF );
+        // Compute delta using the last values for f and J.
+        Matrix JT = this.J.transpose();
+        Matrix lambdaIplusJTJ = Matrix.one( JT.rows() ).scaleInplace( this.lambda ).addProduct( JT , this.J );
+        Matrix JTyMinusF = JT.multiply( this.yMinusF );
         try {
             lambdaIplusJTJ.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
@@ -282,7 +280,7 @@ public class LevenbergMarquardtAlgorithm<T>
         this.delta = JTyMinusF.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
         // Update error.
         this.theta = this.modelFunction.getParameters();
-        this.error = yMinusF.transpose().multiply( yMinusF ).entry( 0,0 );
+        this.error = this.yMinusF.transpose().multiply( this.yMinusF ).entry( 0,0 );
         if( this.error < this.errorBest ) {
             this.errorBest = this.error;
             this.thetaBest = this.theta.copy();
@@ -293,6 +291,8 @@ public class LevenbergMarquardtAlgorithm<T>
         this.modelFunction.setParameters( this.theta );
         // Update iteration.
         this.iteration++;
+        // Update f, J and error for next step.
+        this.updateFJAndError();
     }
     
     
@@ -336,7 +336,7 @@ public class LevenbergMarquardtAlgorithm<T>
      */
     public int getIterationLast()
     {
-        return this.iteration;
+        return this.iteration-1;
     }
     
     
@@ -370,6 +370,30 @@ public class LevenbergMarquardtAlgorithm<T>
     public double getErrorBest()
     {
         return this.errorBest;
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE METHODS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Updates the values of {@link #f}, {@link #J}, and {@link #yMinusF} using the current {@link #modelFunction} parameters.
+     */
+    private void updateFJAndError()
+    {
+        // Build the f vector and Jacobian matrix.
+        int index = 0;
+        for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
+            this.modelFunction.setInput( empiricalPair.getX() );
+            Matrix fOfEmpiricalPair = this.modelFunction.getOutput();
+            this.f.setSubmatrix( index,0 , fOfEmpiricalPair );
+            this.J.setSubmatrix( index,0 , this.modelFunction.getJacobian() );
+            index += fOfEmpiricalPair.rows();
+        }
+        // Compute  y - f.
+        this.yMinusF.setTo( this.y ).subtractInplace( this.f );
     }
     
 }
