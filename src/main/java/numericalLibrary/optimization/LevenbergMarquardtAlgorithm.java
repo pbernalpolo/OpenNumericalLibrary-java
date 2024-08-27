@@ -206,9 +206,8 @@ public class LevenbergMarquardtAlgorithm<T>
      *  <li> Allocate space for the Jacobian of the model function.
      *  <li> Initialize the number of iterations.
      * </ul>
-     * <p>
-     * If an {@link IllegalArgumentException} is thrown because a {@link Matrix} not being positive-definite, try adding a damping factor with {@link #setDampingFactor(double)}.
      * 
+     * @throws IllegalArgumentException if the target of some empirical pair is not a column vector, or if its dimension does not match the dimension of the output of the model function.
      * @see #step()
      */
     public void initialize()
@@ -218,7 +217,13 @@ public class LevenbergMarquardtAlgorithm<T>
         // Count number of rows.
         int numberOfRows = 0;
         for( LevenbergMarquardtEmpiricalPair<T> empiricalPair : this.empiricalPairs ) {
-            numberOfRows += empiricalPair.getY().rows();
+            this.modelFunction.setInput( empiricalPair.getX() );
+            Matrix yOfEmpiricalPair = empiricalPair.getY();
+            Matrix fOfEmpiricalPair = this.modelFunction.getOutput();
+            if( yOfEmpiricalPair.rows() != fOfEmpiricalPair.rows()  ||  yOfEmpiricalPair.cols() != 1  ||  fOfEmpiricalPair.cols() != 1 ) {
+                throw new IllegalArgumentException( "Target of LevenbergMarquardtEmpiricalPair must be a column vector with same rows as output of LevenbergMarquardtModelFunction." );
+            }
+            numberOfRows += yOfEmpiricalPair.rows();
         }
         // Allocate space for y, f, and J.
         this.y = Matrix.empty( numberOfRows , 1 );
@@ -244,8 +249,9 @@ public class LevenbergMarquardtAlgorithm<T>
     /**
      * Performs a step using the Levenberg-Marquardt algorithm.
      * <p>
-     * If an {@link IllegalArgumentException} is thrown because a {@link Matrix} not being positive-definite, try adding a damping factor with {@link #setDampingFactor(double)}.
+     * If an {@link IllegalStateException} is thrown because a {@link Matrix} not being positive-definite, try adding a damping factor with {@link #setDampingFactor(double)}.
      * 
+     * @throws IllegalStateException if a non positive-definite {@link Matrix} is obtained. In such a case, try adding a damping factor with {@link #setDampingFactor(double)}.
      * @see #initialize()
      * @see #iterate()
      */
@@ -266,24 +272,24 @@ public class LevenbergMarquardtAlgorithm<T>
         // Compute delta.
         Matrix JT = J.transpose();
         Matrix lambdaIplusJTJ = Matrix.one( JT.rows() ).scaleInplace( this.lambda ).addProduct( JT , J );
-        Matrix fMinusY = f.subtractInplace( y );
-        Matrix JTfMinusY = JT.multiply( fMinusY );
+        Matrix yMinusF = y.subtract( f );
+        Matrix JTyMinusF = JT.multiply( yMinusF );
         try {
             lambdaIplusJTJ.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a small damping factor with setDampingFactor method can help." );
         }
-        this.delta = JTfMinusY.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
+        this.delta = JTyMinusF.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
         // Update error.
         this.theta = this.modelFunction.getParameters();
-        this.error = fMinusY.transpose().multiply( fMinusY ).entry( 0,0 );
+        this.error = yMinusF.transpose().multiply( yMinusF ).entry( 0,0 );
         if( this.error < this.errorBest ) {
             this.errorBest = this.error;
             this.thetaBest = this.theta.copy();
             this.iterationBest = this.iteration;
         }
         // Update theta.
-        this.theta.subtractInplace( this.delta );
+        this.theta.addInplace( this.delta );
         this.modelFunction.setParameters( this.theta );
         // Update iteration.
         this.iteration++;
