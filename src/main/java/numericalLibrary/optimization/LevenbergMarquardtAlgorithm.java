@@ -245,10 +245,12 @@ public class LevenbergMarquardtAlgorithm<T>
         }
         // Compute initial error.
         this.updateFJAndError();
-        // Initialize best error.
-        this.errorBest = yMinusF.transpose().multiply( yMinusF ).entry( 0,0 );
         // Initialize iterations.
         this.iteration = 0;
+        // Initialize best error.
+        this.errorBest = yMinusF.transpose().multiply( yMinusF ).entry( 0,0 );
+        this.thetaBest = this.theta.copy();
+        this.iterationBest = this.iteration;
         // Set initialized flag.
         this.initialized = true;
     }
