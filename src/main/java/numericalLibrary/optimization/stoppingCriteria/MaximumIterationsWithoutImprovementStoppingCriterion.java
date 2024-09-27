@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.stoppingCriteria;
 
 
-import numericalLibrary.optimization.LevenbergMarquardtAlgorithm;
+import numericalLibrary.optimization.IterativeOptimizationAlgorithm;
 
 
 
@@ -34,7 +34,7 @@ public class MaximumIterationsWithoutImprovementStoppingCriterion
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
-    public boolean isFinished( LevenbergMarquardtAlgorithm<?> iterativeAlgorithm )
+    public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm )
     {
         double errorBest = iterativeAlgorithm.getErrorBest();
         if( errorBest < this.errorBestLast ) {
