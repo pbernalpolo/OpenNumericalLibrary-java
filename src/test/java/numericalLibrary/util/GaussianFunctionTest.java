@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import numericalLibrary.optimization.LevenbergMarquardtModelFunction;
-import numericalLibrary.optimization.LevenbergMarquardtModelFunctionTester;
+import numericalLibrary.optimization.OptimizableFunction;
+import numericalLibrary.optimization.OptimizableFunctionTester;
 import numericalLibrary.types.Matrix;
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  */
 class GaussianFunctionTest
     implements
-        LevenbergMarquardtModelFunctionTester<Double>
+        OptimizableFunctionTester<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
@@ -25,7 +25,7 @@ class GaussianFunctionTest
     /**
      * {@inheritDoc}
      */
-    public LevenbergMarquardtModelFunction<Double> getModelFunction()
+    public OptimizableFunction<Double> getModelFunction()
     {
         return new GaussianFunction();
     }
