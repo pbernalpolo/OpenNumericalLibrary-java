@@ -6,28 +6,28 @@ import numericalLibrary.types.Matrix;
 
 
 /**
- * Represents a pair of values related through a {@link LevenbergMarquardtModelFunction}.
+ * Represents a pair of values related through a {@link OptimizableFunction}.
  * <p>
- * The process of defining the concrete {@link LevenbergMarquardtEmpiricalPair} helps the user to think about a natural definition of the concrete {@link LevenbergMarquardtModelFunction}.
- * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link LevenbergMarquardtModelFunction}.
+ * The process of defining the concrete {@link LevenbergMarquardtEmpiricalPair} helps the user to think about a natural definition of the concrete {@link OptimizableFunction}.
+ * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link OptimizableFunction}.
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
- * @see LevenbergMarquardtModelFunction
+ * @see OptimizableFunction
  */
-public class LevenbergMarquardtEmpiricalPair<T>
+public class LeastSquaresDataPair<T>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Target output of the {@link LevenbergMarquardtModelFunction} when {@link #x} is inputed.
+     * Target output of the {@link OptimizableFunction} when {@link #x} is inputed.
      */
     private Matrix y;
     
     
     /**
-     * Input to the {@link LevenbergMarquardtModelFunction} for which the target {@link #y} is expected.
+     * Input to the {@link OptimizableFunction} for which the target {@link #y} is expected.
      */
     private T x;
     
@@ -40,13 +40,13 @@ public class LevenbergMarquardtEmpiricalPair<T>
     /**
      * Constructs a {@link LevenbergMarquardtEmpiricalPair}.
      * 
-     * @param target    target output of the {@link LevenbergMarquardtModelFunction}.
-     * @param sample    input to the {@link LevenbergMarquardtModelFunction}.
+     * @param target    target output of the {@link OptimizableFunction}.
+     * @param input    input to the {@link OptimizableFunction}.
      */
-    public LevenbergMarquardtEmpiricalPair( Matrix target , T sample )
+    public LeastSquaresDataPair( Matrix target , T input )
     {
         this.y = target;
-        this.x = sample;
+        this.x = input;
     }
     
     
@@ -60,7 +60,7 @@ public class LevenbergMarquardtEmpiricalPair<T>
      * 
      * @return  target of the {@link LevenbergMarquardtEmpiricalPair}.
      */
-    public Matrix getY()
+    public Matrix getTarget()
     {
         return this.y;
     }
@@ -71,7 +71,7 @@ public class LevenbergMarquardtEmpiricalPair<T>
      * 
      * @return  input of the {@link LevenbergMarquardtEmpiricalPair}.
      */
-    public T getX()
+    public T getInput()
     {
         return this.x;
     }

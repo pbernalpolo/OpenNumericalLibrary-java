@@ -1,7 +1,7 @@
 package numericalLibrary.util;
 
 
-import numericalLibrary.optimization.LevenbergMarquardtModelFunction;
+import numericalLibrary.optimization.OptimizableFunction;
 import numericalLibrary.types.Matrix;
 
 
@@ -15,7 +15,7 @@ import numericalLibrary.types.Matrix;
  * @see <a href>https://en.wikipedia.org/wiki/Gaussian_function</a>
  */
 public class GaussianFunction
-    implements LevenbergMarquardtModelFunction<Double>
+    implements OptimizableFunction<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES

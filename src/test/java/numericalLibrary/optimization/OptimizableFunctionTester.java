@@ -14,40 +14,40 @@ import numericalLibrary.types.Matrix;
 
 
 /**
- * Implements test methods for {@link LevenbergMarquardtModelFunction}.
+ * Implements test methods for {@link OptimizableFunction}.
  * 
- * @param <T>   concrete type of {@link LevenbergMarquardtModelFunction}.
+ * @param <T>   concrete type of {@link OptimizableFunction}.
  */
-public interface LevenbergMarquardtModelFunctionTester<T>
+public interface OptimizableFunctionTester<T>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Returns the {@link LevenbergMarquardtModelFunction} to be tested.
+     * Returns the {@link OptimizableFunction} to be tested.
      * 
-     * @return  {@link LevenbergMarquardtModelFunction} to be tested.
+     * @return  {@link OptimizableFunction} to be tested.
      */
-    public LevenbergMarquardtModelFunction<T> getModelFunction();
+    public OptimizableFunction<T> getModelFunction();
     
     
     /**
-     * Returns a list of inputs to evaluate the {@link LevenbergMarquardtModelFunction}.
+     * Returns a list of inputs to evaluate the {@link OptimizableFunction}.
      * <p>
      * The size of the list must be the same as the size returned by {@link #getParameterList()}.
      * 
-     * @return  list of inputs to evaluate the {@link LevenbergMarquardtModelFunction}.
+     * @return  list of inputs to evaluate the {@link OptimizableFunction}.
      */
     public List<T> getInputList();
     
     
     /**
-     * Returns a list of parameters to evaluate the {@link LevenbergMarquardtModelFunction}.
+     * Returns a list of parameters to evaluate the {@link OptimizableFunction}.
      * <p>
      * The size of the list must be the same as the size returned by {@link #getInputList()}.
      * 
-     * @return  list of parameters to evaluate the {@link LevenbergMarquardtModelFunction}.
+     * @return  list of parameters to evaluate the {@link OptimizableFunction}.
      */
     public List<Matrix> getParameterList();
     
@@ -68,13 +68,13 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link LevenbergMarquardtModelFunction#getParameters()} returns a column {@link Matrix}.
+     * Tests that {@link OptimizableFunction#getParameters()} returns a column {@link Matrix}.
      */
     @Test
     default void getParametersReturnColumnMatrix()
     {
         // Get parameters from model function.
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         Matrix parameters = modelFunction.getParameters();
         // They must be a column matrix.
         assertEquals( 1 , parameters.cols() );
@@ -82,13 +82,13 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     
     
     /**
-     * Tests that calling {@link LevenbergMarquardtModelFunction#getParameters()}, then {@link LevenbergMarquardtModelFunction#setParameters(Matrix)}, and then {@link LevenbergMarquardtModelFunction#getParameters()} again returns same parameters we started with.
+     * Tests that calling {@link OptimizableFunction#getParameters()}, then {@link OptimizableFunction#setParameters(Matrix)}, and then {@link OptimizableFunction#getParameters()} again returns same parameters we started with.
      */
     @Test
     default void setParametersGetParametersDoesNotChangeParameters()
     {
         // Get model function.
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         // Get parameter list.
         List<Matrix> parameterList = this.getParameterList();
         for( int i=0; i<parameterList.size(); i++ ) {
@@ -110,7 +110,7 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     @Test
     default void differentInputsProduceDifferentOutputs()
     {
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
@@ -134,7 +134,7 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     @Test
     default void differentInputsProduceDifferentJacobian()
     {
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
@@ -153,12 +153,12 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} and {@link LevenbergMarquardtModelFunction#getOutput()} return {@link Matrix}s with same number of rows.
+     * Tests that {@link OptimizableFunction#getJacobian()} and {@link OptimizableFunction#getOutput()} return {@link Matrix}s with same number of rows.
      */
     @Test
     default void jacobianHasSameRowsAsOutput()
     {
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size(); i++ ) {
@@ -176,13 +176,13 @@ public interface LevenbergMarquardtModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link LevenbergMarquardtModelFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
+     * Tests that {@link OptimizableFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
      */
     @Test
     default void jacobianHasSameColumnsAsParameters()
     {
         // Get parameters from model function.
-        LevenbergMarquardtModelFunction<T> modelFunction = this.getModelFunction();
+        OptimizableFunction<T> modelFunction = this.getModelFunction();
         Matrix parameters = modelFunction.getParameters();
         // Get the Jacobian.
         Matrix jacobian = modelFunction.getJacobian();
