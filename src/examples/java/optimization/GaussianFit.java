@@ -1,11 +1,12 @@
-package levenbergMarquardtAlgorithm;
+package optimization;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import numericalLibrary.optimization.LevenbergMarquardtAlgorithm;
-import numericalLibrary.optimization.LevenbergMarquardtEmpiricalPair;
+import numericalLibrary.optimization.LeastSquaresDataPair;
+import numericalLibrary.optimization.LeastSquaresFunction;
 import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStoppingCriterion;
 import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
 import numericalLibrary.types.Matrix;
@@ -30,20 +31,20 @@ public class GaussianFit
         gaussianKnown.setParameters( parameters );
         
         // Sample with the known Gaussian function.
-        List<LevenbergMarquardtEmpiricalPair<Double>> empiricalPairs = new ArrayList<LevenbergMarquardtEmpiricalPair<Double>>();
+        List<LeastSquaresDataPair<Double>> empiricalPairList = new ArrayList<LeastSquaresDataPair<Double>>();
         for( int m=0; m<10; m++ )
         {
             double x = m/5.0;
             gaussianKnown.setInput( x );
-            empiricalPairs.add( new LevenbergMarquardtEmpiricalPair<Double>( gaussianKnown.getOutput() , x ) );
+            empiricalPairList.add( new LeastSquaresDataPair<Double>( gaussianKnown.getOutput() , x ) );
         }
         
         // Find a solution using the Levenberg-Marquardt algorithm.
-        LevenbergMarquardtAlgorithm<Double> algorithm = new LevenbergMarquardtAlgorithm<Double>();
-        algorithm.setEmpiricalPairs( empiricalPairs );
+        LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>> algorithm = new LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>>();
+        algorithm.setOptimizableFunctionInputList( empiricalPairList );
         GaussianFunction gaussianUnknown = new GaussianFunction();
         gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
-        algorithm.setModelFunction( gaussianUnknown );
+        algorithm.setOptimizableFunction( new LeastSquaresFunction<Double>( gaussianUnknown ) );
         //algorithm.setStoppingCriterion( new IterationThresholdStoppingCriterion( 1000 ) );
         algorithm.setDampingFactor( 1.0e-8 );
         
