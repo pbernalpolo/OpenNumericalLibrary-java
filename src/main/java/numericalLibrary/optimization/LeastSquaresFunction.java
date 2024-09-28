@@ -6,12 +6,13 @@ import numericalLibrary.types.Matrix;
 
 
 /**
- * Represents a pair of values related through a {@link OptimizableFunction}.
+ * {@link LeastSquaresFunction} is the {@link OptimizableFunction} to be used when using an {@link IterativeOptimizationAlgorithm} to solve a least squares problem.
  * <p>
- * The process of defining the concrete {@link LevenbergMarquardtEmpiricalPair} helps the user to think about a natural definition of the concrete {@link OptimizableFunction}.
- * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link OptimizableFunction}.
+ * In particular, the {@link OptimizableFunction} is defined as:
+ * f( x_i , theta ) = f_model( x_i , theta ) - y_i
+ * so by optimizing the squared norm of f( x_i , theta ) we obtain the parameter vector theta that best approximates the relation
+ * f_model( x_i , theta ) = y_i
  * 
- * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
  * @see OptimizableFunction
  */
 public class LeastSquaresFunction<T>
@@ -21,17 +22,27 @@ public class LeastSquaresFunction<T>
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
-    
+    /**
+     * Function f_model( x_i , theta ) that models the relation between the input data and the target data.
+     */
     private OptimizableFunction<T> modelFunction;
     
-    
+    /**
+     * Target output of the {@link #modelFunction}.
+     */
     private Matrix target;
+    
     
     
     ////////////////////////////////////////////////////////////////
     // PUBLIC CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Constructs a {@link LeastSquaresFunction}.
+     * 
+     * @param optimizableFunction   {@link OptimizableFunction} that models the relation between input data and target data.
+     */
     public LeastSquaresFunction( OptimizableFunction<T> optimizableFunction )
     {
         this.modelFunction = optimizableFunction;
@@ -43,18 +54,27 @@ public class LeastSquaresFunction<T>
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * {@inheritDoc}
+     */
     public void setParameters( Matrix theta )
     {
         this.modelFunction.setParameters( theta );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix getParameters()
     {
         return this.modelFunction.getParameters();
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public void setInput( LeastSquaresDataPair<T> xy )
     {
         this.modelFunction.setInput( xy.getInput() );
@@ -62,12 +82,18 @@ public class LeastSquaresFunction<T>
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix getOutput()
     {
         return this.modelFunction.getOutput().subtract( this.target );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix getJacobian()
     {
         return this.modelFunction.getJacobian();

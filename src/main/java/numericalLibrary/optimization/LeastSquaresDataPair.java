@@ -7,11 +7,7 @@ import numericalLibrary.types.Matrix;
 
 /**
  * Represents a pair of values related through a {@link OptimizableFunction}.
- * <p>
- * The process of defining the concrete {@link LevenbergMarquardtEmpiricalPair} helps the user to think about a natural definition of the concrete {@link OptimizableFunction}.
- * It is advised to start thinking about the {@link LevenbergMarquardtEmpiricalPair} before thinking about the {@link OptimizableFunction}.
  * 
- * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
  * @see OptimizableFunction
  */
 public class LeastSquaresDataPair<T>
@@ -38,7 +34,7 @@ public class LeastSquaresDataPair<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Constructs a {@link LevenbergMarquardtEmpiricalPair}.
+     * Constructs a {@link LeastSquaresDataPair}.
      * 
      * @param target    target output of the {@link OptimizableFunction}.
      * @param input    input to the {@link OptimizableFunction}.
@@ -56,9 +52,9 @@ public class LeastSquaresDataPair<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Returns the target of the {@link LevenbergMarquardtEmpiricalPair}.
+     * Returns the target of the {@link LeastSquaresDataPair}.
      * 
-     * @return  target of the {@link LevenbergMarquardtEmpiricalPair}.
+     * @return  target of the {@link LeastSquaresDataPair}.
      */
     public Matrix getTarget()
     {
@@ -67,9 +63,9 @@ public class LeastSquaresDataPair<T>
     
     
     /**
-     * Returns the input of the {@link LevenbergMarquardtEmpiricalPair}.
+     * Returns the input of the {@link LeastSquaresDataPair}.
      * 
-     * @return  input of the {@link LevenbergMarquardtEmpiricalPair}.
+     * @return  input of the {@link LeastSquaresDataPair}.
      */
     public T getInput()
     {
