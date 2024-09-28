@@ -218,11 +218,12 @@ public abstract class IterativeOptimizationAlgorithm<T>
         this.f = Matrix.empty( numberOfRows , 1 );
         this.J = Matrix.empty( numberOfRows , this.theta.rows() );
         // Compute initial error.
-        this.updateFJAndError();
+        this.update_fAndJ();
         // Initialize iterations.
         this.iteration = 0;
         // Initialize best error.
-        this.errorBest = f.transpose().multiply( f ).entry( 0,0 );
+        this.error = f.transpose().multiply( f ).entry( 0,0 );
+        this.errorBest = this.error;
         this.thetaBest = this.theta.copy();
         this.iterationBest = this.iteration;
         // Set initialized flag.
@@ -244,21 +245,21 @@ public abstract class IterativeOptimizationAlgorithm<T>
         }
         // Compute delta using the last values for f and J.
         this.delta = this.computeDelta();
-        // Update error.
+        // Update theta.
         this.theta = this.optimizableFunction.getParameters();
+        this.theta.addInplace( this.delta );
+        this.optimizableFunction.setParameters( this.theta );
+        // Update iteration.
+        this.iteration++;
+        // Update f, J and error for next step.
+        this.update_fAndJ();
+        // Update error.
         this.error = this.f.transpose().multiply( this.f ).entry( 0,0 );
         if( this.error < this.errorBest ) {
             this.errorBest = this.error;
             this.thetaBest = this.theta.copy();
             this.iterationBest = this.iteration;
         }
-        // Update theta.
-        this.theta.addInplace( this.delta );
-        this.optimizableFunction.setParameters( this.theta );
-        // Update iteration.
-        this.iteration++;
-        // Update f, J and error for next step.
-        this.updateFJAndError();
     }
     
     
@@ -302,7 +303,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
      */
     public int getIterationLast()
     {
-        return this.iteration-1;
+        return this.iteration;
     }
     
     
@@ -347,7 +348,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
     /**
      * Updates the values of {@link #f}, and {@link #J} using the current {@link #optimizableFunction} parameters.
      */
-    private void updateFJAndError()
+    private void update_fAndJ()
     {
         // Build the f vector and Jacobian matrix.
         int index = 0;
