@@ -69,15 +69,14 @@ public class LevenbergMarquardtAlgorithm<T>
      */
     protected Matrix computeDelta()
     {
-        Matrix JT = this.J.transpose();
-        Matrix lambdaIplusJTJ = Matrix.one( JT.rows() ).scaleInplace( this.lambda ).addProduct( JT , this.J );
-        Matrix JTf = JT.multiply( this.f );
+        Matrix lambdaIplusJTWJ = Matrix.one( this.JTW.rows() ).scaleInplace( this.lambda ).addProduct( this.JTW , this.J );
+        Matrix JTWf = this.JTW.multiply( this.f );
         try {
-            lambdaIplusJTJ.choleskyDecompositionInplace();
+            lambdaIplusJTWJ.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a small damping factor with setDampingFactor method can help." );
         }
-        return JTf.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTJ );
+        return JTWf.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( lambdaIplusJTWJ );
     }
     
 }

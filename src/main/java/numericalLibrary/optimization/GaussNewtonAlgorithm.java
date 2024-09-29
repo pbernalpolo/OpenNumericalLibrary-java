@@ -30,15 +30,14 @@ public class GaussNewtonAlgorithm<T>
      */
     protected Matrix computeDelta()
     {
-        Matrix JT = this.J.transpose();
-        Matrix JTJ = JT.multiply( this.J );
-        Matrix JTf = JT.multiply( this.f );
+        Matrix JTWJ = this.JTW.multiply( this.J );
+        Matrix JTWf = this.JTW.multiply( this.f );
         try {
-            JTJ.choleskyDecompositionInplace();
+            JTWJ.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Using the Levenberg-Marquardt algorithm using a small damping factor can help." );
         }
-        return JTf.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( JTJ );
+        return JTWf.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( JTWJ );
     }
     
 }
