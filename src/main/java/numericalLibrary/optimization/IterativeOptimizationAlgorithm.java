@@ -3,6 +3,8 @@ package numericalLibrary.optimization;
 
 import java.util.List;
 
+import numericalLibrary.optimization.robustFunctions.IdentityRobustFunction;
+import numericalLibrary.optimization.robustFunctions.RobustFunction;
 import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStoppingCriterion;
 import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
 import numericalLibrary.optimization.stoppingCriteria.OrOperatorOnStoppingCriteria;
@@ -17,7 +19,7 @@ import numericalLibrary.types.Matrix;
 public abstract class IterativeOptimizationAlgorithm<T>
 {
     ////////////////////////////////////////////////////////////////
-    // PUBLIC ABSTRACT METHODS
+    // PROTECTED ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -38,15 +40,21 @@ public abstract class IterativeOptimizationAlgorithm<T>
     
     /**
      * Vector of output values from the {@link #optimizableFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #updateFJAndError()}.
+     * Recomputed in each {@link #update_fAndJ()}.
      */
     protected Matrix f;
     
     /**
      * Jacobian of the {@link #optimizableFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #updateFJAndError()}.
+     * Recomputed in each {@link #update_fAndJ()}.
      */
     protected Matrix J;
+    
+    /**
+     * Transposed of {@link #J} multiplied by the weight matrix W.
+     * Recomputed in each {@link #update_fAndJ()}
+     */
+    protected Matrix JTW;
     
     
     
@@ -60,9 +68,19 @@ public abstract class IterativeOptimizationAlgorithm<T>
     private OptimizableFunction<T> optimizableFunction;
     
     /**
+     * Robust function that defines the cost of the error squared.
+     */
+    private RobustFunction robustFunction;
+    
+    /**
      * List of input data to {@link #optimizableFunction}.
      */
-    private List<T> optimizableFunctionInputList;
+    private List<T> inputList;
+    
+    /**
+     * List of weights associated to each input data in {@link #inputList}.
+     */
+    private List<Double> weightList;
     
     /**
      * Stopping criterion used to stop the iterative algorithm.
@@ -131,6 +149,8 @@ public abstract class IterativeOptimizationAlgorithm<T>
      */
     protected IterativeOptimizationAlgorithm()
     {
+        // Default robust function.
+        this.robustFunction = new IdentityRobustFunction();
         // Default stopping criteria.
         MaximumIterationsWithoutImprovementStoppingCriterion first = new MaximumIterationsWithoutImprovementStoppingCriterion( 20 );
         IterationThresholdStoppingCriterion second = new IterationThresholdStoppingCriterion( 1000 );
@@ -159,13 +179,30 @@ public abstract class IterativeOptimizationAlgorithm<T>
     
     
     /**
+     * Sets the robust function that defines the cost of the error squared.
+     * 
+     * @param theRobustFunction     robust function that defines the cost of the error squared.
+     */
+    public void setRobustFunction( RobustFunction theRobustFunction )
+    {
+        this.robustFunction = theRobustFunction;
+        // Now it will be necessary to call initialize().
+        this.initialized = false;
+    }
+    
+    
+    /**
      * Sets the list of inputs to the {@link #optimizableFunction} whose output is to be optimized.
      * 
      * @param optimizableFunctionInputList     list of inputs to the {@link #optimizableFunction} whose output is to be optimized.
      */
-    public void setOptimizableFunctionInputList( List<T> optimizableFunctionInputList )
+    public void setOptimizableFunctionInputList( List<T> optimizableFunctionInputList , List<Double> inputWeightList )
     {
-        this.optimizableFunctionInputList = optimizableFunctionInputList;
+        if( optimizableFunctionInputList.size() != inputWeightList.size() ) {
+            throw new IllegalArgumentException( "Incompatible list sizes in optimizableFunctionInputList and inputWeightList." );
+        }
+        this.inputList = optimizableFunctionInputList;
+        this.weightList = inputWeightList;
         // Now it will be necessary to call initialize().
         this.initialized = false;
     }
@@ -202,7 +239,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
         this.theta = this.optimizableFunction.getParameters();
         // Count number of rows.
         int numberOfRows = 0;
-        for( T input : this.optimizableFunctionInputList ) {
+        for( T input : this.inputList ) {
             this.optimizableFunction.setInput( input );
             Matrix output = this.optimizableFunction.getOutput();
             Matrix jacobian = this.optimizableFunction.getJacobian();
@@ -217,6 +254,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
         // Allocate space for f, and J.
         this.f = Matrix.empty( numberOfRows , 1 );
         this.J = Matrix.empty( numberOfRows , this.theta.rows() );
+        this.JTW = Matrix.empty( this.theta.rows() , numberOfRows );
         // Compute initial error.
         this.update_fAndJ();
         // Initialize iterations.
@@ -352,11 +390,16 @@ public abstract class IterativeOptimizationAlgorithm<T>
     {
         // Build the f vector and Jacobian matrix.
         int index = 0;
-        for( T input : this.optimizableFunctionInputList ) {
+        for( int i=0; i<this.inputList.size(); i++ ) {
+            T input = this.inputList.get( i );
             this.optimizableFunction.setInput( input );
             Matrix output = this.optimizableFunction.getOutput();
             this.f.setSubmatrix( index,0 , output );
-            this.J.setSubmatrix( index,0 , this.optimizableFunction.getJacobian() );
+            Matrix jacobian = this.optimizableFunction.getJacobian();
+            this.J.setSubmatrix( index,0 , jacobian );
+            double errorSquared = output.transpose().multiply( output ).entry( 0,0 );
+            double robustWeight = this.weightList.get( i ) * this.robustFunction.f1( errorSquared );
+            this.JTW.setSubmatrix( 0,index , jacobian.transpose().scaleInplace( robustWeight ) );
             index += output.rows();
         }
     }
