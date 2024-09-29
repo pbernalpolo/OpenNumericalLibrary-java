@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import numericalLibrary.optimization.LevenbergMarquardtAlgorithm;
+import numericalLibrary.optimization.robustFunctions.WelschRobustFunction;
 import numericalLibrary.optimization.LeastSquaresDataPair;
 import numericalLibrary.optimization.LeastSquaresFunction;
 import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStoppingCriterion;
@@ -32,24 +33,33 @@ public class GaussianFit
         
         // Sample with the known Gaussian function.
         List<LeastSquaresDataPair<Double>> empiricalPairList = new ArrayList<LeastSquaresDataPair<Double>>();
+        List<Double> inputWeightList = new ArrayList<Double>();
         for( int m=0; m<10; m++ )
         {
             double x = m/5.0;
             gaussianKnown.setInput( x );
             empiricalPairList.add( new LeastSquaresDataPair<Double>( gaussianKnown.getOutput() , x ) );
+            inputWeightList.add( 1.0 );
         }
         
         // Find a solution using the Levenberg-Marquardt algorithm.
         LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>> algorithm = new LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>>();
-        algorithm.setOptimizableFunctionInputList( empiricalPairList );
+        algorithm.setRobustFunction( new WelschRobustFunction( 1.0 ) );
+        algorithm.setOptimizableFunctionInputList( empiricalPairList , inputWeightList );
         GaussianFunction gaussianUnknown = new GaussianFunction();
         gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
         algorithm.setOptimizableFunction( new LeastSquaresFunction<Double>( gaussianUnknown ) );
         //algorithm.setStoppingCriterion( new IterationThresholdStoppingCriterion( 1000 ) );
-        algorithm.setDampingFactor( 1.0e-8 );
+        algorithm.setDampingFactor( 1.0e-4 );
         
         algorithm.initialize();
-        algorithm.iterate();
+        System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getErrorLast() );
+        for( int i=0; i<50; i++) {
+            algorithm.step();
+            System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getErrorLast() );
+        }
+        //algorithm.iterate();
+        System.out.println();
         
         System.out.println( "Last solution was obtained after " + algorithm.getIterationLast() + " iterations, and produces an error of " + algorithm.getErrorLast() );
         System.out.println( "Last solution is:" );
