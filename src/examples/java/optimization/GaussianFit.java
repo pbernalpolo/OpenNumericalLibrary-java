@@ -45,7 +45,7 @@ public class GaussianFit
         // Find a solution using the Levenberg-Marquardt algorithm.
         LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>> algorithm = new LevenbergMarquardtAlgorithm<LeastSquaresDataPair<Double>>();
         algorithm.setRobustFunction( new WelschRobustFunction( 1.0 ) );
-        algorithm.setOptimizableFunctionInputList( empiricalPairList , inputWeightList );
+        algorithm.setInputList( empiricalPairList , inputWeightList );
         GaussianFunction gaussianUnknown = new GaussianFunction();
         gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
         algorithm.setOptimizableFunction( new LeastSquaresFunction<Double>( gaussianUnknown ) );
@@ -53,19 +53,19 @@ public class GaussianFit
         algorithm.setDampingFactor( 1.0e-4 );
         
         algorithm.initialize();
-        System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getErrorLast() );
+        System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getCostLast() );
         for( int i=0; i<50; i++) {
             algorithm.step();
-            System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getErrorLast() );
+            System.out.println( "error after " + algorithm.getIterationLast() + " iterations: " + algorithm.getCostLast() );
         }
         //algorithm.iterate();
         System.out.println();
         
-        System.out.println( "Last solution was obtained after " + algorithm.getIterationLast() + " iterations, and produces an error of " + algorithm.getErrorLast() );
+        System.out.println( "Last solution was obtained after " + algorithm.getIterationLast() + " iterations, and produces an error of " + algorithm.getCostLast() );
         System.out.println( "Last solution is:" );
         algorithm.getSolutionLast().print();
         
-        System.out.println( "Best solution was obtained after " + algorithm.getIterationBest() + " iterations, and produces an error of " + algorithm.getErrorBest() );
+        System.out.println( "Best solution was obtained after " + algorithm.getIterationBest() + " iterations, and produces an error of " + algorithm.getCostBest() );
         System.out.println( "Best solution is:" );
         algorithm.getSolutionBest().print();
     }
