@@ -15,22 +15,56 @@ import numericalLibrary.types.Matrix;
 
 /**
  * Base class for every iterative optimization algorithm.
+ * <p>
+ * Every {@link IterativeOptimizationAlgorithm} aims to minimize a cost function of the form:
+ * C( theta ) = \sum_i g( || f( x_i , theta ) ||^2 )
+ * where,
+ * - { x_i }_{i=1}^N is the set of inputs to the {@link OptimizableFunction} f,
+ * - theta is the parameter vector,
+ * - g is a robust function that defines the cost of each error squared.
  */
 public abstract class IterativeOptimizationAlgorithm<T>
 {
     ////////////////////////////////////////////////////////////////
-    // PROTECTED ABSTRACT METHODS
+    // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Computes delta using the last values for f and J.
-     * Performs a step of the {@link IterativeOptimizationAlgorithm}.
-     * 
-     * @throws IllegalStateException if {@link #initialize()} has not been called previously.
-     * @see #initialize()
-     * @see #iterate()
+     * Allocates space for variables used in the concrete {@link IterativeOptimizationAlgorithm}.
      */
-    protected abstract Matrix computeDelta();
+    public abstract void allocateSpace( int numberOfParameters );
+    
+    
+    /**
+     * Computes quantities that are necessary to obtain the delta vector (parameters increment).
+     * <p>
+     * This method allows to improve performance avoiding the computation of the cost.
+     */
+    public abstract void updateDelta();
+    
+    
+    /**
+     * Computes quantities that are necessary to obtain the value of the cost and the delta vector (parameters increment).
+     * <p>
+     * This method allows to compute the cost and the value of delta at the same time.
+     */
+    public abstract void updateCostAndDelta();
+    
+    
+    /**
+     * Returns the cost obtained after the last call to {@link #updateCostAndDelta()}.
+     * 
+     * @return  cost obtained after the last call to {@link #updateCostAndDelta()}.
+     */
+    public abstract double cost();
+
+    
+    /**
+     * Returns the delta in the parameter space computed with the concrete {@link IterativeOptimizationAlgorithm}.
+     * <p>
+     * The value returned is the one obtained after the last call to {@link #updateDelta()} or {@link #updateCostAndDelta()}.
+     */
+    public abstract Matrix deltaParameters();
     
     
     
@@ -39,48 +73,30 @@ public abstract class IterativeOptimizationAlgorithm<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Vector of output values from the {@link #optimizableFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #update_fAndJ()}.
+     * Vector function whose norm squared will be minimized by this {@link IterativeOptimizationAlgorithm}.
      */
-    protected Matrix f;
+    protected OptimizableFunction<T> optimizableFunction;
     
     /**
-     * Jacobian of the {@link #optimizableFunction} at the current {@link #theta}.
-     * Recomputed in each {@link #update_fAndJ()}.
+     * Robust function that defines the cost of the error squared.
      */
-    protected Matrix J;
+    protected RobustFunction robustFunction;
     
     /**
-     * Transposed of {@link #J} multiplied by the weight matrix W.
-     * Recomputed in each {@link #update_fAndJ()}
+     * List of input data to {@link #optimizableFunction}.
      */
-    protected Matrix JTW;
+    protected List<T> inputList;
+    
+    /**
+     * List of weights associated to each input data in {@link #inputList}.
+     */
+    protected List<Double> weightList;
     
     
     
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Vector function whose norm squared will be minimized by this {@link IterativeOptimizationAlgorithm}.
-     */
-    private OptimizableFunction<T> optimizableFunction;
-    
-    /**
-     * Robust function that defines the cost of the error squared.
-     */
-    private RobustFunction robustFunction;
-    
-    /**
-     * List of input data to {@link #optimizableFunction}.
-     */
-    private List<T> inputList;
-    
-    /**
-     * List of weights associated to each input data in {@link #inputList}.
-     */
-    private List<Double> weightList;
     
     /**
      * Stopping criterion used to stop the iterative algorithm.
@@ -98,7 +114,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
     /**
      * Value of the parameter vector for which the minimum error is obtained.
      * 
-     * @see #errorBest
+     * @see #costBest
      */
     private Matrix thetaBest;
     
@@ -109,16 +125,16 @@ public abstract class IterativeOptimizationAlgorithm<T>
     private Matrix delta;
     
     /**
-     * Error obtained with the last value of {@link #theta}.
+     * Cost obtained with the last value of {@link #theta}.
      */
-    private double error;
+    private double costCurrent;
     
     /**
-     * Minimum error obtained so far.
+     * Minimum cost obtained so far.
      * 
      * @see #thetaBest
      */
-    private double errorBest;
+    private double costBest;
     
     /**
      * Number of iterations performed so far.
@@ -128,7 +144,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
     /**
      * Iteration number that produced the minimum error.
      * 
-     * @see #errorBest
+     * @see #costBest
      */
     private int iterationBest;
     
@@ -196,7 +212,7 @@ public abstract class IterativeOptimizationAlgorithm<T>
      * 
      * @param optimizableFunctionInputList     list of inputs to the {@link #optimizableFunction} whose output is to be optimized.
      */
-    public void setOptimizableFunctionInputList( List<T> optimizableFunctionInputList , List<Double> inputWeightList )
+    public void setInputList( List<T> optimizableFunctionInputList , List<Double> inputWeightList )
     {
         if( optimizableFunctionInputList.size() != inputWeightList.size() ) {
             throw new IllegalArgumentException( "Incompatible list sizes in optimizableFunctionInputList and inputWeightList." );
@@ -225,43 +241,26 @@ public abstract class IterativeOptimizationAlgorithm<T>
      * This includes:
      * <ul>
      *  <li> Initialize the {@link #theta} parameter vector.
-     *  <li> Allocate space for the {@link OptimizableFunction} output.
-     *  <li> Allocate space for the Jacobian of the {@link OptimizableFunction}.
+     *  <li> Allocate space for the variables of the concrete {@link IterativeOptimizationAlgorithm}.
+     *  <li> Computing the initial error.
      *  <li> Initialize the number of iterations.
      * </ul>
      * 
-     * @throws IllegalArgumentException if the output of the OptimizableFunction is not a column vector, or if the rows of the Jacobian do not match the rows of the output vector.
      * @see #step()
      */
     public void initialize()
     {
         // Initialize parameter vector.
         this.theta = this.optimizableFunction.getParameters();
-        // Count number of rows.
-        int numberOfRows = 0;
-        for( T input : this.inputList ) {
-            this.optimizableFunction.setInput( input );
-            Matrix output = this.optimizableFunction.getOutput();
-            Matrix jacobian = this.optimizableFunction.getJacobian();
-            if( output.cols() != 1 ) {
-                throw new IllegalArgumentException( "Output of OptimizableFunction must be a column vector." );
-            }
-            if( jacobian.rows() != output.rows() ) {
-                throw new IllegalArgumentException( "Jacobian of OptimizableFunction must have same rows as output of OptimizableFunction." );
-            }
-            numberOfRows += output.rows();
-        }
-        // Allocate space for f, and J.
-        this.f = Matrix.empty( numberOfRows , 1 );
-        this.J = Matrix.empty( numberOfRows , this.theta.rows() );
-        this.JTW = Matrix.empty( this.theta.rows() , numberOfRows );
+        // Initialize algorithm.
+        this.allocateSpace( this.theta.rows() );
         // Compute initial error.
-        this.update_fAndJ();
+        this.updateCostAndDelta();
+        this.costCurrent = this.cost();
         // Initialize iterations.
         this.iteration = 0;
         // Initialize best error.
-        this.error = f.transpose().multiply( f ).entry( 0,0 );
-        this.errorBest = this.error;
+        this.costBest = this.costCurrent;
         this.thetaBest = this.theta.copy();
         this.iterationBest = this.iteration;
         // Set initialized flag.
@@ -279,22 +278,21 @@ public abstract class IterativeOptimizationAlgorithm<T>
     public void step()
     {
         if( !this.initialized ) {
-            throw new IllegalStateException( "Called step() without having called initialize() previously. That method needs to be called after calling setOptimizableFunction or setOptimizableFunctionInputList." );
+            throw new IllegalStateException( "Called step() without initialize() having been called previously. That method needs to be called after calling setOptimizableFunction or setOptimizableFunctionInputList." );
         }
-        // Compute delta using the last values for f and J.
-        this.delta = this.computeDelta();
+        // Compute delta.
+        this.delta = this.deltaParameters();
         // Update theta.
         this.theta = this.optimizableFunction.getParameters();
         this.theta.addInplace( this.delta );
         this.optimizableFunction.setParameters( this.theta );
         // Update iteration.
         this.iteration++;
-        // Update f, J and error for next step.
-        this.update_fAndJ();
         // Update error.
-        this.error = this.f.transpose().multiply( this.f ).entry( 0,0 );
-        if( this.error < this.errorBest ) {
-            this.errorBest = this.error;
+        this.updateCostAndDelta();
+        this.costCurrent = this.cost();
+        if( this.costCurrent < this.costBest ) {
+            this.costBest = this.costCurrent;
             this.thetaBest = this.theta.copy();
             this.iterationBest = this.iteration;
         }
@@ -361,9 +359,9 @@ public abstract class IterativeOptimizationAlgorithm<T>
      * 
      * @return  error associated to the last produced solution.
      */
-    public double getErrorLast()
+    public double getCostLast()
     {
-        return this.error;
+        return this.costCurrent;
     }
     
     
@@ -372,36 +370,9 @@ public abstract class IterativeOptimizationAlgorithm<T>
      * 
      * @return  error associated to the best produced solution.
      */
-    public double getErrorBest()
+    public double getCostBest()
     {
-        return this.errorBest;
-    }
-    
-    
-    
-    ////////////////////////////////////////////////////////////////
-    // PRIVATE METHODS
-    ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Updates the values of {@link #f}, and {@link #J} using the current {@link #optimizableFunction} parameters.
-     */
-    private void update_fAndJ()
-    {
-        // Build the f vector and Jacobian matrix.
-        int index = 0;
-        for( int i=0; i<this.inputList.size(); i++ ) {
-            T input = this.inputList.get( i );
-            this.optimizableFunction.setInput( input );
-            Matrix output = this.optimizableFunction.getOutput();
-            this.f.setSubmatrix( index,0 , output );
-            Matrix jacobian = this.optimizableFunction.getJacobian();
-            this.J.setSubmatrix( index,0 , jacobian );
-            double errorSquared = output.transpose().multiply( output ).entry( 0,0 );
-            double robustWeight = this.weightList.get( i ) * this.robustFunction.f1( errorSquared );
-            this.JTW.setSubmatrix( 0,index , jacobian.transpose().scaleInplace( robustWeight ) );
-            index += output.rows();
-        }
+        return this.costBest;
     }
     
 }
