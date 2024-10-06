@@ -36,7 +36,7 @@ public class MaximumIterationsWithoutImprovementStoppingCriterion
     
     public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm )
     {
-        double errorBest = iterativeAlgorithm.getErrorBest();
+        double errorBest = iterativeAlgorithm.getCostBest();
         if( errorBest < this.errorBestLast ) {
             this.errorBestLast = errorBest;
             this.iterationsWithoutImprovement = 0;
