@@ -599,6 +599,27 @@ public class Matrix
     }
     
     
+    /**
+     * Returns the {@link Matrix} elements stored in a flat array.
+     * <p>
+     * The {@link Matrix} elements are stored row after row, so the output array will be:
+     * output = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
+     * 
+     * @return  {@link Matrix} elements stored in a flat array.
+     */
+    public double[] toFlatArray()
+    {
+        double[] output = new double[ this.rows() * this.cols() ];
+        int c = 0;
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                output[c++] = this.entryUnchecked( i , j );
+            }
+        }
+        return output;
+    }
+    
+    
     public double[] rowAsArray( int i )
     {
         double[] row = new double[this.cols()];
@@ -755,6 +776,35 @@ public class Matrix
             }
         }
         return m;
+    }
+    
+    
+    /**
+     * Returns a new {@link Matrix} build from a flat array.
+     * <p>
+     * The {@link Matrix} elements must be stored row after row, so the flatArray array must have the form:
+     * flatArray = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
+     * 
+     * @param flatArray     flat array that contains the {@link Matrix} elements row after row.
+     * @param numberOfRows  number of rows of the output {@link Matrix}.
+     * @param numberOfColumns   number of columns of the output {@link Matrix}.
+     * @return  new {@link Matrix} build from a flat array.
+     * 
+     * @throws IllegalArgumentException if length of flatArray does not match provided {@link Matrix} size.
+     */
+    public static Matrix fromFlatArray( double[] flatArray , int numberOfRows , int numberOfColumns )
+    {
+        if( numberOfRows * numberOfColumns != flatArray.length ) {
+            throw new IllegalArgumentException( "Length of flatArray (" + flatArray.length + ") does not match size of matrix ( " + numberOfRows + " x " + numberOfColumns + " )" );
+        }
+        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
+        int c = 0;
+        for( int i=0; i<output.rows(); i++ ) {
+            for( int j=0; j<output.cols(); j++ ) {
+                output.setEntryUnchecked( i , j , flatArray[c++] );
+            }
+        }
+        return output;
     }
     
     
