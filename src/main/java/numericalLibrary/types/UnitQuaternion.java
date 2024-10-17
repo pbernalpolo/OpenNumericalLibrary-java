@@ -232,6 +232,29 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the Tait–Bryan angles that represent the orientation described by the {@link UnitQuaternion}.
+     * <p>
+     * In particular, if the {@link UnitQuaternion} rotates vectors from a frame A to a frame B,
+     * xA = R(qAB) * xB
+     * then, the same rotation matrix will be obtained by the product of 3 successive rotations:
+     * xA = R_z( output[2] ) * R_y( output[1] ) * R_x( output[0] ) * xB
+     * 
+     * @return  Tait–Bryan angles that represent the orientation described by the {@link UnitQuaternion}.
+     * 
+     * @see #fromRollPitchYawZYX(double, double, double)
+     */
+    public double[] toRollPitchYawZYX()
+    {
+        double y2 = this.y() * this.y();
+        double phi = Math.atan2( 2.0 * ( this.w() * this.x() + this.y() * this.z() ) , 1.0 - 2.0 * ( this.x() * this.x() + y2 ) );
+        double twice_wy_minus_xz = 2.0 * ( this.w() * this.y() - this.x() * this.z() );
+        double theta = 2.0 * Math.atan2( Math.sqrt( 1.0 + twice_wy_minus_xz ) , Math.sqrt( 1.0 - twice_wy_minus_xz ) ) - Math.PI/2.0;
+        double psi = Math.atan2( 2.0 * ( this.w() * this.z() + this.x() * this.y() ) , 1.0 - 2.0 * ( y2 + this.z() * this.z() ) );
+        return new double[] { phi , theta , psi };
+    }
+    
+    
     public Vector3 rotate( Vector3 v )
     {
         // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Used_methods
@@ -379,6 +402,27 @@ public class UnitQuaternion
                 break;
         }
         return UnitQuaternion.fromNormalizedQuaternion( q.normalizeInplace() );
+    }
+    
+    
+    /**
+     * Returns a new {@link UnitQuaternion} from the Tait–Bryan angles that represent an orientation.
+     * <p>
+     * In particular, if the Tait-Bryan angles rotate vectors from a frame A to a frame B,
+     * xA = R_z( psi ) * R_y( theta ) * R_x( phi ) * xB
+     * then, the same rotation matrix will be obtained from the {@link UnitQuaternion} that results from this method:
+     * xA = R(qAB) * xB
+     * 
+     * @return  new {@link UnitQuaternion} from the Tait–Bryan angles that represent an orientation.
+     * 
+     * @see #toRollPitchYawZYX()
+     */
+    public static UnitQuaternion fromRollPitchYawZYX( double phi , double theta , double psi )
+    {
+        UnitQuaternion qz = UnitQuaternion.fromAngleAndUnitVector( psi , Vector3.k() );
+        UnitQuaternion qy = UnitQuaternion.fromAngleAndUnitVector( theta , Vector3.j() );
+        UnitQuaternion qx = UnitQuaternion.fromAngleAndUnitVector( phi , Vector3.i() );
+        return qz.multiplyInplace( qy ).multiplyInplace( qx );
     }
     
     

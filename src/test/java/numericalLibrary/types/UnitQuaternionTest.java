@@ -243,6 +243,90 @@ class UnitQuaternionTest
     }
     
     
+    /**
+     * Tests that {@link UnitQuaternion#toRollPitchYawZYX()} -> {@link UnitQuaternion#fromRollPitchYawZYX(double, double, double)} results in initial {@link UnitQuaternion}.
+     */
+    @Test
+    void toRollPitchYawZYX_compatibleWith_fromRollPitchYawZYX()
+    {
+        // Take list of unit quaternions.
+        List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
+        for( UnitQuaternion q0 : luq ) {
+            // Get roll, pitch, yaw from q0.
+            double[] rollPitchYaw = q0.toRollPitchYawZYX();
+            // Get unit quaternion from roll, pitch, yaw.
+            UnitQuaternion q = UnitQuaternion.fromRollPitchYawZYX( rollPitchYaw[0] , rollPitchYaw[1] , rollPitchYaw[2] );
+            // Check that we obtain the initial quaternion.
+            assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
+        }
+    }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternion#fromRollPitchYawZYX(double, double, double)} -> {@link UnitQuaternion#toRollPitchYawZYX()} results in initial roll, pitch, yaw.
+     */
+    @Test
+    void fromRollPitchYawZYX_compatibleWith_toRollPitchYawZYX()
+    {
+        Random rng = new Random( 42 );
+        for( int i=0; i<1000; i++ ) {
+            // Take initial roll, pitch, yaw.
+            double roll = Math.PI;
+            while( Math.abs( roll ) >= Math.PI ) {
+                roll = rng.nextGaussian();
+            }
+            double pitch = Math.PI;
+            while( Math.abs( pitch ) >= Math.PI/2.0 ) {
+                pitch = rng.nextGaussian();
+            }
+            double yaw = Math.PI;
+            while( Math.abs( yaw ) >= Math.PI ) {
+                yaw = rng.nextGaussian();
+            }
+            // Get unit quaternion roll, pitch, yaw.
+            UnitQuaternion q = UnitQuaternion.fromRollPitchYawZYX( roll , pitch , yaw );
+            // Get roll, pitch, yaw from unit quaternion.
+            double[] rollPitchYaw = q.toRollPitchYawZYX();
+            //System.out.println( roll + " " + rollPitchYaw[0] + " " + pitch + " " + rollPitchYaw[1] + " " + yaw + " " + rollPitchYaw[2] );
+            // Check that we obtain the initial roll, pitch, yaw values.
+            assertEquals( roll , rollPitchYaw[0] , 1.0e-11 );
+            assertEquals( pitch , rollPitchYaw[1] , 1.0e-11 );
+            assertEquals( yaw , rollPitchYaw[2] , 1.0e-11 );
+        }
+    }
+    
+    
+    /**
+     * Tests that the rotation matrix multiplication R_z(psi) * R_y(theta) * R_x(phi) results in {@link UnitQuaternion#toRotationMatrix()}.
+     */
+    @Test
+    void rotationMatrix_compatibleWith_rollPitchYawZYX()
+    {
+        List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
+        for( UnitQuaternion q0 : luq ) {
+            double[] rollPitchYaw = q0.toRollPitchYawZYX();
+            Matrix R0 = q0.toRotationMatrix();
+            double phi = rollPitchYaw[0];
+            Matrix Rx = Matrix.matrix3x3(
+                    1 , 0 , 0 ,
+                    0 , Math.cos(phi) , -Math.sin(phi) ,
+                    0 , Math.sin(phi) , Math.cos(phi) );
+            double theta = rollPitchYaw[1];
+            Matrix Ry = Matrix.matrix3x3(
+                    Math.cos(theta) , 0 , Math.sin(theta) ,
+                    0 , 1 , 0 ,
+                    - Math.sin(theta) , 0 , Math.cos(theta) );
+            double psi = rollPitchYaw[2];
+            Matrix Rz = Matrix.matrix3x3(
+                    Math.cos(psi) , -Math.sin(psi) , 0 ,
+                    Math.sin(psi) , Math.cos(psi) , 0 ,
+                    0 , 0 , 1 );
+            Matrix Rzyx = Rz.multiply( Ry ).multiply( Rx );
+            assertTrue( Rzyx.equalsApproximately( R0 , 1.0e-13 ) );
+        }
+    }
+    
+    
     
     ////////////////////////////////////////////////////////////////
     // PRIVATE METHODS
