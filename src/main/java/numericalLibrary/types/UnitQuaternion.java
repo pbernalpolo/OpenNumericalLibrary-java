@@ -103,16 +103,29 @@ public class UnitQuaternion
         return this;
     }
 
-
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Each product of {@link UnitQuaternion}s is renormalized so that another {@link UnitQuaternion} is returned.
+     */
     public UnitQuaternion multiply( UnitQuaternion other )
     {
-        return new UnitQuaternion( this.q.multiply( other.q ).normalizeInplace() );
+        Quaternion product = this.q.multiply( other.q );
+        UnitQuaternion.normalizeInplace( product );
+        return UnitQuaternion.fromNormalizedQuaternion( product );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Each product of {@link UnitQuaternion}s is renormalized so that another {@link UnitQuaternion} is returned.
+     */
     public UnitQuaternion multiplyInplace( UnitQuaternion other )
     {
-        this.q = this.q.multiplyInplace( other.q ).normalizeInplace();
+        this.q = this.q.multiplyInplace( other.q );
+        UnitQuaternion.normalizeInplace( this.q );
         return this;
     }
     
@@ -401,7 +414,8 @@ public class UnitQuaternion
                                     1.0 - R11 - R22 + R33 );
                 break;
         }
-        return UnitQuaternion.fromNormalizedQuaternion( q.normalizeInplace() );
+        UnitQuaternion.normalizeInplace( q );
+        return UnitQuaternion.fromNormalizedQuaternion( q );
     }
     
     
@@ -617,9 +631,25 @@ public class UnitQuaternion
     }
     
     
+    
     ////////////////////////////////////////////////////////////////
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Normalizes in place a {@link Quaternion} without checking if it has zero norm.
+     * <p>
+     * Since the norm of a {@link UnitQuaternion} is 1, we avoid the unnecessary check for a zero {@link Quaternion}.
+     * 
+     * @param q     {@link Quaternion} to be normalized in place.
+     * 
+     * @see Quaternion#normalizeInplace()
+     */
+    private static void normalizeInplace( Quaternion q )
+    {
+        q.scaleInplace( 1.0/q.norm() );
+    }
+    
     
     private static UnitQuaternion thatRotatesPiAroundAxisOrthogonalTo( Vector3 v )
     {
