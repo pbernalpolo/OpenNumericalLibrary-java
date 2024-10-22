@@ -828,6 +828,18 @@ public class Matrix
     }
     
     
+    public static Matrix fromArray2D( double[][] theArray )
+    {
+        Matrix output = new Matrix( theArray.length , theArray[0].length );
+        for( int i=0; i<output.rows(); i++ ) {
+            for( int j=0; j<output.cols(); j++ ) {
+                output.setEntryUnchecked( i,j , theArray[i][j] );
+            }
+        }
+        return output;
+    }
+    
+    
     public static Matrix vector2( double v1 , double v2 )
     {
         return Matrix.fromArray2D( new double[][] { { v1 } , { v2 } } );
@@ -982,18 +994,6 @@ public class Matrix
     ////////////////////////////////////////////////////////////////
     // PRIVATE METHODS
     ////////////////////////////////////////////////////////////////
-    
-    private static Matrix fromArray2D( double[][] theArray )
-    {
-        Matrix output = new Matrix( theArray.length , theArray[0].length );
-        for( int i=0; i<output.rows(); i++ ) {
-            for( int j=0; j<output.cols(); j++ ) {
-                output.setEntryUnchecked( i,j , theArray[i][j] );
-            }
-        }
-        return output;
-    }
-    
     
     private void setEntryUnchecked( int i , int j , double value )
     {
