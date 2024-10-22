@@ -35,25 +35,7 @@ public class ComplexNumber
     private double y;  // imaginary part
     
     
-
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC CONSTRUCTORS
-    ////////////////////////////////////////////////////////////////
     
-    /**
-     * Constructs a {@link ComplexNumber}.
-     * 
-     * @param real  real part of the {@link ComplexNumber}.
-     * @param imag  imaginary part of the {@link ComplexNumber}.
-     */
-    public ComplexNumber( double real , double imag )
-    {
-        this.x = real;
-        this.y = imag;
-    }
-
-
-
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
@@ -315,14 +297,14 @@ public class ComplexNumber
      */
     public ComplexNumber divide( ComplexNumber other )
     {
-        double normSquared = this.normSquared();
-        if( normSquared == 0 ) {
+        double otherNormSquared = other.normSquared();
+        if( otherNormSquared == 0 ) {
             throw new IllegalArgumentException( "Division by zero is undefined." );
         }
-        double oneOverNormSquared = 1.0/normSquared;
+        double oneOverOtherNormSquared = 1.0/otherNormSquared;
         return new ComplexNumber(
-                ( this.re() * other.re() + this.im() * other.im() ) * oneOverNormSquared ,
-                ( this.re() * other.im() - this.im() * other.re() ) * oneOverNormSquared );
+                ( this.re() * other.re() + this.im() * other.im() ) * oneOverOtherNormSquared ,
+                ( this.re() * other.im() - this.im() * other.re() ) * oneOverOtherNormSquared );
     }
     
     
@@ -333,15 +315,15 @@ public class ComplexNumber
      */
     public ComplexNumber divideInplace( ComplexNumber other )
     {
-        double normSquared = this.normSquared();
-        if( normSquared == 0 ) {
+        double otherNormSquared = other.normSquared();
+        if( otherNormSquared == 0 ) {
             throw new IllegalArgumentException( "Division by zero is undefined." );
         }
         double re = this.re();
         double im = this.im();
-        double oneOverNormSquared = 1.0/normSquared;
-        this.x = ( re * other.re() + im * other.im() ) * oneOverNormSquared;
-        this.y = ( re * other.im() - im * other.re() ) * oneOverNormSquared;
+        double oneOverOtherNormSquared = 1.0/otherNormSquared;
+        this.x = ( re * other.re() + im * other.im() ) * oneOverOtherNormSquared;
+        this.y = ( re * other.im() - im * other.re() ) * oneOverOtherNormSquared;
         return this;
     }
     
@@ -503,7 +485,7 @@ public class ComplexNumber
     
     
     /**
-     * Returns i {@link ComplexNumber} stored in a new instance.
+     * Returns the i {@link ComplexNumber} stored in a new instance.
      * <p>
      * That is {@code 0  +  1 · epsilon}.
      * 
@@ -512,6 +494,19 @@ public class ComplexNumber
     public static ComplexNumber i()
     {
         return new ComplexNumber( 0.0 , 1.0 );
+    }
+    
+    
+    /**
+     * Returns a new {@link ComplexNumber} from its real part and its imaginary part.
+     * 
+     * @param real  real part of the {@link ComplexNumber}.
+     * @param imag  imaginary part of the {@link ComplexNumber}.
+     * @return  new {@link ComplexNumber} from its real part and its imaginary part.
+     */
+    public static ComplexNumber fromRealPartAndImaginaryPart( double real , double imag )
+    {
+        return new ComplexNumber( real , imag );
     }
     
     
@@ -541,6 +536,24 @@ public class ComplexNumber
         return new ComplexNumber(
                 randomNumberGenerator.nextGaussian() ,
                 randomNumberGenerator.nextGaussian() );
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE CONSTRUCTORS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Constructs a {@link ComplexNumber}.
+     * 
+     * @param real  real part of the {@link ComplexNumber}.
+     * @param imag  imaginary part of the {@link ComplexNumber}.
+     */
+    private ComplexNumber( double real , double imag )
+    {
+        this.x = real;
+        this.y = imag;
     }
     
 }
