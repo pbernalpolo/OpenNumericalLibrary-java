@@ -307,17 +307,17 @@ class UnitQuaternionTest
             double[] rollPitchYaw = q0.toRollPitchYawZYX();
             Matrix R0 = q0.toRotationMatrix();
             double phi = rollPitchYaw[0];
-            Matrix Rx = Matrix.matrix3x3(
+            Matrix Rx = Matrix.fromEntries3x3(
                     1 , 0 , 0 ,
                     0 , Math.cos(phi) , -Math.sin(phi) ,
                     0 , Math.sin(phi) , Math.cos(phi) );
             double theta = rollPitchYaw[1];
-            Matrix Ry = Matrix.matrix3x3(
+            Matrix Ry = Matrix.fromEntries3x3(
                     Math.cos(theta) , 0 , Math.sin(theta) ,
                     0 , 1 , 0 ,
                     - Math.sin(theta) , 0 , Math.cos(theta) );
             double psi = rollPitchYaw[2];
-            Matrix Rz = Matrix.matrix3x3(
+            Matrix Rz = Matrix.fromEntries3x3(
                     Math.cos(psi) , -Math.sin(psi) , 0 ,
                     Math.sin(psi) , Math.cos(psi) , 0 ,
                     0 , 0 , 1 );

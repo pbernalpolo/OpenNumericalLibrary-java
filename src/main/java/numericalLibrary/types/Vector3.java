@@ -256,17 +256,19 @@ public class Vector3
     
     public Matrix crossProductMatrix()
     {
-        return Matrix.matrix3x3( 0.0      , -this.z() ,  this.y() ,
-                                     this.z() ,  0.0      , -this.x() ,
-                                    -this.y() ,  this.x() ,  0.0      );
+        return Matrix.fromEntries3x3(
+                0.0      , -this.z() ,  this.y() ,
+                this.z() ,  0.0      , -this.x() ,
+               -this.y() ,  this.x() ,  0.0      );
     }
     
     
     public Matrix outerProduct( Vector3 other )
     {
-        return Matrix.matrix3x3( this.x() * other.x() , this.x() * other.y() , this.x() * other.z() ,
-                                     this.y() * other.x() , this.y() * other.y() , this.y() * other.z() ,
-                                     this.z() * other.x() , this.z() * other.y() , this.z() * other.z() );
+        return Matrix.fromEntries3x3(
+                this.x() * other.x() , this.x() * other.y() , this.x() * other.z() ,
+                this.y() * other.x() , this.y() * other.y() , this.y() * other.z() ,
+                this.z() * other.x() , this.z() * other.y() , this.z() * other.z() );
     }
     
     

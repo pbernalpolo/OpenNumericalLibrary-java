@@ -239,9 +239,10 @@ public class UnitQuaternion
         double kk = this.z() * this.z();
         kk += kk;
         
-        return Matrix.matrix3x3( 1.0 -jj -kk  , ij - rk      , ik + rj ,
-                                     ij + rk      , 1.0 -ii -kk  , jk - ri ,
-                                     ik - rj      , jk + ri      , 1.0 -ii -jj );
+        return Matrix.fromEntries3x3(
+                1.0 -jj -kk  , ij - rk      , ik + rj ,
+                ij + rk      , 1.0 -ii -kk  , jk - ri ,
+                ik - rj      , jk + ri      , 1.0 -ii -jj );
     }
     
     

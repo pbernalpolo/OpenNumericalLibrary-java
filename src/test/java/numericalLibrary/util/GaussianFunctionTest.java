@@ -52,7 +52,7 @@ class GaussianFunctionTest
         List<Matrix> output = new ArrayList<Matrix>();
         Random randomNumberGenerator = new Random( 42 );
         for( int i=0; i<100; i++ ) {
-            output.add( Matrix.columnFromArray( new double[] {
+            output.add( Matrix.fromArrayAsColumn( new double[] {
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() } ) );

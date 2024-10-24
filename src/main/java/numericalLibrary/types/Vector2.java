@@ -225,8 +225,9 @@ public class Vector2
     
     public Matrix outerProduct( Vector2 other )
     {
-        return Matrix.matrix2x2( this.x() * other.x() , this.x() * other.y() ,
-                                     this.y() * other.x() , this.y() * other.y() );
+        return Matrix.fromEntries2x2(
+                this.x() * other.x() , this.x() * other.y() ,
+                this.y() * other.x() , this.y() * other.y() );
     }
     
     
