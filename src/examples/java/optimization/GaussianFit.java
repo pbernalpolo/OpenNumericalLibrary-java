@@ -28,7 +28,7 @@ public class GaussianFit
     {
         // Generate a known Gaussian function.
         GaussianFunction gaussianKnown = new GaussianFunction();
-        Matrix parameters = Matrix.columnFromArray( new double[] { 3.0 , 2.0 , 5.0 } );
+        Matrix parameters = Matrix.fromArrayAsColumn( new double[] { 3.0 , 2.0 , 5.0 } );
         gaussianKnown.setParameters( parameters );
         
         // Sample with the known Gaussian function.
@@ -47,7 +47,7 @@ public class GaussianFit
         algorithm.setRobustFunction( new WelschRobustFunction( 1.0 ) );
         algorithm.setInputList( empiricalPairList , inputWeightList );
         GaussianFunction gaussianUnknown = new GaussianFunction();
-        gaussianUnknown.setParameters( Matrix.columnFromArray( new double[] { 1.0 , 0.0 , 1.0 } ) );
+        gaussianUnknown.setParameters( Matrix.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
         algorithm.setOptimizableFunction( new LeastSquaresFunction<Double>( gaussianUnknown ) );
         //algorithm.setStoppingCriterion( new IterationThresholdStoppingCriterion( 1000 ) );
         algorithm.setDampingFactor( 1.0e-4 );
