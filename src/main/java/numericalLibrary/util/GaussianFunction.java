@@ -1,7 +1,7 @@
 package numericalLibrary.util;
 
 
-import numericalLibrary.optimization.OptimizableFunction;
+import numericalLibrary.optimization.ModelFunction;
 import numericalLibrary.types.Matrix;
 
 
@@ -15,7 +15,7 @@ import numericalLibrary.types.Matrix;
  * @see <a href>https://en.wikipedia.org/wiki/Gaussian_function</a>
  */
 public class GaussianFunction
-    implements OptimizableFunction<Double>
+    implements ModelFunction<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -73,8 +73,8 @@ public class GaussianFunction
     public void setParameters( Matrix theta )
     {
         this.a = theta.entry( 0 , 0 );
-        this.b = theta.entry( 1 , 0 );
-        this.c = theta.entry( 2 , 0 );
+        this.b = theta.entry( 0 , 1 );
+        this.c = theta.entry( 0 , 2 );
     }
     
     
@@ -83,10 +83,10 @@ public class GaussianFunction
      */
     public Matrix getParameters()
     {
-        Matrix output = Matrix.empty( 3 , 1 );
+        Matrix output = Matrix.empty( 1 , 3 );
         output.setEntry( 0,0 , this.a );
-        output.setEntry( 1,0 , this.b );
-        output.setEntry( 2,0 , this.c );
+        output.setEntry( 0,1 , this.b );
+        output.setEntry( 0,2 , this.c );
         return output;
     }
     
