@@ -38,7 +38,7 @@ public class RealNumber
     /**
      * Constructs a {@link RealNumber}.
      * 
-     * @param real  double that represents the {@link RealNumber}.
+     * @param realNumber  double that represents the {@link RealNumber}.
      */
     public RealNumber( double realNumber )
     {

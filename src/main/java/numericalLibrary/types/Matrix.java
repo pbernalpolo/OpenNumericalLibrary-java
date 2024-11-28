@@ -851,7 +851,7 @@ public class Matrix
      * <ul>
      *  <li> array.length -> number of rows
      *  <li> array[0].length -> number of columns
-     *  <li> array[i][j] is obtained from {@link Matrix#entry(i,j)}
+     *  <li> array[i][j] is obtained from {@link Matrix#entry(int, int)}
      * </ul>
      * 
      * @param array     2d array that contains the {@link Matrix} entries.

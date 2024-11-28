@@ -58,7 +58,7 @@ public class GradientDescentAlgorithm
     /**
      * Sets the loss function to be minimized.
      * 
-     * @param theLossFunction   loss function to be minimized.
+     * @param differentiableLossFunction   loss function to be minimized.
      */
     public void setLossFunction( DifferentiableLoss differentiableLossFunction )
     {

@@ -149,10 +149,10 @@ public abstract class IterativeOptimizationAlgorithm<T extends Loss>
     
     
     /**
-     * Iterates using {@link #step()} until {@link #isFinished()} returns true.
+     * Iterates using {@link #step()} until a {@link StoppingCriterion} is met.
      * 
      * @see #step()
-     * @see #isFinished()
+     * @see StoppingCriterion#isFinished(IterativeOptimizationAlgorithm)
      */
     public void iterate()
     {

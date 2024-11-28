@@ -76,7 +76,7 @@ public abstract class MeanDifferentiableLoss<T>
     /**
      * Constructs a {@link MeanDifferentiableLoss}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} used to define the differentiable loss function F( x_i , \theta ).
+     * @param modelFunction   {@link ModelFunction} used to define the differentiable loss function F( x_i , \theta ).
      */
     public MeanDifferentiableLoss( ModelFunction<T> modelFunction )
     {

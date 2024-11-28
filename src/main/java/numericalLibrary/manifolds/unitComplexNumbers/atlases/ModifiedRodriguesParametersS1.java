@@ -44,8 +44,6 @@ public class ModifiedRodriguesParametersS1
      * {@inheritDoc}
      * <p>
      * The image of the chart is R: the entire set of real numbers.
-     * 
-     * @see #MAX_NORM
      */
     public ComplexNumber toManifoldFromChartCenteredAtIdentity( RealNumber e )
     {

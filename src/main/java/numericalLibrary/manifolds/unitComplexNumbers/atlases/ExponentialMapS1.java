@@ -47,7 +47,7 @@ public class ExponentialMapS1
     /**
      * {@inheritDoc}
      * <p>
-     * Any {@link UnitQuaternion} can be mapped to an element in the chart.
+     * Any {@link ComplexNumber} can be mapped to an element in the chart.
      * This is possible because both q and -q represent the same rotation transformation.
      */
     public RealNumber toChartCenteredAtIdentity( ComplexNumber z )

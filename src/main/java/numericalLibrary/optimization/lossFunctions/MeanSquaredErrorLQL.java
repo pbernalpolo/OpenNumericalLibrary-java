@@ -41,7 +41,7 @@ public class MeanSquaredErrorLQL<T>
     /**
      * Constructs a {@link MeanSquaredErrorLQL}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} that models the relation between input data and target data.
+     * @param modelFunction   {@link ModelFunction} that models the relation between input data and target data.
      */
     public MeanSquaredErrorLQL( ModelFunction<T> modelFunction )
     {

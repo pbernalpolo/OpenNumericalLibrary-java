@@ -29,7 +29,7 @@ public class MeanSquaredFunctionLQL<T>
     /**
      * Constructs a {@link MeanSquaredFunctionLQL}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} used to define the error.
+     * @param modelFunction   {@link ModelFunction} used to define the error.
      */
     public MeanSquaredFunctionLQL( ModelFunction<T> modelFunction )
     {
@@ -45,7 +45,7 @@ public class MeanSquaredFunctionLQL<T>
     /**
      * Sets the list of inputs to the {@link #modelFunction} whose output is to be optimized.
      * 
-     * @param optimizableFunctionInputList     list of inputs to the {@link #modelFunction} whose output is to be optimized.
+     * @param modelFunctionInputList     list of inputs to the {@link #modelFunction} whose output is to be optimized.
      */
     public void setInputList( List<T> modelFunctionInputList )
     {

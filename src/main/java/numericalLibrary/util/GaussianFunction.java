@@ -2,12 +2,13 @@ package numericalLibrary.util;
 
 
 import numericalLibrary.optimization.ModelFunction;
+import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.types.Matrix;
 
 
 
 /**
- * Implements a Gaussian function to fit data using the {@link LevenbergMarquardtAlgorithm}.
+ * Implements a Gaussian function to fit data using a {@link IterativeOptimizationAlgorithm}.
  * <p>
  * Concretely, the Gaussian function is given by:
  *      a exp( -( x - b )^2/( 2 * c^2 )

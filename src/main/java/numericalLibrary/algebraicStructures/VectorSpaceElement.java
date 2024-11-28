@@ -10,7 +10,6 @@ package numericalLibrary.algebraicStructures;
  * @param <T>   concrete type of {@link VectorSpaceElement}. We use CRTP to bound the type to interfaces that extend this interface.
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Vector_space</a>
- * @see VectorSpaceElementGeneric
  */
 public interface VectorSpaceElement< T extends VectorSpaceElement<T> >
 	extends AdditiveAbelianGroupElement<T>

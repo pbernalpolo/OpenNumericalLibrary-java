@@ -47,7 +47,7 @@ public class WeightedMeanSquaredErrorLQL<T>
     /**
      * Constructs a {@link MeanSquaredErrorLQL}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} that models the relation between input data and target data.
+     * @param modelFunction   {@link ModelFunction} that models the relation between input data and target data.
      */
     public WeightedMeanSquaredErrorLQL( ModelFunction<T> modelFunction )
     {

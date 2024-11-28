@@ -53,7 +53,7 @@ public abstract class MeanLocallyQuadraticLoss<T>
     /**
      * Constructs a {@link MeanLocallyQuadraticLoss}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} used to define the locally quadratic loss function F( x_i , \theta ).
+     * @param modelFunction   {@link ModelFunction} used to define the locally quadratic loss function F( x_i , \theta ).
      */
     public MeanLocallyQuadraticLoss( ModelFunction<T> modelFunction )
     {

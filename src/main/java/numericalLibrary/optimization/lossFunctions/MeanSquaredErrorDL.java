@@ -41,7 +41,7 @@ public class MeanSquaredErrorDL<T>
     /**
      * Constructs a {@link MeanSquaredErrorDL}.
      * 
-     * @param optimizableFunction   {@link ModelFunction} that models the relation between input data and target data.
+     * @param modelFunction   {@link ModelFunction} that models the relation between input data and target data.
      */
     public MeanSquaredErrorDL( ModelFunction<T> modelFunction )
     {
