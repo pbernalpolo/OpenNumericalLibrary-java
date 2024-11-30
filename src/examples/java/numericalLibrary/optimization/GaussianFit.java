@@ -1,10 +1,11 @@
-package optimization;
+package numericalLibrary.optimization;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import numericalLibrary.optimization.algorithms.GradientDescentAlgorithm;
+import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.optimization.algorithms.LevenbergMarquardtAlgorithm;
 import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorLQL;
 import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredErrorLQL;
@@ -14,7 +15,7 @@ import numericalLibrary.util.GaussianFunction;
 
 
 /**
- * Example that shows how to set up and use the Levenberg-Marquardt algorithm to fit a Gaussian function to empirical data.
+ * Example that shows how to set up and use {@link IterativeOptimizationAlgorithm}s to fit a Gaussian function to empirical data.
  */
 public class GaussianFit
 {
