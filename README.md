@@ -6,9 +6,9 @@ A numerical library written in Java. Designed to provide versatile utility code 
 ## License
 This project is licensed under the [MIT License](./LICENSE). Feel free to use, modify, and distribute the library under the terms of this license.
 
+<!---
 ## Donation
-If you find this project useful, consider making a donation:
-
+If you find this project useful, consider making a donation.
 - [Ko-fi](https://ko-fi.com/pablobernalpolo)
-
 Every contribution, no matter the size, is greatly appreciated. It reminds that there is someone who cares about this project, and encourages to continue developing it.
+-->
