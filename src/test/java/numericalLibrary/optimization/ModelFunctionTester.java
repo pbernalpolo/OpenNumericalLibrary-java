@@ -71,13 +71,13 @@ public interface ModelFunctionTester<T>
      * Tests that {@link ModelFunction#getParameters()} returns a column {@link Matrix}.
      */
     @Test
-    default void getParametersReturnRowMatrix()
+    default void getParametersReturnColumnMatrix()
     {
         // Get parameters from model function.
         ModelFunction<T> modelFunction = this.getModelFunction();
         Matrix parameters = modelFunction.getParameters();
         // They must be a column matrix.
-        assertEquals( 1 , parameters.rows() );
+        assertEquals( 1 , parameters.cols() );
     }
     
     
@@ -179,7 +179,7 @@ public interface ModelFunctionTester<T>
      * Tests that {@link ModelFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
      */
     @Test
-    default void jacobianHasSameRowsAsParameters()
+    default void jacobianHasSameColumnsAsParameters()
     {
         // Get parameters from model function.
         ModelFunction<T> modelFunction = this.getModelFunction();
@@ -187,7 +187,7 @@ public interface ModelFunctionTester<T>
         // Get the Jacobian.
         Matrix jacobian = modelFunction.getJacobian();
         // Check that the Jacobian has as many columns as the number of parameters.
-        assertEquals( parameters.cols() , jacobian.cols() );
+        assertEquals( parameters.rows() , jacobian.cols() );
     }
     
 }

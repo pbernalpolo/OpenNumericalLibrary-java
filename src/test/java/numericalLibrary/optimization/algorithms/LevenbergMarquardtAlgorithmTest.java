@@ -30,14 +30,15 @@ public class LevenbergMarquardtAlgorithmTest
     public void levenbergMarquardtOnNormSquaredConvergesToZero()
     {
         LocallyQuadraticLoss loss = new NormSquaredLossFunction( 42 );
-        loss.setParameters( Matrix.random( 1 , 42 , new Random() ) );
+        loss.setParameters( Matrix.random( 42 , 1 , new Random( 42 ) ) );
         LevenbergMarquardtAlgorithm lma = new LevenbergMarquardtAlgorithm( loss );
-        lma.setStoppingCriterion( new IterationThresholdStoppingCriterion( 100 ) );
+        lma.setStoppingCriterion( new IterationThresholdStoppingCriterion( 4 ) );
         lma.setDampingFactor( 1.0e-4 );
         lma.initialize();
         lma.iterate();
         Matrix optimizedParameters = loss.getParameters();
-        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 1 , 42 ) , 1.0e-6 ) );
+        System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
+        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-15 ) );
     }
     
 }

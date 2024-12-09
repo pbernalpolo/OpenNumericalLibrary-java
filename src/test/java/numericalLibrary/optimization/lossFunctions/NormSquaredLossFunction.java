@@ -38,7 +38,7 @@ public class NormSquaredLossFunction
      */
     public NormSquaredLossFunction( int dimension )
     {
-        this.x = Matrix.empty( 1 , dimension );
+        this.x = Matrix.empty( dimension , 1 );
     }
     
     
@@ -83,9 +83,9 @@ public class NormSquaredLossFunction
      * From that, we obtain that the Jacobian of ||f(\theta)||^2 is
      * (\theta^T)^T * I = \theta
      */
-    public Matrix getJacobian()
+    public Matrix getGradient()
     {
-        return this.x;
+        return this.x.copy();
     }
     
     
@@ -99,7 +99,7 @@ public class NormSquaredLossFunction
      */
     public Matrix getGaussNewtonMatrix()
     {
-        return Matrix.one( this.x.cols() );
+        return Matrix.one( this.x.rows() );
     }
     
 }

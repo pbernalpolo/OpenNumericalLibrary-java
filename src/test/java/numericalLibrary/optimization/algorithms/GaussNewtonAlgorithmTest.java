@@ -30,13 +30,13 @@ public class GaussNewtonAlgorithmTest
     public void gaussNewtonOnNormSquaredConvergesInOneIteration()
     {
         LocallyQuadraticLoss loss = new NormSquaredLossFunction( 42 );
-        loss.setParameters( Matrix.random( 1 , 42 , new Random() ) );
+        loss.setParameters( Matrix.random( 42 , 1 , new Random( 42 ) ) );
         GaussNewtonAlgorithm gna = new GaussNewtonAlgorithm( loss );
         gna.setStoppingCriterion( new IterationThresholdStoppingCriterion( 100 ) );
         gna.initialize();
         gna.step();
         Matrix optimizedParameters = loss.getParameters();
-        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 1 , 42 ) , 1.0e-6 ) );
+        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-6 ) );
     }
     
 }
