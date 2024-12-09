@@ -7,8 +7,8 @@ import java.util.List;
 import numericalLibrary.optimization.algorithms.GradientDescentAlgorithm;
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.optimization.algorithms.LevenbergMarquardtAlgorithm;
-import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorLQL;
-import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredErrorLQL;
+import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorFromTargetsLocallyQuadraticLoss;
+import numericalLibrary.optimization.lossFunctions.SquaredErrorFromTargetLoss;
 import numericalLibrary.types.Matrix;
 import numericalLibrary.util.GaussianFunction;
 
@@ -27,7 +27,7 @@ public class GaussianFit
     {
         // Generate a known Gaussian function.
         GaussianFunction gaussianKnown = new GaussianFunction();
-        Matrix parameters = Matrix.fromArrayAsRow( new double[] { 3.0 , 2.0 , 5.0 } );
+        Matrix parameters = Matrix.fromArrayAsColumn( new double[] { 3.0 , 2.0 , 5.0 } );
         gaussianKnown.setParameters( parameters );
         
         // Sample with the known Gaussian function.
@@ -43,14 +43,15 @@ public class GaussianFit
         
         // Define the loss function.
         GaussianFunction gaussianUnknown = new GaussianFunction();
-        gaussianUnknown.setParameters( Matrix.fromArrayAsRow( new double[] { 1.0 , 0.0 , 1.0 } ) );
-        //MeanSquaredErrorLQL<Double> loss = new MeanSquaredErrorLQL<Double>( gaussianUnknown );
-        RobustMeanSquaredErrorLQL<Double> loss = new RobustMeanSquaredErrorLQL<Double>( gaussianUnknown );
-        loss.setInputListAndTargetList( inputList , targetList );
+        gaussianUnknown.setParameters( Matrix.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
+        SquaredErrorFromTargetLoss<Double> individualLoss = new SquaredErrorFromTargetLoss<Double>( gaussianUnknown );
+        MeanSquaredErrorFromTargetsLocallyQuadraticLoss<Double> mseLoss = new MeanSquaredErrorFromTargetsLocallyQuadraticLoss<Double>( individualLoss );
+        mseLoss.setInputListAndTargetList( inputList , targetList );
         
         // Find a solution using the Levenberg-Marquardt algorithm.
-        //GradientDescentAlgorithm algorithm = new GradientDescentAlgorithm( loss );
-        LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm( loss );
+        //GradientDescentAlgorithm algorithm = new GradientDescentAlgorithm( mseLoss );
+        //algorithm.setLearningRate( 1.0e-1 );
+        LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm( mseLoss );
         algorithm.setDampingFactor( 1.0e-4 );
         
         algorithm.initialize();

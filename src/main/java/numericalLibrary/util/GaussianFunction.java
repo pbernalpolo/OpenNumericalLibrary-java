@@ -74,8 +74,8 @@ public class GaussianFunction
     public void setParameters( Matrix theta )
     {
         this.a = theta.entry( 0 , 0 );
-        this.b = theta.entry( 0 , 1 );
-        this.c = theta.entry( 0 , 2 );
+        this.b = theta.entry( 1 , 0 );
+        this.c = theta.entry( 2 , 0 );
     }
     
     
@@ -84,10 +84,10 @@ public class GaussianFunction
      */
     public Matrix getParameters()
     {
-        Matrix output = Matrix.empty( 1 , 3 );
+        Matrix output = Matrix.empty( 3 , 1 );
         output.setEntry( 0,0 , this.a );
-        output.setEntry( 0,1 , this.b );
-        output.setEntry( 0,2 , this.c );
+        output.setEntry( 1,0 , this.b );
+        output.setEntry( 2,0 , this.c );
         return output;
     }
     
@@ -139,13 +139,14 @@ public class GaussianFunction
      */
     private void clean()
     {
-        if( this.dirtyFlag )
+        if( !this.dirtyFlag )
         {
-            diff = x - b;
-            oneOverCSquared = 1.0 / ( c * c );
-            this.dfda = Math.exp( -diff * diff * oneOverCSquared / 2.0 );
-            this.dirtyFlag = false;
+            return;
         }
+        diff = x - b;
+        oneOverCSquared = 1.0 / ( c * c );
+        this.dfda = Math.exp( -diff * diff * oneOverCSquared / 2.0 );
+        this.dirtyFlag = false;
     }
     
 }
