@@ -18,17 +18,17 @@ public interface Loss
     /**
      * Sets the parameters of the {@link Loss}.
      * 
-     * @param theta     row {@link Matrix} containing the parameters of the {@link Loss}.
+     * @param theta     column {@link Matrix} containing the parameters of the {@link Loss}.
      */
     public abstract void setParameters( Matrix theta );
     
     
     /**
-     * Returns the current parameters of the {@link Loss} represented as a row {@link Matrix}.
+     * Returns the current parameters of the {@link Loss} represented as a column {@link Matrix}.
      * <p>
      * Used to get the initial point in the solution space from which a {@link IterativeOptimizationAlgorithm} starts.
      * 
-     * @return  current parameters of the {@link Loss} represented as a row {@link Matrix}.
+     * @return  current parameters of the {@link Loss} represented as a column {@link Matrix}.
      */
     public abstract Matrix getParameters();
     

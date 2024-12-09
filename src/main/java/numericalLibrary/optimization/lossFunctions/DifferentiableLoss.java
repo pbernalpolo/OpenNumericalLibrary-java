@@ -6,7 +6,7 @@ import numericalLibrary.types.Matrix;
 
 
 /**
- * Represents a {@link Loss} whose Jacobian can be computed.
+ * Represents a {@link Loss} whose gradient can be computed.
  */
 public interface DifferentiableLoss
     extends Loss
@@ -16,12 +16,12 @@ public interface DifferentiableLoss
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Returns the Jacobian of the {@link DifferentiableLoss}.
+     * Returns the gradient of the {@link DifferentiableLoss} as a column matrix.
      * <p>
-     * The Jacobian is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
+     * The gradient is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
      * 
-     * @return  Jacobian of the {@link DifferentiableLoss}.
+     * @return  gradient of the {@link DifferentiableLoss} as a column matrix.
      */
-    public abstract Matrix getJacobian();
+    public abstract Matrix getGradient();
     
 }
