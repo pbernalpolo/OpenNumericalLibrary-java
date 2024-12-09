@@ -10,10 +10,24 @@ import numericalLibrary.types.Matrix;
  * Implements the Gradient Descent algorithm.
  * <p>
  * The Gradient Descent algorithm aims to minimize the loss function:
- * L( \theta ) = f( \theta )
+ * <br>
+ * L( \theta ) = F( \theta )
+ * <br>
  * where:
- * - f is a {@link DifferentiableLoss},
- * - \theta is the parameter vector, represented as a row {@link Matrix}.
+ * <ul>
+ *  <li> F is a {@link DifferentiableLoss},
+ *  <li> \theta is the parameter vector, represented as a column {@link Matrix}.
+ * </ul>
+ * <p>
+ * The gradient descent parameter update step takes the form:
+ * <br>
+ * \theta_{k+1} = \theta_k - \gamma g
+ * <br>
+ * where:
+ * <ul>
+ *  <li> g is the gradeint of F,
+ *  <li> gamma is the learning rate.
+ * </ul>
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Gradient_descent</a>
  */
@@ -85,20 +99,13 @@ public class GradientDescentAlgorithm
     /**
      * {@inheritDoc}
      * <p>
-     * theta_{k+1} = theta_k - gamma * ( d f / d theta )^T
+     * The increment in the parameter space is computed as:
+     * <br>
+     * \theta_{k+1} = \theta_k - gamma * ( d f / d theta )
      */
     public Matrix getDeltaParameters()
     {
-        /*
-         * Although the Gradient descent update is usually presented in the form:
-         * \theta_{k+1} = \theta_k - J^T
-         * being \theta a column vector, here \theta is assumed to be a row vector.
-         * This avoids the need to transpose the Jacobian, making the algorithm more efficient.
-         * The update equation takes the form:
-         * \theta_{k+1} = \theta_k - J
-         * this time being \theta a row vector.
-         */
-        return this.lossFunction.getJacobian().scaleInplace( -this.learningRate );
+        return this.lossFunction.getGradient().scaleInplace( -this.learningRate );
     }
     
 }

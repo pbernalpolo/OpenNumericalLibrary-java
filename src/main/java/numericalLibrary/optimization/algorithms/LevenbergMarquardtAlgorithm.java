@@ -10,10 +10,34 @@ import numericalLibrary.types.Matrix;
  * Implements the Levenberg-Marquardt algorithm.
  * <p>
  * The Levenberg-Marquardt algorithm aims to minimize the loss function:
- * L( \theta ) = F( \theta )
+ * L( \theta ) = F( \theta ) + \lambda || \delta ||^2
+ * <br>
  * where:
- * - F is a {@link LocallyQuadraticLoss},
- * - \theta is the parameter vector, represented as a row {@link Matrix}.
+ * <br>
+ * <ul>
+ *  <li> F is a {@link LocallyQuadraticLoss},
+ *  <li> \theta is the parameter vector, represented as a column {@link Matrix},
+ *  <li> \lambda is the damping factor,
+ *  <li> \delta is the increment in the parameter space.
+ * </ul>
+ * <p>
+ * The Levenberg-Marquardt parameter update step takes the form:
+ * <br>
+ * \theta_{k+1} = \theta_k - ( H^{-1} + \lambda I ) g
+ * <br>
+ * where:
+ * <ul>
+ *  <li> g is the gradient of F,
+ *  <li> H is the Gauss-Newton matrix of F,
+ *  <li> I is the identity matrix.
+ * </ul>
+ * If we think about a loss function defined as:
+ * <br>
+ * L( \theta ) = \sum_i || f( x_i , \theta ) - y_i ||^2
+ * <br>
+ * then the Levenberg-Marquardt parameter update step takes the more familiar form:
+ * <br>
+ * \theta_{k+1} = \theta_k - ( \sum_i  J_i^T  J_i  +  \lambda I )^{-1}  ( \sum_i  J_i^T  ( f( x_i , \theta ) - y_i ) )
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
  */
@@ -25,11 +49,11 @@ public class LevenbergMarquardtAlgorithm
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Damping factor used to improve stability.
+     * Identity matrix multiplied by the damping factor used to increase stability.
      * 
      * @see #setDampingFactor(double)
      */
-    private double lambda;
+    private Matrix lambdaIdentity;
     
     
     
@@ -67,7 +91,8 @@ public class LevenbergMarquardtAlgorithm
      */
     public void setDampingFactor( double dampingFactor )
     {
-        this.lambda = dampingFactor;
+        Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
+        this.lambdaIdentity = Matrix.one( gaussNewtonMatrix.cols() ).scaleInplace( dampingFactor );
     }
     
     
@@ -84,24 +109,15 @@ public class LevenbergMarquardtAlgorithm
     public Matrix getDeltaParameters()
     {
         Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
-        gaussNewtonMatrix.addInplace( Matrix.one( gaussNewtonMatrix.cols() ).scaleInplace( this.lambda ) );
+        gaussNewtonMatrix.addInplace( this.lambdaIdentity );
         Matrix L = null;
         try {
             L = gaussNewtonMatrix.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a larger damping factor with setDampingFactor method might help." );
         }
-        Matrix fTWJ = this.lossFunction.getJacobian();
-        /*
-         * Although the Levenberg-Marquardt update is usually presented in the form:
-         * \theta_{k+1} = \theta_k - ( J^T J + lambda I )^{-1} J^T ( r(\theta) )
-         * being \theta is a column vector, here \theta is assumed to be a row vector.
-         * This avoids the need to transpose the Jacobian, making the algorithm more efficient.
-         * The update equation takes the form:
-         * \theta_{k+1} = \theta_k - ( r(\theta) )^T J ( J^T J + lambda I )^{-1}
-         * this time being \theta a row vector.
-         */
-        return fTWJ.inverseAdditive().divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
+        Matrix gradient = this.lossFunction.getGradient();
+        return gradient.inverseAdditive().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     
 }

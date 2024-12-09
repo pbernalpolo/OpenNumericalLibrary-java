@@ -10,10 +10,31 @@ import numericalLibrary.types.Matrix;
  * Implements the Gauss-Newton algorithm.
  * <p>
  * The Gauss-Newton algorithm aims to minimize the loss function:
+ * <br>
  * L( \theta ) = F( \theta )
+ * <br>
  * where:
- * - F is a {@link LocallyQuadraticLoss},
- * - \theta is the parameter vector, represented as a row {@link Matrix}.
+ * <ul>
+ *  <li> F is a {@link LocallyQuadraticLoss},
+ *  <li> \theta is the parameter vector, represented as a column {@link Matrix}.
+ * </ul>
+ * <p>
+ * The Gauss-Newton parameter update step takes the form:
+ * <br>
+ * \theta_{k+1} = \theta_k - H^{-1} g
+ * <br>
+ * where:
+ * <ul>
+ *  <li> g is the gradient of F,
+ *  <li> H is the Gauss-Newton matrix of F.
+ * </ul>
+ * If we think about a loss function defined as:
+ * <br>
+ * L( \theta ) = \sum_i || f( x_i , \theta ) - y_i ||^2
+ * <br>
+ * then the Gauss-Newton parameter update step takes the more familiar form:
+ * <br>
+ * \theta_{k+1} = \theta_k - ( \sum_i  J_i^T  J_i )^{-1}  ( \sum_i  J_i^T  ( f( x_i , \theta ) - y_i ) )
  * 
  * @see <a href>https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm</a>
  */
@@ -54,17 +75,8 @@ public class GaussNewtonAlgorithm
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Using the Levenberg-Marquardt algorithm with a small damping factor can help." );
         }
-        Matrix fTWJ = this.lossFunction.getJacobian();
-        /*
-         * Although the Gauss-Newton update is usually presented in the form:
-         * \theta_{k+1} = \theta_k - ( J^T J )^{-1} J^T ( r(\theta) )
-         * being \theta a column vector, here \theta is assumed to be a row vector.
-         * This avoids the need to transpose the Jacobian, making the algorithm more efficient.
-         * The update equation takes the form:
-         * \theta_{k+1} = \theta_k - ( r(\theta) )^T J ( J^T J )^{-1}
-         * this time being \theta a row vector.
-         */
-        return fTWJ.inverseAdditive().divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
+        Matrix gradient = this.lossFunction.getGradient();
+        return gradient.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     
 }
