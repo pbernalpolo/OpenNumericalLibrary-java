@@ -1,13 +1,12 @@
 package numericalLibrary.optimization.robustFunctions;
 
 
-import numericalLibrary.optimization.lossFunctions.RobustSquaredErrorFromTargetLoss;
-import numericalLibrary.optimization.lossFunctions.RobustSquaredErrorFunctionLoss;
+import numericalLibrary.optimization.lossFunctions.Loss;
 
 
 
 /**
- * Represents a robust function to be used in {@link RobustSquaredErrorFunctionLoss} or {@link RobustSquaredErrorFromTargetLoss}.
+ * Represents a robust function used to define a robust cost in a {@link Loss}.
  */
 public interface RobustFunction
 {
