@@ -32,13 +32,13 @@ public class LevenbergMarquardtAlgorithmTest
         LocallyQuadraticLoss loss = new NormSquaredLossFunction( 42 );
         loss.setParameters( Matrix.random( 42 , 1 , new Random( 42 ) ) );
         LevenbergMarquardtAlgorithm lma = new LevenbergMarquardtAlgorithm( loss );
-        lma.setStoppingCriterion( new IterationThresholdStoppingCriterion( 4 ) );
+        lma.setStoppingCriterion( new IterationThresholdStoppingCriterion( 5 ) );
         lma.setDampingFactor( 1.0e-4 );
         lma.initialize();
         lma.iterate();
         Matrix optimizedParameters = loss.getParameters();
-        System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
-        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-15 ) );
+        //System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
+        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-18 ) );
     }
     
 }

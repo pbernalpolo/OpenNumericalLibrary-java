@@ -25,6 +25,21 @@ public class NormSquaredLossFunction
      */
     private Matrix x;
     
+    /**
+     * Last computed cost.
+     */
+    public double cost;
+    
+    /**
+     * Last computed gradient.
+     */
+    public Matrix gradient;
+    
+    /**
+     * Last computed Gauss-Newton matrix.
+     */
+    public Matrix gaussNewtonMatrix;
+    
     
     
     ////////////////////////////////////////////////////////////////
@@ -70,36 +85,79 @@ public class NormSquaredLossFunction
      */
     public double getCost()
     {
-        return this.x.normFrobeniusSquared();
+        return this.cost;
     }
     
     
     /**
      * {@inheritDoc}
-     * <p>
-     * Here we can think that although \theta is the parameter vector as a row matrix,
-     * it appears inside the norm squared as a column matrix.
-     * Then, the Jacobian of f(\theta) in ||f(\theta)||^2 is the identity.
-     * From that, we obtain that the Jacobian of ||f(\theta)||^2 is
-     * (\theta^T)^T * I = \theta
      */
     public Matrix getGradient()
     {
-        return this.x.copy();
+        return this.gradient;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Matrix getGaussNewtonMatrix()
+    {
+        return this.gaussNewtonMatrix;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void allocateGradient()
+    {
+        this.gradient = this.x.copy();
     }
     
     
     /**
      * {@inheritDoc}
      * <p>
-     * Here we can think that although \theta is the parameter vector as a row matrix,
-     * it appears inside the norm squared as a column matrix.
-     * Then, the Jacobian of f(\theta) in ||f(\theta)||^2 is the identity.
+     * The Jacobian of f(\theta) in 1/2 ||f(\theta)||^2 is the identity.
      * From that, we obtain that J^T J = I * I = I
      */
-    public Matrix getGaussNewtonMatrix()
+    public void allocateGaussNewtonMatrix()
     {
-        return Matrix.one( this.x.rows() );
+        this.gaussNewtonMatrix = Matrix.one( this.x.rows() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void updateCost()
+    {
+        this.cost = this.x.normFrobeniusSquared();
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The Jacobian of f(\theta) in ||f(\theta)||^2 is the identity.
+     * From that, we obtain that the gradient of 1/2 ||f(\theta)||^2 is
+     * J^T * f(\theta) = I * \theta = \theta
+     */
+    public void updateCostAndGradient()
+    {
+        this.updateCost();
+        this.gradient.setTo( this.x );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void updateCostGradientAndGaussNewtonMatrix()
+    {
+        this.updateCostAndGradient();
+        // Gauss-Newton matrix is always the identity.
     }
     
 }
