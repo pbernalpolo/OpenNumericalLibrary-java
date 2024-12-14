@@ -91,15 +91,23 @@ public class LevenbergMarquardtAlgorithm
      */
     public void setDampingFactor( double dampingFactor )
     {
-        Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
-        this.lambdaIdentity = Matrix.one( gaussNewtonMatrix.cols() ).scaleInplace( dampingFactor );
+        Matrix theta = this.lossFunction.getParameters();
+        this.lambdaIdentity = Matrix.one( theta.rows() ).scaleInplace( dampingFactor );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize()
+    {
+        // Call initialize on parent class.
+        super.initialize();
+        // Allocate memory for gradient and Gauss-Newton matrix.
+        this.lossFunction.allocateGradient();
+        this.lossFunction.allocateGaussNewtonMatrix();
+    }
     
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
-    ////////////////////////////////////////////////////////////////
     
     /**
      * {@inheritDoc}
@@ -108,6 +116,9 @@ public class LevenbergMarquardtAlgorithm
      */
     public Matrix getDeltaParameters()
     {
+        // Update cost, gradient, and Gauss-Newton matrix.
+        this.lossFunction.updateCostGradientAndGaussNewtonMatrix();
+        // Compute the step.
         Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
         gaussNewtonMatrix.addInplace( this.lambdaIdentity );
         Matrix L = null;

@@ -91,10 +91,17 @@ public class GradientDescentAlgorithm
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize()
+    {
+        // Call initialize on parent class.
+        super.initialize();
+        // Allocate memory for gradient and Gauss-Newton matrix.
+        this.lossFunction.allocateGradient();
+    }
     
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
-    ////////////////////////////////////////////////////////////////
     
     /**
      * {@inheritDoc}
@@ -105,6 +112,9 @@ public class GradientDescentAlgorithm
      */
     public Matrix getDeltaParameters()
     {
+        // Update cost, and the gradient.
+        this.lossFunction.updateCostAndGradient();
+        // Compute the step.
         return this.lossFunction.getGradient().scaleInplace( -this.learningRate );
     }
     
