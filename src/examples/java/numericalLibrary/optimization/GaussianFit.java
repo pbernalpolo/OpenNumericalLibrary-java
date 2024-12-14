@@ -7,8 +7,8 @@ import java.util.List;
 import numericalLibrary.optimization.algorithms.GradientDescentAlgorithm;
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.optimization.algorithms.LevenbergMarquardtAlgorithm;
-import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorFromTargetsLocallyQuadraticLoss;
-import numericalLibrary.optimization.lossFunctions.SquaredErrorFromTargetLoss;
+import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorFromTargets;
+import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
 import numericalLibrary.types.Matrix;
 import numericalLibrary.util.GaussianFunction;
 
@@ -44,26 +44,28 @@ public class GaussianFit
         // Define the loss function.
         GaussianFunction gaussianUnknown = new GaussianFunction();
         gaussianUnknown.setParameters( Matrix.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
-        SquaredErrorFromTargetLoss<Double> individualLoss = new SquaredErrorFromTargetLoss<Double>( gaussianUnknown );
-        MeanSquaredErrorFromTargetsLocallyQuadraticLoss<Double> mseLoss = new MeanSquaredErrorFromTargetsLocallyQuadraticLoss<Double>( individualLoss );
-        mseLoss.setInputListAndTargetList( inputList , targetList );
+        MeanSquaredErrorFromTargets<Double> loss = new MeanSquaredErrorFromTargets<Double>( gaussianUnknown );
+        loss.setInputListAndTargetList( inputList , targetList );
         
         // Find a solution using the Levenberg-Marquardt algorithm.
         //GradientDescentAlgorithm algorithm = new GradientDescentAlgorithm( mseLoss );
         //algorithm.setLearningRate( 1.0e-1 );
-        LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm( mseLoss );
+        LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm( loss );
         algorithm.setDampingFactor( 1.0e-4 );
+        algorithm.setStoppingCriterion( new MaximumIterationsWithoutImprovementStoppingCriterion( 4 ) );
         
         algorithm.initialize();
-        System.out.println( "error after " + algorithm.getIteration() + " iterations: " + algorithm.getCost() );
+        /*loss.updateCost();
+        System.out.println( "error after " + algorithm.getIteration() + " iterations: " + loss.getCost() );
         for( int i=0; i<50; i++) {
             algorithm.step();
-            System.out.println( "error after " + algorithm.getIteration() + " iterations: " + algorithm.getCost() );
-        }
-        //algorithm.iterate();
+            loss.updateCost();
+            System.out.println( "error after " + algorithm.getIteration() + " iterations: " + loss.getCost() );
+        }*/
+        algorithm.iterate();
         System.out.println();
         
-        System.out.println( "Last solution was obtained after " + algorithm.getIteration() + " iterations, and produces an error of " + algorithm.getCost() );
+        System.out.println( "Last solution was obtained after " + algorithm.getIteration() + " iterations, and produces an error of " + loss.getCost() );
         System.out.println( "Last solution is:" );
         gaussianUnknown.getParameters().print();
     }
