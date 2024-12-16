@@ -1,5 +1,6 @@
 package numericalLibrary.manifolds.unitQuaternions.atlases;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,10 +10,13 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
+import numericalLibrary.manifolds.Atlas;
 import numericalLibrary.manifolds.AtlasTester;
 import numericalLibrary.types.Quaternion;
 import numericalLibrary.types.UnitQuaternion;
 import numericalLibrary.types.Vector3;
+
+
 
 /**
  * Implements test methods for {@link UnitQuaternionAtlas}.

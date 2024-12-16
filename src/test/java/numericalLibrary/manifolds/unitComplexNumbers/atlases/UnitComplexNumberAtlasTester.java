@@ -10,6 +10,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
+import numericalLibrary.manifolds.Atlas;
 import numericalLibrary.manifolds.AtlasTester;
 import numericalLibrary.types.ComplexNumber;
 import numericalLibrary.types.RealNumber;
