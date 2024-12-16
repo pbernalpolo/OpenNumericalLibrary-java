@@ -14,40 +14,40 @@ import numericalLibrary.types.Matrix;
 
 
 /**
- * Implements test methods for {@link OptimizableFunction}.
+ * Implements test methods for {@link ModelFunction}.
  * 
- * @param <T>   concrete type of {@link OptimizableFunction}.
+ * @param <T>   type of inputs to this {@link ModelFunction}.
  */
-public interface OptimizableFunctionTester<T>
+public interface ModelFunctionTester<T>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Returns the {@link OptimizableFunction} to be tested.
+     * Returns the {@link ModelFunction} to be tested.
      * 
-     * @return  {@link OptimizableFunction} to be tested.
+     * @return  {@link ModelFunction} to be tested.
      */
-    public OptimizableFunction<T> getModelFunction();
+    public ModelFunction<T> getModelFunction();
     
     
     /**
-     * Returns a list of inputs to evaluate the {@link OptimizableFunction}.
+     * Returns a list of inputs to evaluate the {@link ModelFunction}.
      * <p>
      * The size of the list must be the same as the size returned by {@link #getParameterList()}.
      * 
-     * @return  list of inputs to evaluate the {@link OptimizableFunction}.
+     * @return  list of inputs to evaluate the {@link ModelFunction}.
      */
     public List<T> getInputList();
     
     
     /**
-     * Returns a list of parameters to evaluate the {@link OptimizableFunction}.
+     * Returns a list of parameters to evaluate the {@link ModelFunction}.
      * <p>
      * The size of the list must be the same as the size returned by {@link #getInputList()}.
      * 
-     * @return  list of parameters to evaluate the {@link OptimizableFunction}.
+     * @return  list of parameters to evaluate the {@link ModelFunction}.
      */
     public List<Matrix> getParameterList();
     
@@ -68,13 +68,13 @@ public interface OptimizableFunctionTester<T>
     
     
     /**
-     * Tests that {@link OptimizableFunction#getParameters()} returns a column {@link Matrix}.
+     * Tests that {@link ModelFunction#getParameters()} returns a column {@link Matrix}.
      */
     @Test
     default void getParametersReturnColumnMatrix()
     {
         // Get parameters from model function.
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         Matrix parameters = modelFunction.getParameters();
         // They must be a column matrix.
         assertEquals( 1 , parameters.cols() );
@@ -82,13 +82,13 @@ public interface OptimizableFunctionTester<T>
     
     
     /**
-     * Tests that calling {@link OptimizableFunction#getParameters()}, then {@link OptimizableFunction#setParameters(Matrix)}, and then {@link OptimizableFunction#getParameters()} again returns same parameters we started with.
+     * Tests that calling {@link ModelFunction#getParameters()}, then {@link ModelFunction#setParameters(Matrix)}, and then {@link ModelFunction#getParameters()} again returns same parameters we started with.
      */
     @Test
     default void setParametersGetParametersDoesNotChangeParameters()
     {
         // Get model function.
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         // Get parameter list.
         List<Matrix> parameterList = this.getParameterList();
         for( int i=0; i<parameterList.size(); i++ ) {
@@ -110,7 +110,7 @@ public interface OptimizableFunctionTester<T>
     @Test
     default void differentInputsProduceDifferentOutputs()
     {
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
@@ -134,7 +134,7 @@ public interface OptimizableFunctionTester<T>
     @Test
     default void differentInputsProduceDifferentJacobian()
     {
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
@@ -153,12 +153,12 @@ public interface OptimizableFunctionTester<T>
     
     
     /**
-     * Tests that {@link OptimizableFunction#getJacobian()} and {@link OptimizableFunction#getOutput()} return {@link Matrix}s with same number of rows.
+     * Tests that {@link ModelFunction#getJacobian()} and {@link ModelFunction#getOutput()} return {@link Matrix}s with same number of rows.
      */
     @Test
     default void jacobianHasSameRowsAsOutput()
     {
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         List<Matrix> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size(); i++ ) {
@@ -176,13 +176,13 @@ public interface OptimizableFunctionTester<T>
     
     
     /**
-     * Tests that {@link OptimizableFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
+     * Tests that {@link ModelFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
      */
     @Test
     default void jacobianHasSameColumnsAsParameters()
     {
         // Get parameters from model function.
-        OptimizableFunction<T> modelFunction = this.getModelFunction();
+        ModelFunction<T> modelFunction = this.getModelFunction();
         Matrix parameters = modelFunction.getParameters();
         // Get the Jacobian.
         Matrix jacobian = modelFunction.getJacobian();

@@ -1,13 +1,14 @@
 package numericalLibrary.util;
 
 
-import numericalLibrary.optimization.OptimizableFunction;
+import numericalLibrary.optimization.ModelFunction;
+import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.types.Matrix;
 
 
 
 /**
- * Implements a Gaussian function to fit data using the {@link LevenbergMarquardtAlgorithm}.
+ * Implements a Gaussian function to fit data using a {@link IterativeOptimizationAlgorithm}.
  * <p>
  * Concretely, the Gaussian function is given by:
  *      a exp( -( x - b )^2/( 2 * c^2 )
@@ -15,7 +16,7 @@ import numericalLibrary.types.Matrix;
  * @see <a href>https://en.wikipedia.org/wiki/Gaussian_function</a>
  */
 public class GaussianFunction
-    implements OptimizableFunction<Double>
+    implements ModelFunction<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -138,13 +139,14 @@ public class GaussianFunction
      */
     private void clean()
     {
-        if( this.dirtyFlag )
+        if( !this.dirtyFlag )
         {
-            diff = x - b;
-            oneOverCSquared = 1.0 / ( c * c );
-            this.dfda = Math.exp( -diff * diff * oneOverCSquared / 2.0 );
-            this.dirtyFlag = false;
+            return;
         }
+        diff = x - b;
+        oneOverCSquared = 1.0 / ( c * c );
+        this.dfda = Math.exp( -diff * diff * oneOverCSquared / 2.0 );
+        this.dirtyFlag = false;
     }
     
 }

@@ -426,17 +426,25 @@ public class Quaternion
     {
         return Math.sqrt( this.normSquared() );
     }
-
-
+    
+    
     public Quaternion normalize()
     {
-        return this.scale( 1.0/this.norm() );
+        double normSquared = this.normSquared();
+        if( normSquared <= 0.0 ) {
+            throw new IllegalArgumentException( "Zero quaternion can not be normalized." );
+        }
+        return this.scale( 1.0/Math.sqrt( normSquared ) );
     }
 
 
     public Quaternion normalizeInplace()
     {
-        return this.scaleInplace( 1.0/this.norm() );
+        double normSquared = this.normSquared();
+        if( normSquared <= 0.0 ) {
+            throw new IllegalArgumentException( "Zero quaternion can not be normalized." );
+        }
+        return this.scaleInplace( 1.0/Math.sqrt( normSquared ) );
     }
     
 /*

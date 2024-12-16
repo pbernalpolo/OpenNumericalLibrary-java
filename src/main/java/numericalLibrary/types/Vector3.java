@@ -256,17 +256,19 @@ public class Vector3
     
     public Matrix crossProductMatrix()
     {
-        return Matrix.matrix3x3( 0.0      , -this.z() ,  this.y() ,
-                                     this.z() ,  0.0      , -this.x() ,
-                                    -this.y() ,  this.x() ,  0.0      );
+        return Matrix.fromEntries3x3(
+                0.0      , -this.z() ,  this.y() ,
+                this.z() ,  0.0      , -this.x() ,
+               -this.y() ,  this.x() ,  0.0      );
     }
     
     
     public Matrix outerProduct( Vector3 other )
     {
-        return Matrix.matrix3x3( this.x() * other.x() , this.x() * other.y() , this.x() * other.z() ,
-                                     this.y() * other.x() , this.y() * other.y() , this.y() * other.z() ,
-                                     this.z() * other.x() , this.z() * other.y() , this.z() * other.z() );
+        return Matrix.fromEntries3x3(
+                this.x() * other.x() , this.x() * other.y() , this.x() * other.z() ,
+                this.y() * other.x() , this.y() * other.y() , this.y() * other.z() ,
+                this.z() * other.x() , this.z() * other.y() , this.z() * other.z() );
     }
     
     
@@ -279,6 +281,20 @@ public class Vector3
     public Matrix toMatrixAsRow()
     {
         return Matrix.fromVector3AsRow( this );
+    }
+    
+    
+    /**
+     * Returns the {@link Vector3} as a flat array.
+     * <p>
+     * The output is:
+     * new double[] { this.x() , this.y() , this.z() };
+     * 
+     * @return  {@link Vector3} as a flat array.
+     */
+    public double[] toFlatArray()
+    {
+        return new double[] { this.x() , this.y() , this.z() };
     }
     
     
@@ -308,6 +324,21 @@ public class Vector3
     public static Vector3 k()
     {
         return new Vector3( 0.0 , 0.0 , 1.0 );
+    }
+    
+    
+    /**
+     * Returns a new {@link Vector3} constructed from a flat array.
+     * 
+     * @param flatArray     array that contains the {@link Vector3} elements.
+     * @return  new {@link Vector3} constructed from a flat array.
+     */
+    public static Vector3 fromFlatArray( double[] flatArray )
+    {
+        if( flatArray.length < 3 ) {
+            throw new IllegalArgumentException( "Not enough elements in flatArray; found " + flatArray.length + "; expected 3 or more." );
+        }
+        return new Vector3( flatArray[0] , flatArray[1] , flatArray[2] );
     }
     
     

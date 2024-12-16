@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import numericalLibrary.optimization.OptimizableFunction;
-import numericalLibrary.optimization.OptimizableFunctionTester;
+import numericalLibrary.optimization.ModelFunction;
+import numericalLibrary.optimization.ModelFunctionTester;
 import numericalLibrary.types.Matrix;
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  */
 class GaussianFunctionTest
     implements
-        OptimizableFunctionTester<Double>
+        ModelFunctionTester<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
@@ -25,7 +25,7 @@ class GaussianFunctionTest
     /**
      * {@inheritDoc}
      */
-    public OptimizableFunction<Double> getModelFunction()
+    public ModelFunction<Double> getModelFunction()
     {
         return new GaussianFunction();
     }
@@ -52,7 +52,7 @@ class GaussianFunctionTest
         List<Matrix> output = new ArrayList<Matrix>();
         Random randomNumberGenerator = new Random( 42 );
         for( int i=0; i<100; i++ ) {
-            output.add( Matrix.columnFromArray( new double[] {
+            output.add( Matrix.fromArrayAsColumn( new double[] {
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() } ) );

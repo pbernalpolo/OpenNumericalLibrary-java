@@ -599,6 +599,27 @@ public class Matrix
     }
     
     
+    /**
+     * Returns the {@link Matrix} elements stored in a flat array.
+     * <p>
+     * The {@link Matrix} elements are stored row after row, so the output array will be:
+     * output = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
+     * 
+     * @return  {@link Matrix} elements stored in a flat array.
+     */
+    public double[] toFlatArray()
+    {
+        double[] output = new double[ this.rows() * this.cols() ];
+        int c = 0;
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                output[c++] = this.entryUnchecked( i , j );
+            }
+        }
+        return output;
+    }
+    
+    
     public double[] rowAsArray( int i )
     {
         double[] row = new double[this.cols()];
@@ -758,87 +779,196 @@ public class Matrix
     }
     
     
-    public static Matrix rowFromArray( double[] theArray )
+    /**
+     * Returns a new {@link Matrix} built from a flat array.
+     * <p>
+     * The {@link Matrix} elements must be stored row after row, so the flatArray array must have the form:
+     * flatArray = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
+     * 
+     * @param flatArray     flat array that contains the {@link Matrix} elements row after row.
+     * @param numberOfRows  number of rows of the output {@link Matrix}.
+     * @param numberOfColumns   number of columns of the output {@link Matrix}.
+     * @return  new {@link Matrix} build from a flat array.
+     * 
+     * @throws IllegalArgumentException if length of flatArray does not match provided {@link Matrix} size.
+     */
+    public static Matrix fromFlatArray( double[] flatArray , int numberOfRows , int numberOfColumns )
     {
-        Matrix m = Matrix.empty( 1 , theArray.length );
-        for( int j=0; j<theArray.length; j++ ) {
-            m.setEntryUnchecked( 0,j , theArray[j] );
+        if( numberOfRows * numberOfColumns != flatArray.length ) {
+            throw new IllegalArgumentException( "Length of flatArray (" + flatArray.length + ") does not match size of matrix ( " + numberOfRows + " x " + numberOfColumns + " )" );
         }
-        return m;
-    }
-    
-    
-    public static Matrix columnFromArray( double[] theArray )
-    {
-        Matrix m = Matrix.empty( theArray.length , 1 );
-        for( int i=0; i<theArray.length; i++ ) {
-            m.setEntryUnchecked( i,0 , theArray[i] );
+        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
+        int c = 0;
+        for( int i=0; i<output.rows(); i++ ) {
+            for( int j=0; j<output.cols(); j++ ) {
+                output.setEntryUnchecked( i , j , flatArray[c++] );
+            }
         }
-        return m;
+        return output;
     }
     
     
-    public static Matrix vector2( double v1 , double v2 )
+    /**
+     * Returns a new column {@link Matrix} built from an array.
+     * <p>
+     * The size of the returned matrix is ( array.length , 1 ).
+     * 
+     * @param array     array that contains the entries of the column {@link Matrix}.
+     * @return  new column {@link Matrix} built from an array.
+     */
+    public static Matrix fromArrayAsColumn( double[] array )
     {
-        return Matrix.fromArray2D( new double[][] { { v1 } , { v2 } } );
+        Matrix output = Matrix.empty( array.length , 1 );
+        for( int i=0; i<array.length; i++ ) {
+            output.setEntryUnchecked( i,0 , array[i] );
+        }
+        return output;
     }
     
     
-    public static Matrix vector3( double v1 , double v2 , double v3 )
+    /**
+     * Returns a new row {@link Matrix} built from an array.
+     * <p>
+     * The size of the returned matrix is ( 1 , array.length )
+     * 
+     * @param array     array that contains the entries of the of the row {@link Matrix}.
+     * @return  new row {@link Matrix} built from an array.
+     */
+    public static Matrix fromArrayAsRow( double[] array )
     {
-        return Matrix.fromArray2D( new double[][] { { v1 } , { v2 } , { v3 } } );
+        Matrix output = Matrix.empty( 1 , array.length );
+        for( int j=0; j<array.length; j++ ) {
+            output.setEntryUnchecked( 0,j , array[j] );
+        }
+        return output;
     }
     
     
-    public static Matrix matrix2x2( double m11 , double m12 , double m21 , double m22 )
+    /**
+     * Returns a new {@link Matrix} built from a 2d array.
+     * <p>
+     * The size of the returned matrix is set from the dimensions of the input 2d array:
+     * <ul>
+     *  <li> array.length -> number of rows
+     *  <li> array[0].length -> number of columns
+     *  <li> array[i][j] is obtained from {@link Matrix#entry(int, int)}
+     * </ul>
+     * 
+     * @param array     2d array that contains the {@link Matrix} entries.
+     * @return  new {@link Matrix} built from a 2d array.
+     */
+    public static Matrix fromArray2D( double[][] array )
     {
-        return Matrix.fromArray2D( new double[][] { { m11 , m12 } ,
-                                                        { m21 , m22 } } );
+        Matrix output = new Matrix( array.length , array[0].length );
+        for( int i=0; i<output.rows(); i++ ) {
+            for( int j=0; j<output.cols(); j++ ) {
+                output.setEntryUnchecked( i,j , array[i][j] );
+            }
+        }
+        return output;
     }
     
     
-    public static Matrix matrix3x3( double m11 , double m12 , double m13 , double m21 , double m22 , double m23 , double m31 , double m32 , double m33 )
+    /**
+     * Returns a new 2x2 {@link Matrix} from its entries.
+     * 
+     * @param a11    entry stored in (0,0)
+     * @param a12    entry stored in (0,1)
+     * @param a21    entry stored in (1,0)
+     * @param a22    entry stored in (1,1)
+     * @return  new 2x2 {@link Matrix} from its entries.
+     */
+    public static Matrix fromEntries2x2( double a11 , double a12 , double a21 , double a22 )
     {
-        return Matrix.fromArray2D( new double[][] { { m11 , m12 , m13 } ,
-                                                        { m21 , m22 , m23 } ,
-                                                        { m31 , m32 , m33 } } );
+        Matrix output = Matrix.empty( 2 , 2 );
+        output.setEntryUnchecked( 0,0 , a11 );    output.setEntryUnchecked( 0,1 , a12 );
+        output.setEntryUnchecked( 1,0 , a21 );    output.setEntryUnchecked( 1,1 , a22 );
+        return output;
     }
     
     
+    /**
+     * Returns a new 3x3 {@link Matrix} from its entries.
+     * 
+     * @param a11   entry stored in (0,0)
+     * @param a12   entry stored in (0,1)
+     * @param a13   entry stored in (0,2)
+     * @param a21   entry stored in (1,0)
+     * @param a22   entry stored in (1,1)
+     * @param a23   entry stored in (1,2)
+     * @param a31   entry stored in (2,0)
+     * @param a32   entry stored in (2,1)
+     * @param a33   entry stored in (2,2)
+     * @return  new 3x3 {@link Matrix} from its entries.
+     */
+    public static Matrix fromEntries3x3( double a11 , double a12 , double a13 , double a21 , double a22 , double a23 , double a31 , double a32 , double a33 )
+    {
+        Matrix output = Matrix.empty( 3 , 3 );
+        output.setEntryUnchecked( 0,0 , a11 );    output.setEntryUnchecked( 0,1 , a12 );    output.setEntryUnchecked( 0,2 , a13 );
+        output.setEntryUnchecked( 1,0 , a21 );    output.setEntryUnchecked( 1,1 , a22 );    output.setEntryUnchecked( 1,2 , a23 );
+        output.setEntryUnchecked( 2,0 , a31 );    output.setEntryUnchecked( 2,1 , a32 );    output.setEntryUnchecked( 2,2 , a33 );
+        return output;
+    }
+    
+    
+    /**
+     * Returns a new column {@link Matrix} from a {@link Vector2}.
+     * 
+     * @param v     {@link Vector2} from which the column {@link Matrix} will be built.
+     * @return  new column {@link Matrix} from a {@link Vector2}.
+     */
     public static Matrix fromVector2AsColumn( Vector2 v )
     {
         Matrix output = Matrix.empty( 2 , 1 );
-        output.setEntry( 0,0 , v.x() );
-        output.setEntry( 1,0 , v.y() );
+        output.setEntryUnchecked( 0,0 , v.x() );
+        output.setEntryUnchecked( 1,0 , v.y() );
         return output;
     }
     
     
+    /**
+     * Returns a new row {@link Matrix} from a {@link Vector2}.
+     * 
+     * @param v     {@link Vector2} from which the row {@link Matrix} will be built.
+     * @return  new row {@link Matrix} from a {@link Vector2}.
+     */
     public static Matrix fromVector2AsRow( Vector2 v )
     {
         Matrix output = Matrix.empty( 1 , 2 );
-        output.setEntry( 0,0 , v.x() );
-        output.setEntry( 0,1 , v.y() );
+        output.setEntryUnchecked( 0,0 , v.x() );
+        output.setEntryUnchecked( 0,1 , v.y() );
         return output;
     }
     
     
+    /**
+     * Returns a new column {@link Matrix} from a {@link Vector3}.
+     * 
+     * @param v     {@link Vector3} from which the column {@link Matrix} will be built.
+     * @return  new column {@link Matrix} from a {@link Vector3}.
+     */
     public static Matrix fromVector3AsColumn( Vector3 v )
     {
         Matrix output = Matrix.empty( 3 , 1 );
-        output.setEntry( 0,0 , v.x() );
-        output.setEntry( 1,0 , v.y() );
-        output.setEntry( 2,0 , v.z() );
+        output.setEntryUnchecked( 0,0 , v.x() );
+        output.setEntryUnchecked( 1,0 , v.y() );
+        output.setEntryUnchecked( 2,0 , v.z() );
         return output;
     }
     
     
+    /**
+     * Returns a new row {@link Matrix} from a {@link Vector3}.
+     * 
+     * @param v     {@link Vector3} from which the row {@link Matrix} will be built.
+     * @return  new row {@link Matrix} from a {@link Vector3}.
+     */
     public static Matrix fromVector3AsRow( Vector3 v )
     {
         Matrix output = Matrix.empty( 1 , 3 );
-        output.setEntry( 0,0 , v.x() );
-        output.setEntry( 0,1 , v.y() );
-        output.setEntry( 0,2 , v.z() );
+        output.setEntryUnchecked( 0,0 , v.x() );
+        output.setEntryUnchecked( 0,1 , v.y() );
+        output.setEntryUnchecked( 0,2 , v.z() );
         return output;
     }
     
@@ -881,7 +1011,7 @@ public class Matrix
     
     public static Matrix rotation2d( double rotationAngle )
     {
-        return Matrix.matrix2x2(
+        return Matrix.fromEntries2x2(
                 Math.cos( rotationAngle ) , -Math.sin( rotationAngle ) ,
                 Math.sin( rotationAngle ) ,  Math.cos( rotationAngle ) );
     }
@@ -932,18 +1062,6 @@ public class Matrix
     ////////////////////////////////////////////////////////////////
     // PRIVATE METHODS
     ////////////////////////////////////////////////////////////////
-    
-    private static Matrix fromArray2D( double[][] theArray )
-    {
-        Matrix output = new Matrix( theArray.length , theArray[0].length );
-        for( int i=0; i<output.rows(); i++ ) {
-            for( int j=0; j<output.cols(); j++ ) {
-                output.setEntryUnchecked( i,j , theArray[i][j] );
-            }
-        }
-        return output;
-    }
-    
     
     private void setEntryUnchecked( int i , int j , double value )
     {
