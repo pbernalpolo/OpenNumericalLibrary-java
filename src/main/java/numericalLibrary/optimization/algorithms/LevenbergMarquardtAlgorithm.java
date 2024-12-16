@@ -98,27 +98,11 @@ public class LevenbergMarquardtAlgorithm
     
     /**
      * {@inheritDoc}
-     */
-    public void initialize()
-    {
-        // Call initialize on parent class.
-        super.initialize();
-        // Allocate memory for gradient and Gauss-Newton matrix.
-        this.lossFunction.allocateGradient();
-        this.lossFunction.allocateGaussNewtonMatrix();
-    }
-    
-    
-    /**
-     * {@inheritDoc}
      * 
      * @throws IllegalStateException if a non positive-definite {@link Matrix} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
      */
     public Matrix getDeltaParameters()
     {
-        // Update cost, gradient, and Gauss-Newton matrix.
-        this.lossFunction.updateCostGradientAndGaussNewtonMatrix();
-        // Compute the step.
         Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
         gaussNewtonMatrix.addInplace( this.lambdaIdentity );
         Matrix L = null;
