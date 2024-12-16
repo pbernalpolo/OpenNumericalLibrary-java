@@ -34,23 +34,7 @@ public interface LocallyQuadraticLoss
      * The approximate Hessian matrix is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
      * 
      * @return  approximate Hessian matrix of the {@link LocallyQuadraticLoss}.
-     * 
-     * @see #updateCostGradientAndGaussNewtonMatrix()
      */
     public abstract Matrix getGaussNewtonMatrix();
-    
-    
-    /**
-     * Allocates the {@link Matrix} that holds the Gauss-Newton matrix.
-     * 
-     * @see #getGaussNewtonMatrix()
-     */
-    public abstract void allocateGaussNewtonMatrix();
-    
-    
-    /**
-     * Updates the values returned by {@link #getCost()}, {@link #getGradient()}, and {@link #getGaussNewtonMatrix()}.
-     */
-    public abstract void updateCostGradientAndGaussNewtonMatrix();
     
 }

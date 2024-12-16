@@ -37,18 +37,9 @@ public interface Loss
      * Returns the output of the {@link Loss}.
      * <p>
      * The loss function is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
-     * The value of the cost must be updated before calling this method.
      * 
      * @return  output of the {@link Loss}.
-     * 
-     * @see #updateCost()
      */
     public abstract double getCost();
-    
-    
-    /**
-     * Updates the value returned by {@link #getCost()}.
-     */
-    public abstract void updateCost();
     
 }
