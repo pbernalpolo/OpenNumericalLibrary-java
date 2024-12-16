@@ -8,6 +8,8 @@ import numericalLibrary.optimization.algorithms.GradientDescentAlgorithm;
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.optimization.algorithms.LevenbergMarquardtAlgorithm;
 import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorFromTargets;
+import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredErrorFromTargets;
+import numericalLibrary.optimization.robustFunctions.MaximumDistanceRobustFunction;
 import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
 import numericalLibrary.types.Matrix;
 import numericalLibrary.util.GaussianFunction;
@@ -46,23 +48,24 @@ public class GaussianFit
         gaussianUnknown.setParameters( Matrix.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
         MeanSquaredErrorFromTargets<Double> loss = new MeanSquaredErrorFromTargets<Double>( gaussianUnknown );
         loss.setInputListAndTargetList( inputList , targetList );
+        /*RobustMeanSquaredErrorFromTargets<Double> loss = new RobustMeanSquaredErrorFromTargets<Double>( gaussianUnknown );
+        loss.setRobustFunction( new MaximumDistanceRobustFunction( 1.0e1 ) );
+        loss.setInputListAndTargetList( inputList , targetList );*/
         
         // Find a solution using the Levenberg-Marquardt algorithm.
         //GradientDescentAlgorithm algorithm = new GradientDescentAlgorithm( mseLoss );
         //algorithm.setLearningRate( 1.0e-1 );
         LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm( loss );
-        algorithm.setDampingFactor( 1.0e-4 );
+        algorithm.setDampingFactor( 1.0e-8 );
         algorithm.setStoppingCriterion( new MaximumIterationsWithoutImprovementStoppingCriterion( 4 ) );
         
         algorithm.initialize();
-        /*loss.updateCost();
         System.out.println( "error after " + algorithm.getIteration() + " iterations: " + loss.getCost() );
         for( int i=0; i<50; i++) {
             algorithm.step();
-            loss.updateCost();
             System.out.println( "error after " + algorithm.getIteration() + " iterations: " + loss.getCost() );
-        }*/
-        algorithm.iterate();
+        }
+        //algorithm.iterate();
         System.out.println();
         
         System.out.println( "Last solution was obtained after " + algorithm.getIteration() + " iterations, and produces an error of " + loss.getCost() );
