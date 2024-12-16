@@ -24,7 +24,7 @@ import numericalLibrary.types.Matrix;
  * @param <T>   type of inputs to the {@link ModelFunction} f.
  */
 public class WeightedMeanErrorFunction<T>
-    extends AbstractLocallyQuadraticLossDefinedWithModelFunction<T>
+    extends EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     implements DifferentiableLoss
 {
     ////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public class WeightedMeanErrorFunction<T>
     /**
      * Constructs a {@link WeightedMeanErrorFunction}.
      * 
-     * @param squaredErrorFunctionLoss   {@link SquaredErrorFunctionLoss} used to define the loss.
+     * @param modelFunction   {@link ModelFunction} used to define the loss.
      */
     public WeightedMeanErrorFunction( ModelFunction<T> modelFunction )
     {
@@ -64,9 +64,9 @@ public class WeightedMeanErrorFunction<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Sets the list of inputs to the {@link SquaredErrorFunctionLoss} and their weights.
+     * Sets the list of inputs to the {@link WeightedMeanErrorFunction} and their weights.
      * 
-     * @param modelFunctionInputList    list of inputs to {@link SquaredErrorFunctionLoss}.
+     * @param modelFunctionInputList    list of inputs to {@link WeightedMeanErrorFunction}.
      * @param weightList    list of weights that define the importance of each input.
      */
     public void setInputListAndWeightList( List<T> modelFunctionInputList , List<Double> weightList )
@@ -76,81 +76,110 @@ public class WeightedMeanErrorFunction<T>
         }
         this.inputList = modelFunctionInputList;
         this.weightList = weightList;
+        this.dirtyFlag = true;
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PROTECTED METHODS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected WeightedMeanErrorFunctionDifferentiableLossUpdateStrategy getDifferentiableLossUpdateStrategy()
+    {
+        return new WeightedMeanErrorFunctionDifferentiableLossUpdateStrategy();
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public void updateCost()
+    protected WeightedMeanErrorFunctionLocallyQuadraticLossUpdateStrategy getLocallyQuadraticLossUpdateStrategy()
     {
-        // Initialize cost, and gradient.
-        this.cost = 0.0;
-        // For each input...
-        for( int i=0; i<this.inputList.size(); i++ ) {
-            // Set the input.
-            T input = this.inputList.get( i );
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            double weight = this.weightList.get( i );
-            // Add contribution to cost, and gradient.
-            this.cost += weight * modelFunctionOutput.normFrobeniusSquared();
+        return new WeightedMeanErrorFunctionLocallyQuadraticLossUpdateStrategy();
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE CLASSES
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Implements the strategy that offers better performance at the expense of only being able to use the class as a {@link DifferentiableLoss}.
+     */
+    private class WeightedMeanErrorFunctionDifferentiableLossUpdateStrategy
+        implements LocallyQuadraticLossDefinedWithModelFunctionUpdateStrategy<T>
+    {
+        /**
+         * {@inheritDoc}
+         */
+        public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
+        {
+            // Initialize cost, and gradient.
+            loss.cost = 0.0;
+            loss.gradient.setToZero();
+            // For each input...
+            for( int i=0; i<inputList.size(); i++ ) {
+                // Set the input.
+                T input = inputList.get( i );
+                loss.modelFunction.setInput( input );
+                // Compute quantities involved in the cost and gradient.
+                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                Matrix J = loss.modelFunction.getJacobian();
+                double weight = weightList.get( i );
+                Matrix JWT = J.transpose().scaleInplace( weight );
+                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
+                // Add contribution to cost, and gradient.
+                loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
+                loss.gradient.addInplace( gradient_i );
+            }
+            double oneOverInputListSize = 1.0/inputList.size();
+            loss.cost *= oneOverInputListSize;
+            loss.gradient.scaleInplace( oneOverInputListSize );
         }
     }
     
     
     /**
-     * {@inheritDoc}
+     * Implements the strategy that allows to use the class as a {@link LocallyQuadraticLoss}.
      */
-    public void updateCostAndGradient()
+    private class WeightedMeanErrorFunctionLocallyQuadraticLossUpdateStrategy
+        implements LocallyQuadraticLossDefinedWithModelFunctionUpdateStrategy<T>
     {
-        // Initialize cost, and gradient.
-        this.cost = 0.0;
-        this.gradient.setToZero();
-        // For each input...
-        for( int i=0; i<this.inputList.size(); i++ ) {
-            // Set the input.
-            T input = this.inputList.get( i );
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            Matrix J = this.modelFunction.getJacobian();
-            double weight = this.weightList.get( i );
-            Matrix JWT = J.transpose().scaleInplace( weight );
-            Matrix gradient_i = JWT.multiply( modelFunctionOutput );
-            // Add contribution to cost, and gradient.
-            this.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-            this.gradient.addInplace( gradient_i );
-        }
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void updateCostGradientAndGaussNewtonMatrix()
-    {
-        // Initialize cost, and gradient.
-        this.cost = 0.0;
-        this.gradient.setToZero();
-        this.gaussNewtonMatrix.setToZero();
-        // For each input...
-        for( int i=0; i<this.inputList.size(); i++ ) {
-            // Set the input.
-            T input = this.inputList.get( i );
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            Matrix J = this.modelFunction.getJacobian();
-            double weight = this.weightList.get( i );
-            Matrix JWT = J.transpose().scaleInplace( weight );
-            Matrix gradient_i = JWT.multiply( modelFunctionOutput );
-            Matrix gaussNewtonMatrix_i = JWT.multiply( J );
-            // Add contribution to cost, and gradient.
-            this.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-            this.gradient.addInplace( gradient_i );
-            this.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+        /**
+         * {@inheritDoc}
+         */
+        public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
+        {
+            // Initialize cost, and gradient.
+            loss.cost = 0.0;
+            loss.gradient.setToZero();
+            loss.gaussNewtonMatrix.setToZero();
+            // For each input...
+            for( int i=0; i<inputList.size(); i++ ) {
+                // Set the input.
+                T input = inputList.get( i );
+                loss.modelFunction.setInput( input );
+                // Compute quantities involved in the cost and gradient.
+                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                Matrix J = loss.modelFunction.getJacobian();
+                double weight = weightList.get( i );
+                Matrix JWT = J.transpose().scaleInplace( weight );
+                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
+                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
+                // Add contribution to cost, and gradient.
+                loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
+                loss.gradient.addInplace( gradient_i );
+                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+            }
+            double oneOverInputListSize = 1.0/inputList.size();
+            loss.cost *= oneOverInputListSize;
+            loss.gradient.scaleInplace( oneOverInputListSize );
+            loss.gaussNewtonMatrix.scaleInplace( oneOverInputListSize );
         }
     }
     

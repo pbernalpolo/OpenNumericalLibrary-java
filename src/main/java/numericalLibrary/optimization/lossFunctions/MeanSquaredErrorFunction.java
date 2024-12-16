@@ -23,17 +23,17 @@ import numericalLibrary.types.Matrix;
  * @param <T>   type of inputs to the {@link ModelFunction} f.
  */
 public class MeanSquaredErrorFunction<T>
-    extends AbstractLocallyQuadraticLossDefinedWithModelFunction<T>
+    extends EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     implements LocallyQuadraticLoss
 {
     ////////////////////////////////////////////////////////////////
-    // PROTECTED VARIABLES
+    // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
      * List of inputs to the {@link ModelFunction}.
      */
-    protected List<T> inputList;
+    private List<T> inputList;
     
     
     
@@ -58,82 +58,113 @@ public class MeanSquaredErrorFunction<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Sets the list of inputs to the {@link #modelFunction}.
+     * Sets the list of inputs to the {@link ModelFunction}.
      * 
-     * @param modelFunctionInputList    list of inputs to the {@link #modelFunction}.
+     * @param modelFunctionInputList    list of inputs to the {@link ModelFunction}.
      */
     public void setInputList( List<T> modelFunctionInputList )
     {
         this.inputList = modelFunctionInputList;
+        this.dirtyFlag = true;
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PROTECTED METHODS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected MeanSquaredErrorFunctionDifferentiableLossUpdateStrategy getDifferentiableLossUpdateStrategy()
+    {
+        return new MeanSquaredErrorFunctionDifferentiableLossUpdateStrategy();
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public void updateCost()
+    protected MeanSquaredErrorFunctionLocallyQuadraticLossUpdateStrategy getLocallyQuadraticLossUpdateStrategy()
     {
-        // Initialize cost, and gradient.
-        this.cost = 0.0;
-        // For each input...
-        for( T input : this.inputList ) {
-            // Set the input.
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            // Add contribution to cost, and gradient.
-            this.cost += modelFunctionOutput.normFrobeniusSquared();
+        return new MeanSquaredErrorFunctionLocallyQuadraticLossUpdateStrategy();
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PRIVATE CLASSES
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Implements the strategy that offers better performance at the expense of only being able to use the class as a {@link DifferentiableLoss}.
+     */
+    private class MeanSquaredErrorFunctionDifferentiableLossUpdateStrategy
+        implements LocallyQuadraticLossDefinedWithModelFunctionUpdateStrategy<T>
+    {
+        /**
+         * {@inheritDoc}
+         */
+        public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
+        {
+            // Initialize cost, and gradient.
+            loss.cost = 0.0;
+            loss.gradient.setToZero();
+            // For each input...
+            for( T input : inputList ) {
+                // Set the input.
+                loss.modelFunction.setInput( input );
+                // Compute quantities involved in the cost and gradient.
+                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                Matrix J = loss.modelFunction.getJacobian();
+                Matrix JT = J.transpose();
+                Matrix gradient_i = JT.multiply( modelFunctionOutput );
+                // Add contribution to cost, and gradient.
+                loss.cost += modelFunctionOutput.normFrobeniusSquared();
+                loss.gradient.addInplace( gradient_i );
+            }
+            double oneOverInputListSize = 1.0/inputList.size();
+            loss.cost *= oneOverInputListSize;
+            loss.gradient.scaleInplace( oneOverInputListSize );
         }
     }
     
     
     /**
-     * {@inheritDoc}
+     * Implements the strategy that allows to use the class as a {@link LocallyQuadraticLoss}.
      */
-    public void updateCostAndGradient()
+    private class MeanSquaredErrorFunctionLocallyQuadraticLossUpdateStrategy
+        implements LocallyQuadraticLossDefinedWithModelFunctionUpdateStrategy<T>
     {
-        // Initialize cost, and gradient.
-        this.cost = 0.0;
-        this.gradient.setToZero();
-        // For each input...
-        for( T input : this.inputList ) {
-            // Set the input.
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            Matrix J = this.modelFunction.getJacobian();
-            Matrix JT = J.transpose();
-            Matrix gradient_i = JT.multiply( modelFunctionOutput );
-            // Add contribution to cost, and gradient.
-            this.cost += modelFunctionOutput.normFrobeniusSquared();
-            this.gradient.addInplace( gradient_i );
-        }
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void updateCostGradientAndGaussNewtonMatrix()
-    {
-        // Initialize cost, gradient, and Gauss-Newton matrix.
-        this.cost = 0.0;
-        this.gradient.setToZero();
-        this.gaussNewtonMatrix.setToZero();
-        // For each input...
-        for( T input : this.inputList ) {
-            // Set the input.
-            this.modelFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            Matrix modelFunctionOutput = this.modelFunction.getOutput();
-            Matrix J = this.modelFunction.getJacobian();
-            Matrix JT = J.transpose();
-            Matrix gradient_i = JT.multiply( modelFunctionOutput );
-            Matrix gaussNewtonMatrix_i = JT.multiply( J );
-            // Add contribution to cost, gradient, and Gauss-Newton matrix.
-            this.cost += modelFunctionOutput.normFrobeniusSquared();
-            this.gradient.addInplace( gradient_i );
-            this.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+        /**
+         * {@inheritDoc}
+         */
+        public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
+        {
+            // Initialize cost, gradient, and Gauss-Newton matrix.
+            loss.cost = 0.0;
+            loss.gradient.setToZero();
+            loss.gaussNewtonMatrix.setToZero();
+            // For each input...
+            for( T input : inputList ) {
+                // Set the input.
+                loss.modelFunction.setInput( input );
+                // Compute quantities involved in the cost and gradient.
+                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                Matrix J = loss.modelFunction.getJacobian();
+                Matrix JT = J.transpose();
+                Matrix gradient_i = JT.multiply( modelFunctionOutput );
+                Matrix gaussNewtonMatrix_i = JT.multiply( J );
+                // Add contribution to cost, gradient, and Gauss-Newton matrix.
+                loss.cost += modelFunctionOutput.normFrobeniusSquared();
+                loss.gradient.addInplace( gradient_i );
+                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+            }
+            double oneOverInputListSize = 1.0/inputList.size();
+            loss.cost *= oneOverInputListSize;
+            loss.gradient.scaleInplace( oneOverInputListSize );
+            loss.gaussNewtonMatrix.scaleInplace( oneOverInputListSize );
         }
     }
     
