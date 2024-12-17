@@ -37,12 +37,22 @@ public class Matrix
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Returns the number of rows of {@code this}.
+     * 
+     * @return  number of rows of {@code this}.
+     */
     public int rows()
     {
         return this.Nrows;
     }
     
     
+    /**
+     * Returns the number of columns of {@code this}.
+     * 
+     * @return  number of columns of {@code this}.
+     */
     public int cols()
     {
         return this.Ncols;
@@ -69,23 +79,113 @@ public class Matrix
     }
     
     
+    /**
+     * Returns the transpose of {@code this}.
+     * <p>
+     * Result is returned as a new instance.
+     * 
+     * @return  transpose of {@code this}.
+     */
     public Matrix transpose()
     {
-        Matrix m = Matrix.empty( this.cols() , this.rows() );
-        for( int i=0; i<this.cols(); i++ ) {
-            for( int j=0; j<this.rows(); j++ ) {
-                m.setEntryUnchecked( i,j , this.entryUnchecked(j,i) );
-            }
-        }
-        return m;
+        Matrix output = Matrix.empty( this.cols() , this.rows() );
+        Matrix.transposeAlgorithm( this , output );
+        return output;
     }
     
     
-    /*public Matrix transposeInplace()
+    /**
+     * Sets {@code this} to the transpose of {@code other}.
+     * 
+     * @param other     {@link Matrix} whose transpose will be set.
+     * @return  transpose of {@code other} stored in {@code this}.
+     * 
+     * @throws IllegalArgumentException if {@code this} has different size as the transpose of {@code other}.
+     */
+    public Matrix setToTransposeOf( Matrix other )
     {
-        this.setTo( this.transpose() );
+        this.assertSize( other.cols() , other.rows() );
+        Matrix.transposeAlgorithm( other , this );
         return this;
-    }*/
+    }
+    
+    
+    /**
+     * Sets {@code this} to the product of left {@link Matrix} and right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as  {@code left * right}.
+     * 
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left} columns.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right}.
+     */
+    public Matrix setToLeftTimesRight( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertRows( left.cols() );
+        this.assertSize( left.rows() , right.cols() );
+        this.setToZero();
+        this.addLeftTimesRightAlgorithm( left , right );
+        return this;
+    }
+    
+    
+    /**
+     * Sets {@code this} to the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left * right^T}.
+     * 
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor to be transposed before {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same columns as {@code left}.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right} rows.
+     */
+    public Matrix setToLeftTimesRightTranspose( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertColumns( left.cols() );
+        this.assertSize( left.rows() , right.rows() );
+        this.setToZero();
+        this.addLeftTimesRightTransposeAlgorithm( left , right );
+        return this;
+    }
+    
+    
+    /**
+     * Sets {@code this} to the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left^T * right}.
+     * 
+     * @param left     left factor to be transposed before {@link Matrix} multiplication.
+     * @param right    right factor of {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} transpose and {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left}.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left} columns, or columns as {@code right}.
+     */
+    public Matrix setToLeftTransposeTimesRight( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertRows( left.rows() );
+        this.assertSize( left.cols() , right.cols() );
+        this.setToZero();
+        this.addLeftTransposeTimesRightAlgorithm( left , right );
+        return this;
+    }
     
     
     /*public double trace()
@@ -100,6 +200,9 @@ public class Matrix
     */
     
     
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
@@ -114,20 +217,22 @@ public class Matrix
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals( Matrix other )
     {
-        if( this.rows() == other.rows()  &&  this.cols() == other.cols()  ) {
-            for( int i=0; i<this.rows(); i++ ) {
-                for( int j=0; j<this.cols(); j++ ) {
-                    if( this.entryUnchecked(i,j) != other.entryUnchecked(i,j) ) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        } else {
+        if( !this.isSameSize( other ) ) {
             return false;
         }
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                if( this.entryUnchecked(i,j) != other.entryUnchecked(i,j) ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
     
@@ -138,7 +243,7 @@ public class Matrix
      */
     public Matrix setTo( Matrix other )
     {
-        this.assertEqualSize( other );
+        this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 this.setEntryUnchecked( i,j , other.entryUnchecked(i,j) );
@@ -148,6 +253,9 @@ public class Matrix
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix copy()
     {
         Matrix c = Matrix.emptyWithSizeOf( this );
@@ -156,9 +264,14 @@ public class Matrix
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public boolean equalsApproximately( Matrix other , double tolerance )
     {
-        this.assertEqualSize( other );
+        if( !this.isSameSize( other ) ) {
+            return false;
+        }
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
@@ -171,22 +284,32 @@ public class Matrix
     }
     
     
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws IllegalArgumentException if {@code this} has different size as {@code other}.
+     */
     public Matrix add( Matrix other )
     {
-        this.assertEqualSize( other );
-        Matrix m = Matrix.emptyWithSizeOf( this );
+        this.assertSameSize( other );
+        Matrix output = Matrix.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                m.setEntryUnchecked( i,j , this.entryUnchecked(i,j) + other.entryUnchecked(i,j) );
+                output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) + other.entryUnchecked(i,j) );
             }
         }
-        return m;
+        return output;
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws IllegalArgumentException if {@code this} has different size as {@code other}.
+     */
     public Matrix addInplace( Matrix other )
     {
-        this.assertEqualSize( other );
+        this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 this.x[i][j] += other.entryUnchecked(i,j);
@@ -196,6 +319,9 @@ public class Matrix
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Matrix identityAdditive()
     {
         return Matrix.zero( this.rows() , this.cols() );
@@ -204,13 +330,13 @@ public class Matrix
     
     public Matrix inverseAdditive()
     {
-        Matrix m = Matrix.emptyWithSizeOf( this );
+        Matrix output = Matrix.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                m.setEntryUnchecked( i,j , -this.entryUnchecked(i,j) );
+                output.setEntryUnchecked( i,j , -this.entryUnchecked(i,j) );
             }
         }
-        return m;
+        return output;
     }
 
 
@@ -227,20 +353,20 @@ public class Matrix
 
     public Matrix subtract( Matrix other )
     {
-        this.assertEqualSize( other );
-        Matrix m = Matrix.emptyWithSizeOf( this );
+        this.assertSameSize( other );
+        Matrix output = Matrix.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                m.setEntryUnchecked( i,j , this.entryUnchecked(i,j) - other.entryUnchecked(i,j) );
+                output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) - other.entryUnchecked(i,j) );
             }
         }
-        return m;
+        return output;
     }
 
 
     public Matrix subtractInplace( Matrix other )
     {
-        this.assertEqualSize( other );
+        this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 this.x[i][j] -= other.entryUnchecked(i,j);
@@ -251,37 +377,11 @@ public class Matrix
     
     
     /**
-     * Adds the product of first {@link Matrix} and second {@link Matrix}.
-     * <p>
-     * The multiplication is performed as  {@code first * second}.
-     * {@code this} must have the same rows as {@code first}, and same columns as {@code second}.
-     * {@code this} must also be different from {@code first} and {@code second}.
-     * 
-     * @param first     first factor of the {@link Matrix} multiplication.
-     * @param second    second factor of the {@link Matrix} multiplication.
-     * @return  {@code this} reference to which the product of {@code first} and {@code second} is added.
-     * 
-     * @throws IllegalArgumentException     if {@code this} is {@code first} or {@code second}.
-     * @throws IllegalArgumentException     if {@code second} does not have same rows as {@code first} columns.
-     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code first}, or columns as {@code second}.
-     */
-    public Matrix addProduct( Matrix first , Matrix second )
-    {
-        if(  this == first  ||  this == second  ) {
-            throw new IllegalArgumentException( "\"this\" must be different from \"first\" and \"second\"." );
-        }
-        second.assertRows( first.cols() );
-        this.assertSize( first.rows() , second.cols() );
-        return this.addProductPrivate( first , second );
-    }
-    
-    
-    /**
      * Computes matrix multiplication.
      * <p>
      * The multiplication is performed as  this * other.
      * 
-     * @param other     second factor in the matrix multiplication operation.
+     * @param other     right factor in the matrix multiplication operation.
      * @return  new {@link Matrix} that contains the multiplication result.
      * 
      * @throws IllegalArgumentException     if {@code other} does not have same rows as {@code this} columns.
@@ -290,7 +390,7 @@ public class Matrix
     {
         other.assertRows( this.cols() );
         Matrix output = Matrix.zero( this.rows() , other.cols() );
-        output.addProductPrivate( this , other );
+        output.addLeftTimesRightAlgorithm( this , other );
         return output;
     }
     
@@ -341,20 +441,92 @@ public class Matrix
     {
         return this.multiplyInplace( other.inverseMultiplicative() );
     }*/
-
+    
+    
+    /**
+     * Adds the product of left {@link Matrix} and right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as  {@code left * right}.
+     * 
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left} columns.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right}.
+     */
+    public Matrix addLeftTimesRight( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertRows( left.cols() );
+        this.assertSize( left.rows() , right.cols() );
+        return this.addLeftTimesRightAlgorithm( left , right );
+    }
+    
+    
+    /**
+     * Adds the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left * right^T}.
+     * 
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor to be transpose before {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same columns as {@code left}.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right} rows.
+     */
+    public Matrix addLeftTimesRightTranspose( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertColumns( left.cols() );
+        this.assertSize( left.rows() , right.rows() );
+        return this.addLeftTimesRightTransposeAlgorithm( left , right );
+    }
+    
+    
+    /**
+     * Adds the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left^T * right}.
+     * 
+     * @param left     left factor to be transposed before {@link Matrix} multiplication.
+     * @param right    right factor of {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} transpose and {@code right} is added.
+     * 
+     * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
+     * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left}.
+     * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left} columns, or columns as {@code right}.
+     */
+    public Matrix addLeftTransposeTimesRight( Matrix left , Matrix right )
+    {
+        if(  this == left  ||  this == right  ) {
+            throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
+        }
+        right.assertRows( left.rows() );
+        this.assertSize( left.cols() , right.cols() );
+        return this.addLeftTransposeTimesRightAlgorithm( left , right );
+    }
+    
     
     public Matrix scale( double scalar )
     {
-        Matrix m = Matrix.emptyWithSizeOf( this );
+        Matrix output = Matrix.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
-                m.setEntryUnchecked( i,j , this.entryUnchecked(i,j) * scalar );
+                output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) * scalar );
             }
         }
-        return m;
+        return output;
     }
-
-
+    
+    
     public Matrix scaleInplace( double scalar )
     {
         for( int i=0; i<this.rows(); i++ ) {
@@ -388,24 +560,23 @@ public class Matrix
     {
         return Math.sqrt( this.normFrobeniusSquared() );
     }
-
-
+    
+    
     public Matrix normalizeFrobenius()
     {
         return this.scale( 1.0/this.normFrobenius() );
     }
-
-
+    
+    
     public Matrix normalizeFrobeniusInplace()
     {
         return this.scaleInplace( 1.0/this.normFrobenius() );
     }
-
-
-
+    
+    
     public double distanceFrom( Matrix other )
     {
-        this.assertEqualSize( other );
+        this.assertSameSize( other );
         double dist2 = 0.0;
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -420,9 +591,9 @@ public class Matrix
     public Matrix choleskyDecomposition()
     {
         this.assertIsSquare();
-        Matrix m = Matrix.emptyWithSizeOf( this );
-        Matrix.choleskyDecompositionAlgorithm( this , m );
-        return m;
+        Matrix output = Matrix.emptyWithSizeOf( this );
+        Matrix.choleskyDecompositionAlgorithm( this , output );
+        return output;
     }
     
     
@@ -437,9 +608,9 @@ public class Matrix
     public Matrix LDLTDecomposition()
     {
         this.assertIsSquare();
-        Matrix m = Matrix.emptyWithSizeOf( this );
-        Matrix.ldltDecompositionAlgorithm( this , m );
-        return m;
+        Matrix output = Matrix.emptyWithSizeOf( this );
+        Matrix.ldltDecompositionAlgorithm( this , output );
+        return output;
     }
     
     
@@ -488,11 +659,11 @@ public class Matrix
     public Matrix divideRightByPositiveDefiniteUsingItsLDLTDecomposition( Matrix LD )
     {
         LD.assertIsSquare();
-        Matrix m = Matrix.emptyWithSizeOf( this );
-        Matrix.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , m );
-        return m;
+        Matrix output = Matrix.emptyWithSizeOf( this );
+        Matrix.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , output );
+        return output;
     }
-
+    
     
     public Matrix divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( Matrix LD )
     {
@@ -665,9 +836,25 @@ public class Matrix
     }
     
     
+    /**
+     * Returns {@code true} if the matrix is square.
+     * 
+     * @return  {@code true} if the matrix is square.
+     */
     public boolean isSquare()
     {
         return ( this.rows() == this.cols() );
+    }
+    
+    
+    /**
+     * Returns {@code true} if {@code this} has same size as {@code other}.
+     * 
+     * @return  {@code true} if {@code this} has same size as {@code other}.
+     */
+    public boolean isSameSize( Matrix other )
+    {
+        return (  this.rows() == other.rows()  &&  this.cols() == other.cols()  );
     }
     
     
@@ -738,7 +925,7 @@ public class Matrix
      * @param other     matrix whose size will be copied.
      * @return  new empty matrix with size as {@code other}.
      */
-    private static Matrix emptyWithSizeOf( Matrix other )
+    public static Matrix emptyWithSizeOf( Matrix other )
     {
         return Matrix.empty( other.rows() , other.cols() );
     }
@@ -769,13 +956,13 @@ public class Matrix
     
     public static Matrix random( int numberOfRows , int numberOfColumns , Random randomNumberGenerator )
     {
-        Matrix m = Matrix.empty( numberOfRows , numberOfColumns );
+        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
         for( int i=0; i<numberOfRows; i++ ) {
             for( int j=0; j<numberOfColumns; j++ ) {
-                m.setEntryUnchecked( i,j , randomNumberGenerator.nextGaussian() );
+                output.setEntryUnchecked( i,j , randomNumberGenerator.nextGaussian() );
             }
         }
-        return m;
+        return output;
     }
     
     
@@ -975,11 +1162,11 @@ public class Matrix
     
     public static Matrix diagonal( double[] diagonalElements )
     {
-        Matrix m = Matrix.zero( diagonalElements.length , diagonalElements.length );
+        Matrix output = Matrix.zero( diagonalElements.length , diagonalElements.length );
         for( int i=0; i<diagonalElements.length; i++ ) {
-            m.setEntryUnchecked( i,i , diagonalElements[i] );
+            output.setEntryUnchecked( i,i , diagonalElements[i] );
         }
-        return m;
+        return output;
     }
     
     
@@ -993,19 +1180,19 @@ public class Matrix
             ncols += rm.cols();
         }
         // then, we create the matrix, and we fill the content
-        Matrix m = Matrix.zero( nrows , ncols );
+        Matrix output = Matrix.zero( nrows , ncols );
         int i0 = 0;
         int j0 = 0;
         for( Matrix rm : lrm ) {
             for( int i=0; i<rm.rows(); i++ ) {
                 for( int j=0; j<rm.cols(); j++ ) {
-                    m.setEntryUnchecked( i0+i , j0+j , rm.entryUnchecked(i,j) );
+                    output.setEntryUnchecked( i0+i , j0+j , rm.entryUnchecked(i,j) );
                 }
             }
             i0 += rm.rows();
             j0 += rm.cols();
         }
-        return m;
+        return output;
     }
     
     
@@ -1077,13 +1264,13 @@ public class Matrix
     
     private Matrix submatrixFast( int i , int j , int numberOfRows , int numberOfColumns )
     {
-        Matrix m = Matrix.empty( numberOfRows , numberOfColumns );
+        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
         for( int ii=0; ii<numberOfRows; ii++ ) {
             for( int jj=0; jj<numberOfColumns; jj++ ) {
-                m.setEntryUnchecked( ii,jj , this.entryUnchecked( i+ii , j+jj ) );
+                output.setEntryUnchecked( ii,jj , this.entryUnchecked( i+ii , j+jj ) );
             }
         }
-        return m;
+        return output;
     }
     
     
@@ -1112,7 +1299,6 @@ public class Matrix
     
     /**
      * Checks the number of rows of this matrix.
-     * <p>
      * <ul>
      *  <li> If this has the number of rows, nothing happens.
      *  <li> If this does not have the number of rows, an {@link IllegalArgumentException} is thrown.
@@ -1126,6 +1312,25 @@ public class Matrix
     {
         if(  Matrix.assertionsOn  &&  this.rows() != rowsExpected  ) {
             throw new IllegalArgumentException( "Rows required: " + rowsExpected + " . Rows found: " + this.rows() );
+        }
+    }
+    
+    
+    /**
+     * Checks the number of columns of this matrix.
+     * <ul>
+     *  <li> If this has the number of columns, nothing happens.
+     *  <li> If this does not have the number of columns, an {@link IllegalArgumentException} is thrown.
+     * </ul>
+     * 
+     * @param columnsExpected  expected number of columns.
+     * 
+     * @throws IllegalArgumentException     if {@code this} does not have the expected number of columns.
+     */
+    private void assertColumns( int columnsExpected )
+    {
+        if(  Matrix.assertionsOn  &&  this.cols() != columnsExpected  ) {
+            throw new IllegalArgumentException( "Columns required: " + columnsExpected + " . Columns found: " + this.cols() );
         }
     }
     
@@ -1159,14 +1364,19 @@ public class Matrix
      * 
      * @throws IllegalArgumentException     if the sizes of {@code this} and {@code other} do not match.
      */
-    private void assertEqualSize( Matrix other )
+    private void assertSameSize( Matrix other )
     {
-        if(  Matrix.assertionsOn  &&  (  this.rows() != other.rows()  ||  this.cols() != other.cols()  )  ) {
+        if(  Matrix.assertionsOn  &&  !this.isSameSize( other )  ) {
             throw new IllegalArgumentException( "Same matrix size is required: " + this.size() + " != " + other.size() );
         }
     }
     
     
+    /**
+     * Checks that {@code this} is a square matrix.
+     * 
+     * @throws IllegalArgumentException     {@code this} is not a square matrix.
+     */
     private void assertIsSquare()
     {
         if(  Matrix.assertionsOn  &&  !this.isSquare()  ) {
@@ -1176,23 +1386,73 @@ public class Matrix
     
     
     /**
-     * Adds the product of first {@link Matrix} and second {@link Matrix}.
+     * Adds the product of left {@link Matrix} and right {@link Matrix}.
      * <p>
-     * The multiplication is performed as  {@code first * second}.
-     * {@code this} must have the same rows as {@code first}, and same columns as {@code second}.
-     * {@code this} must also be different from {@code first} and {@code second}.
+     * The multiplication is performed as  {@code left * right}.
+     * {@code this} must have the same rows as {@code left}, and same columns as {@code right}.
+     * {@code this} must also be different from {@code left} and {@code right}.
      * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
      * 
-     * @param first     first factor of the {@link Matrix} multiplication.
-     * @param second    second factor of the {@link Matrix} multiplication.
-     * @return  {@code this} reference to which the product of {@code first} and {@code second} is added.
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
      */
-    private Matrix addProductPrivate( Matrix first , Matrix second )
+    private Matrix addLeftTimesRightAlgorithm( Matrix left , Matrix right )
     {
-        for( int i=0; i<first.rows(); i++ ) {
-            for( int j=0; j<second.cols(); j++ ) {
-                for( int k=0; k<first.cols(); k++ ) {
-                    this.x[i][j] += first.entryUnchecked(i,k) * second.entryUnchecked(k,j);
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                for( int k=0; k<left.cols(); k++ ) {
+                    this.x[i][j] += left.entryUnchecked(i,k) * right.entryUnchecked(k,j);
+                }
+            }
+        }
+        return this;
+    }
+    
+    
+    /**
+     * Adds the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left * right^T}.
+     * {@code this} must have the same rows as {@code left}, and same columns as rows of {@code right}.
+     * {@code this} must also be different from {@code left} and {@code right}.
+     * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
+     * 
+     * @param left     left factor of the {@link Matrix} multiplication.
+     * @param right    right factor to be transpose before {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
+     */
+    private Matrix addLeftTimesRightTransposeAlgorithm( Matrix left , Matrix right )
+    {
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                for( int k=0; k<left.cols(); k++ ) {
+                    this.x[i][j] += left.entryUnchecked(i,k) * right.entryUnchecked(j,k);
+                }
+            }
+        }
+        return this;
+    }
+    
+    
+    /**
+     * Adds the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * <p>
+     * The multiplication is performed as {@code left^T * right}.
+     * {@code this} must have the same rows as columns of {@code left}, and same columns as {@code right}.
+     * {@code this} must also be different from {@code left} and {@code right}.
+     * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
+     * 
+     * @param left     left factor to be transpose before {@link Matrix} multiplication.
+     * @param right    right factor of the {@link Matrix} multiplication.
+     * @return  {@code this} reference to which the product of transpose of {@code left} and {@code right} is added.
+     */
+    private Matrix addLeftTransposeTimesRightAlgorithm( Matrix left , Matrix right )
+    {
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.cols(); j++ ) {
+                for( int k=0; k<left.rows(); k++ ) {
+                    this.x[i][j] += left.entryUnchecked(k,i) * right.entryUnchecked(k,j);
                 }
             }
         }
@@ -1204,6 +1464,22 @@ public class Matrix
     ////////////////////////////////////////////////////////////////
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Performs a matrix transposition.
+     * 
+     * @param input     matrix to be transposed.
+     * @param output    resulting transposed matrix.
+     */
+    private static void transposeAlgorithm( Matrix input , Matrix output )
+    {
+        for( int i=0; i<input.cols(); i++ ) {
+            for( int j=0; j<input.rows(); j++ ) {
+                output.setEntryUnchecked( i,j , input.entryUnchecked(j,i) );
+            }
+        }
+    }
+    
     
     /**
      * Performs a Cholesky decomposition of the form A = L * L^T.
@@ -1371,11 +1647,11 @@ public class Matrix
     }
     
     
-    private static Matrix absPrivate( Matrix m , Matrix output )
+    private static Matrix absPrivate( Matrix input , Matrix output )
     {
-        for( int i=0; i<m.rows(); i++ ) {
-            for( int j=0; j<m.cols(); j++ ) {
-                output.setEntryUnchecked( i,j , Math.abs( m.entryUnchecked(i,j) ) );
+        for( int i=0; i<input.rows(); i++ ) {
+            for( int j=0; j<input.cols(); j++ ) {
+                output.setEntryUnchecked( i,j , Math.abs( input.entryUnchecked(i,j) ) );
             }
         }
         return output;
