@@ -173,10 +173,12 @@ public class RobustMeanSquaredErrorFunction<T>
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
                 Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                double errorSquared = modelFunctionOutput.normFrobeniusSquared();
+                double robustWeight = robustFunction.f1( errorSquared );
                 Matrix J = loss.modelFunction.getJacobian();
-                Matrix JT = J.transpose();
-                Matrix gradient_i = JT.multiply( modelFunctionOutput );
-                Matrix gaussNewtonMatrix_i = JT.multiply( J );
+                Matrix JWT = J.transpose().scaleInplace( robustWeight );
+                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
+                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
                 // Add contribution to cost, gradient, and Gauss-Newton matrix.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();
                 loss.gradient.addInplace( gradient_i );
