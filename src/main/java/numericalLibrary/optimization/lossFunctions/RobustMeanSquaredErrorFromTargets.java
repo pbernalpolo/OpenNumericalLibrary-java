@@ -152,11 +152,9 @@ public class RobustMeanSquaredErrorFromTargets<T>
                 double errorSquared = outputMinusTarget.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
                 Matrix J = loss.modelFunction.getJacobian();
-                Matrix JWT = J.transpose().scaleInplace( robustWeight );
-                Matrix gradient_i = JWT.multiply( outputMinusTarget );
                 // Add contribution to cost, and gradient.
                 loss.cost += robustFunction.f( errorSquared );
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , outputMinusTarget.scaleInplace( robustWeight ) );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -176,6 +174,8 @@ public class RobustMeanSquaredErrorFromTargets<T>
          */
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
+            // Create matrix to speed up computations.
+            Matrix JW = Matrix.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, and gradient.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -192,13 +192,11 @@ public class RobustMeanSquaredErrorFromTargets<T>
                 double errorSquared = outputMinusTarget.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
                 Matrix J = loss.modelFunction.getJacobian();
-                Matrix JWT = J.transpose().scaleInplace( robustWeight );
-                Matrix gradient_i = JWT.multiply( outputMinusTarget );
-                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
+                JW.setTo( J ).scaleInplace( robustWeight );
                 // Add contribution to cost, and gradient.
                 loss.cost += robustFunction.f( errorSquared );
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( JW , outputMinusTarget );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;

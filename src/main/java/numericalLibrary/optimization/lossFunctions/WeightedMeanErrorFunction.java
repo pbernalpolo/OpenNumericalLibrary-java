@@ -131,11 +131,9 @@ public class WeightedMeanErrorFunction<T>
                 Matrix modelFunctionOutput = loss.modelFunction.getOutput();
                 Matrix J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
-                Matrix JWT = J.transpose().scaleInplace( weight );
-                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
                 // Add contribution to cost, and gradient.
                 loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput.scaleInplace( weight ) );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -155,6 +153,8 @@ public class WeightedMeanErrorFunction<T>
          */
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
+            // Create matrix to speed up computations.
+            Matrix JW = Matrix.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, and gradient.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -168,13 +168,11 @@ public class WeightedMeanErrorFunction<T>
                 Matrix modelFunctionOutput = loss.modelFunction.getOutput();
                 Matrix J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
-                Matrix JWT = J.transpose().scaleInplace( weight );
-                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
-                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
+                JW.setTo( J ).scaleInplace( weight );
                 // Add contribution to cost, and gradient.
                 loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( JW , modelFunctionOutput );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
