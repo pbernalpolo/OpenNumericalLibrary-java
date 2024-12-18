@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 
 import numericalLibrary.types.ComplexNumber;
 import numericalLibrary.types.RealNumber;
-import numericalLibrary.types.UnitQuaternion;
 
 
 
 /**
- * Implements test methods for {@link UnitQuaternionDifferentiableAtlas}.
+ * Implements test methods for {@link UnitComplexNumberDifferentiableAtlas}.
  */
 public abstract class UnitComplexNumberDifferentiableAtlasTester
     extends UnitComplexNumberAtlasTester
@@ -36,7 +35,7 @@ public abstract class UnitComplexNumberDifferentiableAtlasTester
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} transforms elements in the neighborhood of the element that defines the new chart in a consistent way.
+     * Tests that {@link UnitComplexNumberDifferentiableAtlas#jacobianOfTransitionMap(ComplexNumber)} transforms elements in the neighborhood of the element that defines the new chart in a consistent way.
      */
     @Test
     public void transitionMapMatrixIsConsistentWithTransitionMap()

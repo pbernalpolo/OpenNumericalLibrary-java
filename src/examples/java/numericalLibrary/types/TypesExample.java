@@ -38,9 +38,9 @@ public class TypesExample
         }
         
         // Create a list of matrices.
-        List<Matrix> matrixList = new ArrayList<Matrix>();
+        List<MatrixReal> matrixList = new ArrayList<MatrixReal>();
         for( int i=0; i<2; i++ ) {
-            matrixList.add( Matrix.one( i+2 ) );
+            matrixList.add( MatrixReal.one( i+2 ) );
         }
         
         // Put all elements in a list of VectorSpaceElements.

@@ -254,33 +254,33 @@ public class Vector3
     }
     
     
-    public Matrix crossProductMatrix()
+    public MatrixReal crossProductMatrix()
     {
-        return Matrix.fromEntries3x3(
+        return MatrixReal.fromEntries3x3(
                 0.0      , -this.z() ,  this.y() ,
                 this.z() ,  0.0      , -this.x() ,
                -this.y() ,  this.x() ,  0.0      );
     }
     
     
-    public Matrix outerProduct( Vector3 other )
+    public MatrixReal outerProduct( Vector3 other )
     {
-        return Matrix.fromEntries3x3(
+        return MatrixReal.fromEntries3x3(
                 this.x() * other.x() , this.x() * other.y() , this.x() * other.z() ,
                 this.y() * other.x() , this.y() * other.y() , this.y() * other.z() ,
                 this.z() * other.x() , this.z() * other.y() , this.z() * other.z() );
     }
     
     
-    public Matrix toMatrixAsColumn()
+    public MatrixReal toMatrixAsColumn()
     {
-        return Matrix.fromVector3AsColumn( this );
+        return MatrixReal.fromVector3AsColumn( this );
     }
     
     
-    public Matrix toMatrixAsRow()
+    public MatrixReal toMatrixAsRow()
     {
-        return Matrix.fromVector3AsRow( this );
+        return MatrixReal.fromVector3AsRow( this );
     }
     
     

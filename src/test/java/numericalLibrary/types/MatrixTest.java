@@ -17,13 +17,13 @@ import numericalLibrary.algebraicStructures.VectorSpaceElementTester;
 
 
 /**
- * Implements test methods for {@link Matrix}.
+ * Implements test methods for {@link MatrixReal}.
  */
 class MatrixTest
     implements
-        AdditiveAbelianGroupElementTester<Matrix>,
-        VectorSpaceElementTester<Matrix>,
-        MetricSpaceElementTester<Matrix>
+        AdditiveAbelianGroupElementTester<MatrixReal>,
+        VectorSpaceElementTester<MatrixReal>,
+        MetricSpaceElementTester<MatrixReal>
 {
     ////////////////////////////////////////////////////////////////
     // CONSTANTS
@@ -55,15 +55,15 @@ class MatrixTest
     /**
      * {@inheritDoc}
      */
-    public List<Matrix> getElementList()
+    public List<MatrixReal> getElementList()
     {
-        List<Matrix> output = new ArrayList<Matrix>();
-        output.add( Matrix.zero( 4 , 4 ) );
-        output.add( Matrix.diagonal( new double[] { 1.0 , 2.0 , 3.0 , 4.0 } ) );
-        output.add( Matrix.one( 4 ) );
+        List<MatrixReal> output = new ArrayList<MatrixReal>();
+        output.add( MatrixReal.zero( 4 , 4 ) );
+        output.add( MatrixReal.diagonal( new double[] { 1.0 , 2.0 , 3.0 , 4.0 } ) );
+        output.add( MatrixReal.one( 4 ) );
         Random randomNumberGenerator = new Random( 42 );
         for( int i=0; i<1000; i++ ) {
-            output.add( Matrix.random( 4 , 4 , randomNumberGenerator ) );
+            output.add( MatrixReal.random( 4 , 4 , randomNumberGenerator ) );
         }
         return output;
     }
@@ -78,7 +78,7 @@ class MatrixTest
     void setAndGet()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix m = Matrix.zero(2,2);
+            MatrixReal m = MatrixReal.zero(2,2);
             double value = 123.0;
             m.setEntry( 0,0 , value );
             assertEquals( value , m.entry(0,0) );
@@ -90,10 +90,10 @@ class MatrixTest
     void multiplyBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix a = createMatrixA();
-            Matrix b = createMatrixB();
-            Matrix ab = a.multiply( b );
-            Matrix abExpected = Matrix.empty( 2 , 2 );
+            MatrixReal a = createMatrixA();
+            MatrixReal b = createMatrixB();
+            MatrixReal ab = a.multiply( b );
+            MatrixReal abExpected = MatrixReal.empty( 2 , 2 );
             abExpected.setEntry( 0,0 , -3.0 );    abExpected.setEntry( 0,1 , 2.0 );
             abExpected.setEntry( 1,0 , -5.0 );    abExpected.setEntry( 1,1 , 0.0 );
             assertTrue( ab.equals( abExpected ) );
@@ -102,17 +102,17 @@ class MatrixTest
 
     
     /**
-     * Tests the behavior of {@link Matrix#choleskyDecomposition()}.
+     * Tests the behavior of {@link MatrixReal#choleskyDecomposition()}.
      */
     @Test
     void choleskyDecompositionBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Obtain the Cholesky decomposition.
-            Matrix L = A.choleskyDecomposition();
+            MatrixReal L = A.choleskyDecomposition();
             // Rebuild the matrix doing L * L^T
-            Matrix LLT = L.multiply( L.transpose() );
+            MatrixReal LLT = L.multiply( L.transpose() );
             // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
@@ -120,17 +120,17 @@ class MatrixTest
 
     
     /**
-     * Tests the behavior of {@link Matrix#choleskyDecompositionInplace()}.
+     * Tests the behavior of {@link MatrixReal#choleskyDecompositionInplace()}.
      */
     @Test
     void choleskyDecompositionInplaceBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Obtain the Cholesky decomposition.
-            Matrix L = A.copy().choleskyDecompositionInplace();
+            MatrixReal L = A.copy().choleskyDecompositionInplace();
             // Rebuild the matrix doing L * L^T
-            Matrix LLT = L.multiply( L.transpose() );
+            MatrixReal LLT = L.multiply( L.transpose() );
             // We should obtain the same matrix we started with.
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
@@ -141,14 +141,14 @@ class MatrixTest
     void LDLTBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we obtain the LDLT decomposition
-            Matrix LD = A.LDLTDecomposition();
+            MatrixReal LD = A.LDLTDecomposition();
             // we obtain L and D from LD
-            Matrix L = Matrix.LfromLDLTDecomposition( LD );
-            Matrix D = Matrix.DfromLDLTDecomposition( LD );
+            MatrixReal L = MatrixReal.LfromLDLTDecomposition( LD );
+            MatrixReal D = MatrixReal.DfromLDLTDecomposition( LD );
             // we rebuild the matrix doing L * D * L^T
-            Matrix LDLT = L.multiply( D.multiply( L.transpose() ) );
+            MatrixReal LDLT = L.multiply( D.multiply( L.transpose() ) );
             assertTrue( LDLT.equalsApproximately( A , 1.0e-13 ) );
         }
     }
@@ -158,21 +158,21 @@ class MatrixTest
     void LDLTAssignBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we obtain the LDLT decomposition
-            Matrix LD = A.copy().LDLTDecompositionInplace();
+            MatrixReal LD = A.copy().LDLTDecompositionInplace();
             // we obtain L and D from LD
-            Matrix L = Matrix.LfromLDLTDecomposition( LD );
-            Matrix D = Matrix.DfromLDLTDecomposition( LD );
+            MatrixReal L = MatrixReal.LfromLDLTDecomposition( LD );
+            MatrixReal D = MatrixReal.DfromLDLTDecomposition( LD );
             // we rebuild the matrix doing L * D * L^T
-            Matrix LDLT = L.multiply( D.multiply( L.transpose() ) );
+            MatrixReal LDLT = L.multiply( D.multiply( L.transpose() ) );
             assertTrue( LDLT.equalsApproximately( A , 1.0e-13 ) );
         }
     }
 
 
     /**
-     * Tests the behavior of {@link Matrix#divideRightByPositiveDefiniteUsingItsCholeskyDecomposition(Matrix)}.
+     * Tests the behavior of {@link MatrixReal#divideRightByPositiveDefiniteUsingItsCholeskyDecomposition(MatrixReal)}.
      * <p>
      * Having a matrix  XA = X * A, and being  A  a known positive definite matrix,
      * we are looking for the matrix X.
@@ -182,13 +182,13 @@ class MatrixTest
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 5 x 10.
-            Matrix X = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            MatrixReal X = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
             // Multiply  X * A  to obtain the matrix we want to divide.
-            Matrix XA = X.multiply( A );
+            MatrixReal XA = X.multiply( A );
             // Divide using the Cholesky decomposition: XA * A^{-1} = X
-            Matrix Xrecomputed = XA.divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
+            MatrixReal Xrecomputed = XA.divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
             assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
         }
@@ -196,7 +196,7 @@ class MatrixTest
 
 
     /**
-     * Tests the behavior of {@link Matrix#divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace(Matrix)}.
+     * Tests the behavior of {@link MatrixReal#divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace(MatrixReal)}.
      * <p>
      * Having a matrix  XA = X * A, and being  A  a known positive definite matrix,
      * we are looking for the matrix X.
@@ -206,11 +206,11 @@ class MatrixTest
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 5 x 10.
-            Matrix X = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            MatrixReal X = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
             // Multiply  X * A  to obtain the matrix we want to divide.
-            Matrix XA = X.multiply( A );
+            MatrixReal XA = X.multiply( A );
             // Divide using the Cholesky decomposition: XA * A^{-1} = X
             XA.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
@@ -220,7 +220,7 @@ class MatrixTest
     
     
     /**
-     * Tests the behavior of {@link Matrix#divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition(Matrix)}.
+     * Tests the behavior of {@link MatrixReal#divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition(MatrixReal)}.
      * <p>
      * Having a matrix  AX = A * X, and being  A  a known positive definite matrix,
      * we are looking for the matrix X.
@@ -230,13 +230,13 @@ class MatrixTest
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 10 x 5.
-            Matrix X = Matrix.random( 10 , 5 , this.randomNumberGenerator );
+            MatrixReal X = MatrixReal.random( 10 , 5 , this.randomNumberGenerator );
             // Multiply  A * X  to obtain the matrix we want to divide.
-            Matrix AX = A.multiply( X );
+            MatrixReal AX = A.multiply( X );
             // Divide using the Cholesky decomposition: A^{-1} * AX = X
-            Matrix Xrecomputed = AX.divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
+            MatrixReal Xrecomputed = AX.divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
             assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
         }
@@ -244,7 +244,7 @@ class MatrixTest
 
 
     /**
-     * Tests the behavior of {@link Matrix#divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace(Matrix)}.
+     * Tests the behavior of {@link MatrixReal#divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace(MatrixReal)}.
      * <p>
      * Having a matrix  AX = A * X, and being  A  a known positive definite matrix,
      * we are looking for the matrix X.
@@ -254,11 +254,11 @@ class MatrixTest
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
-            Matrix X = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal X = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 10 x 5.
-            Matrix A = Matrix.random( 10 , 5 , this.randomNumberGenerator );
+            MatrixReal A = MatrixReal.random( 10 , 5 , this.randomNumberGenerator );
             // Multiply  A * X  to obtain the matrix we want to divide.
-            Matrix XA = X.multiply( A );
+            MatrixReal XA = X.multiply( A );
             // Divide using the Cholesky decomposition: A^{-1} * AX = X
             XA.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( X.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
@@ -271,13 +271,13 @@ class MatrixTest
     void divideRightByPositiveDefiniteUsingItsLDLTDecompositionBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we generate a random matrix
-            Matrix M = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            MatrixReal M = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
             // we obtain the product
-            Matrix MA = M.multiply( A );
+            MatrixReal MA = M.multiply( A );
             // and we divide using the LDLT decomposition
-            Matrix Mrecomputed = MA.divideRightByPositiveDefiniteUsingItsLDLTDecomposition( A.LDLTDecompositionInplace() );
+            MatrixReal Mrecomputed = MA.divideRightByPositiveDefiniteUsingItsLDLTDecomposition( A.LDLTDecompositionInplace() );
             assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-4 ) );
         }
     }
@@ -287,11 +287,11 @@ class MatrixTest
     void divideRightByPositiveDefiniteUsingItsLDLTDecompositionAssignBehavior()
     {
         for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
-            Matrix A = this.randomPositiveDefiniteMatrix( 10 );
+            MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we generate a random matrix
-            Matrix M = Matrix.random( 5 , 10 , this.randomNumberGenerator );
+            MatrixReal M = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
             // we obtain the product
-            Matrix MA = M.multiply( A );
+            MatrixReal MA = M.multiply( A );
             // and we divide using the LDLT decomposition
             MA.divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( A.LDLTDecompositionInplace() );
             assertTrue( MA.equalsApproximately( M , 1.0e-4 ) );
@@ -305,15 +305,15 @@ class MatrixTest
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Generates a random positive definite {@link Matrix}.
+     * Generates a random positive definite {@link MatrixReal}.
      * 
-     * @param dimension     dimension of the positive definite {@link Matrix} to be generated.
-     * @return  random positive definite {@link Matrix}.
+     * @param dimension     dimension of the positive definite {@link MatrixReal} to be generated.
+     * @return  random positive definite {@link MatrixReal}.
      */
-    private Matrix randomPositiveDefiniteMatrix( int dimension )
+    private MatrixReal randomPositiveDefiniteMatrix( int dimension )
     {
         // Generate a random matrix.
-        Matrix M = Matrix.random( dimension , dimension , this.randomNumberGenerator );
+        MatrixReal M = MatrixReal.random( dimension , dimension , this.randomNumberGenerator );
         // Obtain a random positive definite matrix through M * M^T
         return M.multiply( M.transpose() );
     }
@@ -324,27 +324,27 @@ class MatrixTest
     // PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
 
-    private static Matrix createMatrixA()
+    private static MatrixReal createMatrixA()
     {
-        Matrix m = Matrix.empty( 2 , 2 );
+        MatrixReal m = MatrixReal.empty( 2 , 2 );
         m.setEntry( 0,0 , 1.0 );    m.setEntry( 0,1 , 2.0 );
         m.setEntry( 1,0 , 3.0 );    m.setEntry( 1,1 , 4.0 );
         return m;
     }
 
 
-    private static Matrix createMatrixB()
+    private static MatrixReal createMatrixB()
     {
-        Matrix m = Matrix.empty( 2 , 2 );
+        MatrixReal m = MatrixReal.empty( 2 , 2 );
         m.setEntry( 0,0 , 1.0 );     m.setEntry( 0,1 , -4.0 );
         m.setEntry( 1,0 , -2.0 );    m.setEntry( 1,1 , 3.0 );
         return m;
     }
 
 
-    private static Matrix createMatrixC()
+    private static MatrixReal createMatrixC()
     {
-        Matrix m = Matrix.empty( 3 , 2 );
+        MatrixReal m = MatrixReal.empty( 3 , 2 );
         m.setEntry( 0,0 , 1.0 );    m.setEntry( 0,1 , 2.0 );
         m.setEntry( 1,0 , 3.0 );    m.setEntry( 1,1 , 4.0 );
         m.setEntry( 2,0 , 5.0 );    m.setEntry( 2,1 , 6.0 );
@@ -352,9 +352,9 @@ class MatrixTest
     }
 
 
-    private static Matrix createMatrixD()
+    private static MatrixReal createMatrixD()
     {
-        Matrix m = Matrix.empty( 3 , 3 );
+        MatrixReal m = MatrixReal.empty( 3 , 3 );
         m.setEntry( 0,0 , 0.0 );    m.setEntry( 0,1 , 1.0 );     m.setEntry( 0,2 , 1.0 );
         m.setEntry( 1,0 , 2.0 );    m.setEntry( 1,1 , 3.0 );     m.setEntry( 1,2 , 5.0 );
         m.setEntry( 2,0 , 8.0 );    m.setEntry( 2,1 , 13.0 );    m.setEntry( 2,2 , 21.0 );

@@ -4,7 +4,7 @@ package numericalLibrary.optimization.lossFunctions;
 import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -128,14 +128,12 @@ public class WeightedMeanErrorFunction<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
-                Matrix JWT = J.transpose().scaleInplace( weight );
-                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
                 // Add contribution to cost, and gradient.
                 loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput.scaleInplace( weight ) );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -155,6 +153,8 @@ public class WeightedMeanErrorFunction<T>
          */
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
+            // Create matrix to speed up computations.
+            MatrixReal JW = MatrixReal.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, and gradient.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -165,16 +165,14 @@ public class WeightedMeanErrorFunction<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
-                Matrix JWT = J.transpose().scaleInplace( weight );
-                Matrix gradient_i = JWT.multiply( modelFunctionOutput );
-                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
+                JW.setTo( J ).scaleInplace( weight );
                 // Add contribution to cost, and gradient.
                 loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( JW , modelFunctionOutput );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;

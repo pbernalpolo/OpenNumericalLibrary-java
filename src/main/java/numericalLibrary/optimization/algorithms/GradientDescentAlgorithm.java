@@ -2,7 +2,7 @@ package numericalLibrary.optimization.algorithms;
 
 
 import numericalLibrary.optimization.lossFunctions.DifferentiableLoss;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  * where:
  * <ul>
  *  <li> F is a {@link DifferentiableLoss},
- *  <li> \theta is the parameter vector, represented as a column {@link Matrix}.
+ *  <li> \theta is the parameter vector, represented as a column {@link MatrixReal}.
  * </ul>
  * <p>
  * The gradient descent parameter update step takes the form:
@@ -98,7 +98,7 @@ public class GradientDescentAlgorithm
      * <br>
      * \theta_{k+1} = \theta_k - gamma * ( d f / d theta )
      */
-    public Matrix getDeltaParameters()
+    public MatrixReal getDeltaParameters()
     {
         return this.lossFunction.getGradient().scaleInplace( -this.learningRate );
     }

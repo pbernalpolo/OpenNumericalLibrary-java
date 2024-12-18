@@ -3,7 +3,7 @@ package numericalLibrary.optimization;
 
 import numericalLibrary.optimization.lossFunctions.DifferentiableLoss;
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -29,17 +29,17 @@ public interface ModelFunction<T>
     /**
      * Sets the parameters of the {@link ModelFunction}.
      * 
-     * @param theta     row {@link Matrix} containing the parameters of the {@link ModelFunction}.
+     * @param theta     row {@link MatrixReal} containing the parameters of the {@link ModelFunction}.
      */
-    public abstract void setParameters( Matrix theta );
+    public abstract void setParameters( MatrixReal theta );
     
     
     /**
-     * Returns the current parameters of the {@link ModelFunction} as a row {@link Matrix}.
+     * Returns the current parameters of the {@link ModelFunction} as a row {@link MatrixReal}.
      * 
-     * @return  current parameters of the {@link ModelFunction} as a row {@link Matrix}.
+     * @return  current parameters of the {@link ModelFunction} as a row {@link MatrixReal}.
      */
-    public abstract Matrix getParameters();
+    public abstract MatrixReal getParameters();
     
     
     /**
@@ -51,22 +51,22 @@ public interface ModelFunction<T>
     
     
     /**
-     * Returns the output of the {@link ModelFunction} as a column {@link Matrix}.
+     * Returns the output of the {@link ModelFunction} as a column {@link MatrixReal}.
      * <p>
-     * The function is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}, and the inputs set by {@link #setInput(Object)}.
+     * The function is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}, and the inputs set by {@link #setInput(Object)}.
      * 
-     * @return  output of the {@link ModelFunction} as a column {@link Matrix}.
+     * @return  output of the {@link ModelFunction} as a column {@link MatrixReal}.
      */
-    public abstract Matrix getOutput();
+    public abstract MatrixReal getOutput();
     
     
     /**
      * Returns the Jacobian of the {@link ModelFunction}.
      * <p>
-     * The Jacobian is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}, and the inputs set by {@link #setInput(Object)}.
+     * The Jacobian is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}, and the inputs set by {@link #setInput(Object)}.
      * 
      * @return  Jacobian of the {@link ModelFunction}.
      */
-    public abstract Matrix getJacobian();
+    public abstract MatrixReal getJacobian();
     
 }

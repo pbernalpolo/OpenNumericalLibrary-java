@@ -8,7 +8,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.types.UnitQuaternion;
 import numericalLibrary.types.Vector3;
 
@@ -50,8 +50,8 @@ public abstract class UnitQuaternionDifferentiableAtlasTester
             // Also build the same rotation with the opposite quaternion from the first one.
             UnitQuaternion qOpposite = q.opposite();
             // Obtain the transition map matrix T.
-            Matrix T = atlas.jacobianOfTransitionMap( q );
-            Matrix Tminus = atlas.jacobianOfTransitionMap( qOpposite );
+            MatrixReal T = atlas.jacobianOfTransitionMap( q );
+            MatrixReal Tminus = atlas.jacobianOfTransitionMap( qOpposite );
             // Check that both q and -q are mapped to the same transition map matrix.
             double distance = T.distanceFrom( Tminus );
             assertTrue( distance < 1.0e-100 );

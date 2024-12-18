@@ -2,7 +2,7 @@ package numericalLibrary.optimization.algorithms;
 
 
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  * <br>
  * <ul>
  *  <li> F is a {@link LocallyQuadraticLoss},
- *  <li> \theta is the parameter vector, represented as a column {@link Matrix},
+ *  <li> \theta is the parameter vector, represented as a column {@link MatrixReal},
  *  <li> \lambda is the damping factor,
  *  <li> \delta is the increment in the parameter space.
  * </ul>
@@ -53,7 +53,7 @@ public class LevenbergMarquardtAlgorithm
      * 
      * @see #setDampingFactor(double)
      */
-    private Matrix lambdaIdentity;
+    private MatrixReal lambdaIdentity;
     
     
     
@@ -91,27 +91,27 @@ public class LevenbergMarquardtAlgorithm
      */
     public void setDampingFactor( double dampingFactor )
     {
-        Matrix theta = this.lossFunction.getParameters();
-        this.lambdaIdentity = Matrix.one( theta.rows() ).scaleInplace( dampingFactor );
+        MatrixReal theta = this.lossFunction.getParameters();
+        this.lambdaIdentity = MatrixReal.one( theta.rows() ).scaleInplace( dampingFactor );
     }
     
     
     /**
      * {@inheritDoc}
      * 
-     * @throws IllegalStateException if a non positive-definite {@link Matrix} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
+     * @throws IllegalStateException if a non positive-definite {@link MatrixReal} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
      */
-    public Matrix getDeltaParameters()
+    public MatrixReal getDeltaParameters()
     {
-        Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
+        MatrixReal gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
         gaussNewtonMatrix.addInplace( this.lambdaIdentity );
-        Matrix L = null;
+        MatrixReal L = null;
         try {
             L = gaussNewtonMatrix.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a larger damping factor with setDampingFactor method might help." );
         }
-        Matrix gradient = this.lossFunction.getGradient();
+        MatrixReal gradient = this.lossFunction.getGradient();
         return gradient.inverseAdditive().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     

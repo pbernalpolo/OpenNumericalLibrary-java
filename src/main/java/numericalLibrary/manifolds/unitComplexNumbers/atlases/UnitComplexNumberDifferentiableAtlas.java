@@ -3,7 +3,7 @@ package numericalLibrary.manifolds.unitComplexNumbers.atlases;
 
 import numericalLibrary.manifolds.DifferentiableAtlas;
 import numericalLibrary.types.ComplexNumber;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.types.RealNumber;
 
 
@@ -41,7 +41,7 @@ public abstract class UnitComplexNumberDifferentiableAtlas
      * 
      * @param delta     {@link ComplexNumber} that defines the transition map.
      */
-    public abstract Matrix jacobianOfTransitionMap( ComplexNumber delta );
+    public abstract MatrixReal jacobianOfTransitionMap( ComplexNumber delta );
     
     
     
@@ -52,7 +52,7 @@ public abstract class UnitComplexNumberDifferentiableAtlas
     /**
      * {@inheritDoc}
      */
-    public Matrix jacobianOfTransitionMap( ComplexNumber initialChartSelector , ComplexNumber finalChartSelector )
+    public MatrixReal jacobianOfTransitionMap( ComplexNumber initialChartSelector , ComplexNumber finalChartSelector )
     {
         this.setChartSelector( initialChartSelector );
         ComplexNumber delta = this.toChartSelectorPerspective( finalChartSelector );

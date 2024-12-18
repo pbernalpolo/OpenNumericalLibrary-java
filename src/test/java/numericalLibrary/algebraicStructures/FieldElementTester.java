@@ -24,7 +24,7 @@ public interface FieldElementTester<T extends FieldElement<T>>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Tests that {@link MultiplicativeAbelianGroupElement#multiply(Multipliable)} distributes over {@link AdditiveAbelianGroupElement#add(Addable)}.
+     * Tests that {@link MultiplicativeAbelianGroupElement#multiply(MultiplicativeMagmaElement)} distributes over {@link AdditiveAbelianGroupElement#add(AdditiveMagmaElement)}.
      * That is {@code a * ( b + c ) == ( a * b ) + ( a * c ) }.
      */
     @Test

@@ -5,7 +5,7 @@ import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
 import numericalLibrary.optimization.robustFunctions.RobustFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -41,7 +41,7 @@ public class RobustMeanSquaredErrorFromTargets<T>
     /**
      * List of targets of the {@link ModelFunction}.
      */
-    private List<Matrix> targetList;
+    private List<MatrixReal> targetList;
     
     /**
      * {@link RobustFunction} used to define the {@link LocallyQuadraticLoss}.
@@ -87,7 +87,7 @@ public class RobustMeanSquaredErrorFromTargets<T>
      * @param modelFunctionInputList    list of inputs to the {@link ModelFunction}.
      * @param modelFunctionTargetList   list of targets of the {@link ModelFunction}.
      */
-    public void setInputListAndTargetList( List<T> modelFunctionInputList , List<Matrix> modelFunctionTargetList )
+    public void setInputListAndTargetList( List<T> modelFunctionInputList , List<MatrixReal> modelFunctionTargetList )
     {
         if( modelFunctionInputList.size() != modelFunctionTargetList.size() ) {
             throw new IllegalArgumentException( "Incompatible list sizes: modelFunctionInputList has " + modelFunctionInputList.size() + " elements; modelFunctionTargetList has " + modelFunctionTargetList.size() + " elements." );
@@ -146,17 +146,15 @@ public class RobustMeanSquaredErrorFromTargets<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix target = targetList.get( i );
-                Matrix outputMinusTarget = modelFunctionOutput.subtractInplace( target );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal target = targetList.get( i );
+                MatrixReal outputMinusTarget = modelFunctionOutput.subtractInplace( target );
                 double errorSquared = outputMinusTarget.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JWT = J.transpose().scaleInplace( robustWeight );
-                Matrix gradient_i = JWT.multiply( outputMinusTarget );
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += robustFunction.f( errorSquared );
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , outputMinusTarget.scaleInplace( robustWeight ) );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -176,6 +174,8 @@ public class RobustMeanSquaredErrorFromTargets<T>
          */
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
+            // Create matrix to speed up computations.
+            MatrixReal JW = MatrixReal.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, and gradient.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -186,19 +186,17 @@ public class RobustMeanSquaredErrorFromTargets<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix target = targetList.get( i );
-                Matrix outputMinusTarget = modelFunctionOutput.subtractInplace( target );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal target = targetList.get( i );
+                MatrixReal outputMinusTarget = modelFunctionOutput.subtractInplace( target );
                 double errorSquared = outputMinusTarget.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JWT = J.transpose().scaleInplace( robustWeight );
-                Matrix gradient_i = JWT.multiply( outputMinusTarget );
-                Matrix gaussNewtonMatrix_i = JWT.multiply( J );
+                MatrixReal J = loss.modelFunction.getJacobian();
+                JW.setTo( J ).scaleInplace( robustWeight );
                 // Add contribution to cost, and gradient.
                 loss.cost += robustFunction.f( errorSquared );
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( JW , outputMinusTarget );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;

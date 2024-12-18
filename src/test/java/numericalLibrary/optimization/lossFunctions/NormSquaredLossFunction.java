@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.lossFunctions;
 
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -23,17 +23,17 @@ public class NormSquaredLossFunction
     /**
      * Parameter vector.
      */
-    private Matrix x;
+    private MatrixReal x;
     
     /**
      * Last computed gradient.
      */
-    public Matrix gradient;
+    public MatrixReal gradient;
     
     /**
      * Last computed Gauss-Newton matrix.
      */
-    public Matrix gaussNewtonMatrix;
+    public MatrixReal gaussNewtonMatrix;
     
     
     
@@ -48,13 +48,13 @@ public class NormSquaredLossFunction
      */
     public NormSquaredLossFunction( int dimension )
     {
-        this.x = Matrix.empty( dimension , 1 );
-        this.gradient = Matrix.empty( dimension , 1 );
+        this.x = MatrixReal.empty( dimension , 1 );
+        this.gradient = MatrixReal.empty( dimension , 1 );
         /**
          * The Jacobian of f(\theta) in 1/2 ||f(\theta)||^2 is the identity.
          * From that, we obtain that J^T J = I * I = I
          */
-        this.gaussNewtonMatrix = Matrix.one( this.x.rows() );
+        this.gaussNewtonMatrix = MatrixReal.one( this.x.rows() );
     }
     
     
@@ -66,7 +66,7 @@ public class NormSquaredLossFunction
     /**
      * {@inheritDoc}
      */
-    public void setParameters( Matrix theta )
+    public void setParameters( MatrixReal theta )
     {
         this.x.setTo( theta );
     }
@@ -75,7 +75,7 @@ public class NormSquaredLossFunction
     /**
      * {@inheritDoc}
      */
-    public Matrix getParameters()
+    public MatrixReal getParameters()
     {
         return this.x;
     }
@@ -97,7 +97,7 @@ public class NormSquaredLossFunction
      * From that, we obtain that the gradient of 1/2 ||f(\theta)||^2 is
      * J^T * f(\theta) = I * \theta = \theta
      */
-    public Matrix getGradient()
+    public MatrixReal getGradient()
     {
         this.gradient.setTo( this.x );
         return this.gradient;
@@ -107,7 +107,7 @@ public class NormSquaredLossFunction
     /**
      * {@inheritDoc}
      */
-    public Matrix getGaussNewtonMatrix()
+    public MatrixReal getGaussNewtonMatrix()
     {
         return this.gaussNewtonMatrix;
     }

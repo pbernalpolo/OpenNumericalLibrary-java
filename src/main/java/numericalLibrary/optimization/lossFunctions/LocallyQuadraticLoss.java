@@ -2,7 +2,7 @@ package numericalLibrary.optimization.lossFunctions;
 
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -17,7 +17,7 @@ import numericalLibrary.types.Matrix;
  * <ul>
  *  <li> f is a {@link ModelFunction} to be optimized,
  *  <li> x_i is the i-th input to the {@link ModelFunction},
- *  <li> \theta is the parameter vector, represented as a column {@link Matrix}.
+ *  <li> \theta is the parameter vector, represented as a column {@link MatrixReal}.
  * </ul>
  * In such case, the Hessian of L(\theta) can be approximated using the Jacobian of f, J, as J^T * J.
  */
@@ -31,10 +31,10 @@ public interface LocallyQuadraticLoss
     /**
      * Returns the approximate Hessian of the {@link LocallyQuadraticLoss}.
      * <p>
-     * The approximate Hessian matrix is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
+     * The approximate Hessian matrix is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}.
      * 
      * @return  approximate Hessian matrix of the {@link LocallyQuadraticLoss}.
      */
-    public abstract Matrix getGaussNewtonMatrix();
+    public abstract MatrixReal getGaussNewtonMatrix();
     
 }

@@ -1,7 +1,7 @@
 package numericalLibrary.manifolds;
 
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -30,6 +30,6 @@ public interface DifferentiableAtlas<ManifoldElementClass, ChartElementClass>
      * @param finalChartSelector    chart element that selects the final chart.
      * @return  Jacobian of the transition map evaluated at the final chart selector.
      */
-    public Matrix jacobianOfTransitionMap( ManifoldElementClass initialChartSelector , ManifoldElementClass finalChartSelector );
+    public MatrixReal jacobianOfTransitionMap( ManifoldElementClass initialChartSelector , ManifoldElementClass finalChartSelector );
     
 }

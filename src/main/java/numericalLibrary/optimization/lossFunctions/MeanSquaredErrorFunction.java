@@ -4,7 +4,7 @@ package numericalLibrary.optimization.lossFunctions;
 import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -116,13 +116,11 @@ public class MeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JT = J.transpose();
-                Matrix gradient_i = JT.multiply( modelFunctionOutput );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -151,15 +149,12 @@ public class MeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JT = J.transpose();
-                Matrix gradient_i = JT.multiply( modelFunctionOutput );
-                Matrix gaussNewtonMatrix_i = JT.multiply( J );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, gradient, and Gauss-Newton matrix.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( J , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;

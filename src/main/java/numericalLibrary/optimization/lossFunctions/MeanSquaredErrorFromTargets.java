@@ -4,7 +4,7 @@ package numericalLibrary.optimization.lossFunctions;
 import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -39,7 +39,7 @@ public class MeanSquaredErrorFromTargets<T>
     /**
      * List of targets of the {@link ModelFunction}.
      */
-    private List<Matrix> targetList;
+    private List<MatrixReal> targetList;
     
     
     
@@ -69,7 +69,7 @@ public class MeanSquaredErrorFromTargets<T>
      * @param modelFunctionInputList    list of inputs to the {@link ModelFunction}.
      * @param modelFunctionTargetList   list of targets of the {@link ModelFunction}.
      */
-    public void setInputListAndTargetList( List<T> modelFunctionInputList , List<Matrix> modelFunctionTargetList )
+    public void setInputListAndTargetList( List<T> modelFunctionInputList , List<MatrixReal> modelFunctionTargetList )
     {
         if( modelFunctionInputList.size() != modelFunctionTargetList.size() ) {
             throw new IllegalArgumentException( "Incompatible list sizes: modelFunctionInputList has " + modelFunctionInputList.size() + " elements; modelFunctionTargetList has " + modelFunctionTargetList.size() + " elements." );
@@ -128,15 +128,13 @@ public class MeanSquaredErrorFromTargets<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix target = targetList.get( i );
-                Matrix outputMinusTarget = modelFunctionOutput.subtractInplace( target );
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JT = J.transpose();
-                Matrix gradient_i = JT.multiply( modelFunctionOutput );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal target = targetList.get( i );
+                MatrixReal outputMinusTarget = modelFunctionOutput.subtractInplace( target );
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += outputMinusTarget.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
@@ -166,17 +164,14 @@ public class MeanSquaredErrorFromTargets<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix target = targetList.get( i );
-                Matrix outputMinusTarget = modelFunctionOutput.subtractInplace( target );
-                Matrix J = loss.modelFunction.getJacobian();
-                Matrix JT = J.transpose();
-                Matrix gradient_i = JT.multiply( modelFunctionOutput );
-                Matrix gaussNewtonMatrix_i = JT.multiply( J );
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal target = targetList.get( i );
+                MatrixReal outputMinusTarget = modelFunctionOutput.subtractInplace( target );
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += outputMinusTarget.normFrobeniusSquared();
-                loss.gradient.addInplace( gradient_i );
-                loss.gaussNewtonMatrix.addInplace( gaussNewtonMatrix_i );
+                loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );
+                loss.gaussNewtonMatrix.addLeftTransposeTimesRight( J , J );
             }
             double oneOverInputListSize = 1.0/inputList.size();
             loss.cost *= oneOverInputListSize;
