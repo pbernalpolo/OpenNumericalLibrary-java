@@ -1,7 +1,7 @@
 package numericalLibrary.manifolds.unitQuaternions.atlases;
 
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.types.UnitQuaternion;
 import numericalLibrary.types.Vector3;
 
@@ -97,18 +97,18 @@ public class ExponentialMapS3
     /**
      * {@inheritDoc}
      */
-    public Matrix jacobianOfTransitionMap( UnitQuaternion delta )
+    public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {
         delta = delta.positiveScalarPartForm();
         Vector3 deltav = delta.vectorPart();
-        Matrix ddT = deltav.outerProduct( deltav );
+        MatrixReal ddT = deltav.outerProduct( deltav );
         double deltavnorm = deltav.norm();
         if( deltavnorm > 0.0 ) {
-            return Matrix.one( 3 ).subtractInplace( ddT ).scaleInplace( delta.w() )
+            return MatrixReal.one( 3 ).subtractInplace( ddT ).scaleInplace( delta.w() )
                     .subtractInplace( deltav.crossProductMatrix() ).scaleInplace( deltavnorm / Math.asin( deltavnorm ) )
                     .addInplace( ddT );
         } else {
-            return Matrix.one( 3 );
+            return MatrixReal.one( 3 );
         }
     }
     

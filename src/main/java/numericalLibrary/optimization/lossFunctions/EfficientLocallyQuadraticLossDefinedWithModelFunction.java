@@ -2,7 +2,7 @@ package numericalLibrary.optimization.lossFunctions;
 
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -56,12 +56,12 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     /**
      * Last computed gradient.
      */
-    protected Matrix gradient;
+    protected MatrixReal gradient;
     
     /**
      * Last computed Gauss-Newton matrix.
      */
-    protected Matrix gaussNewtonMatrix;
+    protected MatrixReal gaussNewtonMatrix;
     
     /**
      * Flag used to implement the Dirty Flag Optimization Pattern.
@@ -81,13 +81,13 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
      */
     public EfficientLocallyQuadraticLossDefinedWithModelFunction( ModelFunction<T> modelFunction )
     {
-        Matrix theta = modelFunction.getParameters();
+        MatrixReal theta = modelFunction.getParameters();
         if( theta.cols() != 1 ) {
             throw new IllegalArgumentException( "Parameter vector returned by modelFunction must be a column matrix." );
         }
         this.modelFunction = modelFunction;
         this.cost = Double.MAX_VALUE;
-        this.gradient = Matrix.empty( theta.rows() , 1 );
+        this.gradient = MatrixReal.empty( theta.rows() , 1 );
         // Default object can be used as a DifferentiableLoss and as a LocallyQuadraticLoss.
         this.setUpdateStrategyLocallyQuadraticLoss();
         this.dirtyFlag = true;
@@ -116,8 +116,8 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     public void setUpdateStrategyLocallyQuadraticLoss()
     {
         this.updateStrategy = this.getLocallyQuadraticLossUpdateStrategy();
-        Matrix theta = this.modelFunction.getParameters();
-        this.gaussNewtonMatrix = Matrix.empty( theta.rows() , theta.rows() );
+        MatrixReal theta = this.modelFunction.getParameters();
+        this.gaussNewtonMatrix = MatrixReal.empty( theta.rows() , theta.rows() );
         this.dirtyFlag = true;
     }
     
@@ -125,7 +125,7 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     /**
      * {@inheritDoc}
      */
-    public void setParameters( Matrix theta )
+    public void setParameters( MatrixReal theta )
     {
         this.modelFunction.setParameters( theta );
         this.dirtyFlag = true;
@@ -135,7 +135,7 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     /**
      * {@inheritDoc}
      */
-    public Matrix getParameters()
+    public MatrixReal getParameters()
     {
         return this.modelFunction.getParameters();
     }
@@ -154,7 +154,7 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     /**
      * {@inheritDoc}
      */
-    public Matrix getGradient()
+    public MatrixReal getGradient()
     {
         this.clean();
         return this.gradient;
@@ -164,7 +164,7 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     /**
      * {@inheritDoc}
      */
-    public Matrix getGaussNewtonMatrix()
+    public MatrixReal getGaussNewtonMatrix()
     {
         this.clean();
         return this.gaussNewtonMatrix;

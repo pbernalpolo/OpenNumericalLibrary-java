@@ -4,7 +4,7 @@ package numericalLibrary.optimization.lossFunctions;
 import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -128,8 +128,8 @@ public class WeightedMeanErrorFunction<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
                 // Add contribution to cost, and gradient.
                 loss.cost += weight * modelFunctionOutput.normFrobeniusSquared();
@@ -154,7 +154,7 @@ public class WeightedMeanErrorFunction<T>
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
             // Create matrix to speed up computations.
-            Matrix JW = Matrix.emptyWithSizeOf( loss.modelFunction.getJacobian() );
+            MatrixReal JW = MatrixReal.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, and gradient.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -165,8 +165,8 @@ public class WeightedMeanErrorFunction<T>
                 T input = inputList.get( i );
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 double weight = weightList.get( i );
                 JW.setTo( J ).scaleInplace( weight );
                 // Add contribution to cost, and gradient.

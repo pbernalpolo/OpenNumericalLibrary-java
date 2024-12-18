@@ -7,7 +7,7 @@ import java.util.Random;
 
 import numericalLibrary.optimization.ModelFunction;
 import numericalLibrary.optimization.ModelFunctionTester;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -47,12 +47,12 @@ class GaussianFunctionTest
     /**
      * {@inheritDoc}
      */
-    public List<Matrix> getParameterList()
+    public List<MatrixReal> getParameterList()
     {
-        List<Matrix> output = new ArrayList<Matrix>();
+        List<MatrixReal> output = new ArrayList<MatrixReal>();
         Random randomNumberGenerator = new Random( 42 );
         for( int i=0; i<100; i++ ) {
-            output.add( Matrix.fromArrayAsColumn( new double[] {
+            output.add( MatrixReal.fromArrayAsColumn( new double[] {
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() ,
                     randomNumberGenerator.nextGaussian() } ) );

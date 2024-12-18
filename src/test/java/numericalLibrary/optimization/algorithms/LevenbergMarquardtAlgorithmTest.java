@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
 import numericalLibrary.optimization.lossFunctions.NormSquaredLossFunction;
 import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStoppingCriterion;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -30,15 +30,15 @@ public class LevenbergMarquardtAlgorithmTest
     public void levenbergMarquardtOnNormSquaredConvergesToZero()
     {
         LocallyQuadraticLoss loss = new NormSquaredLossFunction( 42 );
-        loss.setParameters( Matrix.random( 42 , 1 , new Random( 42 ) ) );
+        loss.setParameters( MatrixReal.random( 42 , 1 , new Random( 42 ) ) );
         LevenbergMarquardtAlgorithm lma = new LevenbergMarquardtAlgorithm( loss );
         lma.setStoppingCriterion( new IterationThresholdStoppingCriterion( 5 ) );
         lma.setDampingFactor( 1.0e-4 );
         lma.initialize();
         lma.iterate();
-        Matrix optimizedParameters = loss.getParameters();
+        MatrixReal optimizedParameters = loss.getParameters();
         //System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
-        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-18 ) );
+        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-18 ) );
     }
     
 }

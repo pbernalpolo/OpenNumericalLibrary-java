@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
 import numericalLibrary.optimization.lossFunctions.NormSquaredLossFunction;
 import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStoppingCriterion;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -30,13 +30,13 @@ public class GaussNewtonAlgorithmTest
     public void gaussNewtonOnNormSquaredConvergesInOneIteration()
     {
         LocallyQuadraticLoss loss = new NormSquaredLossFunction( 42 );
-        loss.setParameters( Matrix.random( 42 , 1 , new Random( 42 ) ) );
+        loss.setParameters( MatrixReal.random( 42 , 1 , new Random( 42 ) ) );
         GaussNewtonAlgorithm gna = new GaussNewtonAlgorithm( loss );
         gna.setStoppingCriterion( new IterationThresholdStoppingCriterion( 100 ) );
         gna.initialize();
         gna.step();
-        Matrix optimizedParameters = loss.getParameters();
-        assertTrue( optimizedParameters.equalsApproximately( Matrix.zero( 42 , 1 ) , 1.0e-6 ) );
+        MatrixReal optimizedParameters = loss.getParameters();
+        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-6 ) );
     }
     
 }

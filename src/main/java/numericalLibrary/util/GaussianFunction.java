@@ -3,7 +3,7 @@ package numericalLibrary.util;
 
 import numericalLibrary.optimization.ModelFunction;
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -71,7 +71,7 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
-    public void setParameters( Matrix theta )
+    public void setParameters( MatrixReal theta )
     {
         this.a = theta.entry( 0 , 0 );
         this.b = theta.entry( 1 , 0 );
@@ -82,9 +82,9 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
-    public Matrix getParameters()
+    public MatrixReal getParameters()
     {
-        Matrix output = Matrix.empty( 3 , 1 );
+        MatrixReal output = MatrixReal.empty( 3 , 1 );
         output.setEntry( 0,0 , this.a );
         output.setEntry( 1,0 , this.b );
         output.setEntry( 2,0 , this.c );
@@ -105,20 +105,20 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
-    public Matrix getOutput()
+    public MatrixReal getOutput()
     {
         this.clean();
-        return Matrix.one( 1 ).scaleInplace( a * this.dfda );
+        return MatrixReal.one( 1 ).scaleInplace( a * this.dfda );
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public Matrix getJacobian()
+    public MatrixReal getJacobian()
     {
         this.clean();
-        Matrix J = Matrix.empty( 1 , 3 );
+        MatrixReal J = MatrixReal.empty( 1 , 3 );
         J.setEntry( 0,0 , dfda );
         double dfdb = a * dfda * diff * oneOverCSquared;
         J.setEntry( 0,1 , dfdb );

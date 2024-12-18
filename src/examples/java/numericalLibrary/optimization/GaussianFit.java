@@ -11,7 +11,7 @@ import numericalLibrary.optimization.lossFunctions.MeanSquaredErrorFromTargets;
 import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredErrorFromTargets;
 import numericalLibrary.optimization.robustFunctions.MaximumDistanceRobustFunction;
 import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.util.GaussianFunction;
 
 
@@ -29,12 +29,12 @@ public class GaussianFit
     {
         // Generate a known Gaussian function.
         GaussianFunction gaussianKnown = new GaussianFunction();
-        Matrix parameters = Matrix.fromArrayAsColumn( new double[] { 3.0 , 2.0 , 5.0 } );
+        MatrixReal parameters = MatrixReal.fromArrayAsColumn( new double[] { 3.0 , 2.0 , 5.0 } );
         gaussianKnown.setParameters( parameters );
         
         // Sample with the known Gaussian function.
         List<Double> inputList = new ArrayList<Double>();
-        List<Matrix> targetList = new ArrayList<Matrix>();
+        List<MatrixReal> targetList = new ArrayList<MatrixReal>();
         for( int m=0; m<10; m++ )
         {
             double x = m/5.0;
@@ -45,7 +45,7 @@ public class GaussianFit
         
         // Define the loss function.
         GaussianFunction gaussianUnknown = new GaussianFunction();
-        gaussianUnknown.setParameters( Matrix.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
+        gaussianUnknown.setParameters( MatrixReal.fromArrayAsColumn( new double[] { 1.0 , 0.0 , 1.0 } ) );
         MeanSquaredErrorFromTargets<Double> loss = new MeanSquaredErrorFromTargets<Double>( gaussianUnknown );
         loss.setInputListAndTargetList( inputList , targetList );
         /*RobustMeanSquaredErrorFromTargets<Double> loss = new RobustMeanSquaredErrorFromTargets<Double>( gaussianUnknown );

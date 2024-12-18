@@ -195,7 +195,7 @@ class UnitQuaternionTest
         List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
         for( int n=0; n<luq.size(); n++ ) {
             UnitQuaternion q0 = luq.get( n );
-            Matrix R = q0.toRotationMatrix();
+            MatrixReal R = q0.toRotationMatrix();
             UnitQuaternion q = UnitQuaternion.fromRotationMatrix( R );
             assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
         }
@@ -305,23 +305,23 @@ class UnitQuaternionTest
         List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
         for( UnitQuaternion q0 : luq ) {
             double[] rollPitchYaw = q0.toRollPitchYawZYX();
-            Matrix R0 = q0.toRotationMatrix();
+            MatrixReal R0 = q0.toRotationMatrix();
             double phi = rollPitchYaw[0];
-            Matrix Rx = Matrix.fromEntries3x3(
+            MatrixReal Rx = MatrixReal.fromEntries3x3(
                     1 , 0 , 0 ,
                     0 , Math.cos(phi) , -Math.sin(phi) ,
                     0 , Math.sin(phi) , Math.cos(phi) );
             double theta = rollPitchYaw[1];
-            Matrix Ry = Matrix.fromEntries3x3(
+            MatrixReal Ry = MatrixReal.fromEntries3x3(
                     Math.cos(theta) , 0 , Math.sin(theta) ,
                     0 , 1 , 0 ,
                     - Math.sin(theta) , 0 , Math.cos(theta) );
             double psi = rollPitchYaw[2];
-            Matrix Rz = Matrix.fromEntries3x3(
+            MatrixReal Rz = MatrixReal.fromEntries3x3(
                     Math.cos(psi) , -Math.sin(psi) , 0 ,
                     Math.sin(psi) , Math.cos(psi) , 0 ,
                     0 , 0 , 1 );
-            Matrix Rzyx = Rz.multiply( Ry ).multiply( Rx );
+            MatrixReal Rzyx = Rz.multiply( Ry ).multiply( Rx );
             assertTrue( Rzyx.equalsApproximately( R0 , 1.0e-13 ) );
         }
     }

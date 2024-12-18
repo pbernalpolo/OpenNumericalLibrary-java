@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -49,7 +49,7 @@ public interface ModelFunctionTester<T>
      * 
      * @return  list of parameters to evaluate the {@link ModelFunction}.
      */
-    public List<Matrix> getParameterList();
+    public List<MatrixReal> getParameterList();
     
     
     
@@ -68,21 +68,21 @@ public interface ModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link ModelFunction#getParameters()} returns a column {@link Matrix}.
+     * Tests that {@link ModelFunction#getParameters()} returns a column {@link MatrixReal}.
      */
     @Test
     default void getParametersReturnColumnMatrix()
     {
         // Get parameters from model function.
         ModelFunction<T> modelFunction = this.getModelFunction();
-        Matrix parameters = modelFunction.getParameters();
+        MatrixReal parameters = modelFunction.getParameters();
         // They must be a column matrix.
         assertEquals( 1 , parameters.cols() );
     }
     
     
     /**
-     * Tests that calling {@link ModelFunction#getParameters()}, then {@link ModelFunction#setParameters(Matrix)}, and then {@link ModelFunction#getParameters()} again returns same parameters we started with.
+     * Tests that calling {@link ModelFunction#getParameters()}, then {@link ModelFunction#setParameters(MatrixReal)}, and then {@link ModelFunction#getParameters()} again returns same parameters we started with.
      */
     @Test
     default void setParametersGetParametersDoesNotChangeParameters()
@@ -90,14 +90,14 @@ public interface ModelFunctionTester<T>
         // Get model function.
         ModelFunction<T> modelFunction = this.getModelFunction();
         // Get parameter list.
-        List<Matrix> parameterList = this.getParameterList();
+        List<MatrixReal> parameterList = this.getParameterList();
         for( int i=0; i<parameterList.size(); i++ ) {
             // Take parameters.
-            Matrix parameters0 = parameterList.get( i );
+            MatrixReal parameters0 = parameterList.get( i );
             // Set parameters in model function,
             modelFunction.setParameters( parameters0 );
             // and get parameters back.
-            Matrix parameters = modelFunction.getParameters();
+            MatrixReal parameters = modelFunction.getParameters();
             // Check that we obtain same parameters again.
             assertTrue( parameters.equals( parameters0 ) );
         }
@@ -111,17 +111,17 @@ public interface ModelFunctionTester<T>
     default void differentInputsProduceDifferentOutputs()
     {
         ModelFunction<T> modelFunction = this.getModelFunction();
-        List<Matrix> parameterList = this.getParameterList();
+        List<MatrixReal> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
             // Produce output with parameter and input 1.
             modelFunction.setParameters( parameterList.get( i ) );
             modelFunction.setInput( inputList.get( i ) );
-            Matrix output1 = modelFunction.getOutput();
+            MatrixReal output1 = modelFunction.getOutput();
             // Produce output with parameter and input 2.
             modelFunction.setParameters( parameterList.get( i+1 ) );
             modelFunction.setInput( inputList.get( i+1 ) );
-            Matrix output2 = modelFunction.getOutput();
+            MatrixReal output2 = modelFunction.getOutput();
             // Check that the outputs are different.
             assertFalse( output1.equals( output2 ) );
         }
@@ -135,17 +135,17 @@ public interface ModelFunctionTester<T>
     default void differentInputsProduceDifferentJacobian()
     {
         ModelFunction<T> modelFunction = this.getModelFunction();
-        List<Matrix> parameterList = this.getParameterList();
+        List<MatrixReal> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size()-1; i++ ) {
             // Produce output with parameter and input 1.
             modelFunction.setParameters( parameterList.get( i ) );
             modelFunction.setInput( inputList.get( i ) );
-            Matrix jacobian1 = modelFunction.getJacobian();
+            MatrixReal jacobian1 = modelFunction.getJacobian();
             // Produce output with parameter and input 2.
             modelFunction.setParameters( parameterList.get( i+1 ) );
             modelFunction.setInput( inputList.get( i+1 ) );
-            Matrix jacobian2 = modelFunction.getJacobian();
+            MatrixReal jacobian2 = modelFunction.getJacobian();
             // Check that the Jacobians are different.
             assertFalse( jacobian1.equals( jacobian2 ) );
         }
@@ -153,22 +153,22 @@ public interface ModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link ModelFunction#getJacobian()} and {@link ModelFunction#getOutput()} return {@link Matrix}s with same number of rows.
+     * Tests that {@link ModelFunction#getJacobian()} and {@link ModelFunction#getOutput()} return {@link MatrixReal}s with same number of rows.
      */
     @Test
     default void jacobianHasSameRowsAsOutput()
     {
         ModelFunction<T> modelFunction = this.getModelFunction();
-        List<Matrix> parameterList = this.getParameterList();
+        List<MatrixReal> parameterList = this.getParameterList();
         List<T> inputList = this.getInputList();
         for( int i=0; i<inputList.size(); i++ ) {
             // Set inputs and parameters.
             modelFunction.setParameters( parameterList.get( i ) );
             modelFunction.setInput( inputList.get( i ) );
             // Get output.
-            Matrix output = modelFunction.getOutput();
+            MatrixReal output = modelFunction.getOutput();
             // Get jacobian.
-            Matrix jacobian = modelFunction.getJacobian();
+            MatrixReal jacobian = modelFunction.getJacobian();
             // Check that jacobian and output have same number of rows.
             assertEquals( output.rows() , jacobian.rows() );
         }
@@ -176,16 +176,16 @@ public interface ModelFunctionTester<T>
     
     
     /**
-     * Tests that {@link ModelFunction#getJacobian()} returns a {@link Matrix} with as many columns as parameters.
+     * Tests that {@link ModelFunction#getJacobian()} returns a {@link MatrixReal} with as many columns as parameters.
      */
     @Test
     default void jacobianHasSameColumnsAsParameters()
     {
         // Get parameters from model function.
         ModelFunction<T> modelFunction = this.getModelFunction();
-        Matrix parameters = modelFunction.getParameters();
+        MatrixReal parameters = modelFunction.getParameters();
         // Get the Jacobian.
-        Matrix jacobian = modelFunction.getJacobian();
+        MatrixReal jacobian = modelFunction.getJacobian();
         // Check that the Jacobian has as many columns as the number of parameters.
         assertEquals( parameters.rows() , jacobian.cols() );
     }

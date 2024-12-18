@@ -223,23 +223,23 @@ public class Vector2
     }
     
     
-    public Matrix outerProduct( Vector2 other )
+    public MatrixReal outerProduct( Vector2 other )
     {
-        return Matrix.fromEntries2x2(
+        return MatrixReal.fromEntries2x2(
                 this.x() * other.x() , this.x() * other.y() ,
                 this.y() * other.x() , this.y() * other.y() );
     }
     
     
-    public Matrix toMatrixAsColumn()
+    public MatrixReal toMatrixAsColumn()
     {
-        return Matrix.fromVector2AsColumn( this );
+        return MatrixReal.fromVector2AsColumn( this );
     }
     
     
-    public Matrix toMatrixAsRow()
+    public MatrixReal toMatrixAsRow()
     {
-        return Matrix.fromVector2AsRow( this );
+        return MatrixReal.fromVector2AsRow( this );
     }
     
     

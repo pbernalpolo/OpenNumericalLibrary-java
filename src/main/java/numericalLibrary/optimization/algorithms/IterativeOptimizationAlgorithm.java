@@ -6,7 +6,7 @@ import numericalLibrary.optimization.stoppingCriteria.IterationThresholdStopping
 import numericalLibrary.optimization.stoppingCriteria.MaximumIterationsWithoutImprovementStoppingCriterion;
 import numericalLibrary.optimization.stoppingCriteria.OrOperatorOnStoppingCriteria;
 import numericalLibrary.optimization.stoppingCriteria.StoppingCriterion;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -24,7 +24,7 @@ public abstract class IterativeOptimizationAlgorithm<T extends Loss>
     /**
      * Returns the delta in the parameter space computed with the concrete {@link IterativeOptimizationAlgorithm}.
      */
-    public abstract Matrix getDeltaParameters();
+    public abstract MatrixReal getDeltaParameters();
     
     
     
@@ -111,7 +111,7 @@ public abstract class IterativeOptimizationAlgorithm<T extends Loss>
     public void initialize()
     {
         // Check that the parameter vector is well defined.
-        Matrix theta = this.lossFunction.getParameters();
+        MatrixReal theta = this.lossFunction.getParameters();
         if( theta.cols() != 1 ) {
             throw new IllegalArgumentException( "Parameter vector returned by loss function must be a column matrix." );
         }
@@ -138,9 +138,9 @@ public abstract class IterativeOptimizationAlgorithm<T extends Loss>
             throw new IllegalStateException( "Called step() without initialize() having been called previously. Method initialize() must be called after calling set methods in this IterativeOptimizationAlgorithm." );
         }
         // Compute delta.
-        Matrix delta = this.getDeltaParameters();
+        MatrixReal delta = this.getDeltaParameters();
         // Update theta.
-        Matrix theta = this.lossFunction.getParameters();
+        MatrixReal theta = this.lossFunction.getParameters();
         theta.addInplace( delta );
         this.lossFunction.setParameters( theta );
         // Update iteration.

@@ -2,7 +2,7 @@ package numericalLibrary.manifolds.unitQuaternions.atlases;
 
 
 import numericalLibrary.manifolds.DifferentiableAtlas;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.types.UnitQuaternion;
 import numericalLibrary.types.Vector3;
 
@@ -41,7 +41,7 @@ public abstract class UnitQuaternionDifferentiableAtlas
      * 
      * @param delta     {@link UnitQuaternion} that defines the transition map.
      */
-    public abstract Matrix jacobianOfTransitionMap( UnitQuaternion delta );
+    public abstract MatrixReal jacobianOfTransitionMap( UnitQuaternion delta );
     
     
     
@@ -52,7 +52,7 @@ public abstract class UnitQuaternionDifferentiableAtlas
     /**
      * {@inheritDoc}
      */
-    public Matrix jacobianOfTransitionMap( UnitQuaternion initialChartSelector , UnitQuaternion finalChartSelector )
+    public MatrixReal jacobianOfTransitionMap( UnitQuaternion initialChartSelector , UnitQuaternion finalChartSelector )
     {
         this.setChartSelector( initialChartSelector );
         UnitQuaternion delta = this.toChartSelectorPerspective( finalChartSelector );

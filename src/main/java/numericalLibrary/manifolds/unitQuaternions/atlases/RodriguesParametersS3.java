@@ -1,7 +1,7 @@
 package numericalLibrary.manifolds.unitQuaternions.atlases;
 
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 import numericalLibrary.types.Quaternion;
 import numericalLibrary.types.UnitQuaternion;
 import numericalLibrary.types.Vector3;
@@ -76,10 +76,10 @@ public class RodriguesParametersS3
     /**
      * {@inheritDoc}
      */
-    public Matrix jacobianOfTransitionMap( UnitQuaternion delta )
+    public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {
         Vector3 deltav = delta.vectorPart();
-        return Matrix.one(3)
+        return MatrixReal.one(3)
                          .scaleInplace( delta.w() )
                          .subtractInplace( deltav.crossProductMatrix() )
                          .scaleInplace( delta.w() );

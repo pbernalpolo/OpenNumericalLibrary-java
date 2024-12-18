@@ -4,7 +4,7 @@ package numericalLibrary.optimization.lossFunctions;
 import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -116,8 +116,8 @@ public class MeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();
                 loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );
@@ -149,8 +149,8 @@ public class MeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, gradient, and Gauss-Newton matrix.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();
                 loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput );

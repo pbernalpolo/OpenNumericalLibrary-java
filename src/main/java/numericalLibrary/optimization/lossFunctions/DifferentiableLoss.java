@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.lossFunctions;
 
 
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -18,10 +18,10 @@ public interface DifferentiableLoss
     /**
      * Returns the gradient of the {@link DifferentiableLoss} as a column matrix.
      * <p>
-     * The gradient is evaluated at the point defined by the parameters set by {@link #setParameters(Matrix)}.
+     * The gradient is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}.
      * 
      * @return  gradient of the {@link DifferentiableLoss} as a column matrix.
      */
-    public abstract Matrix getGradient();
+    public abstract MatrixReal getGradient();
     
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import numericalLibrary.optimization.ModelFunction;
 import numericalLibrary.optimization.robustFunctions.RobustFunction;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -135,10 +135,10 @@ public class RobustMeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
                 double errorSquared = modelFunctionOutput.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 // Add contribution to cost, and gradient.
                 loss.cost += robustFunction.f( errorSquared );
                 loss.gradient.addLeftTransposeTimesRight( J , modelFunctionOutput.scaleInplace( robustWeight ) );
@@ -162,7 +162,7 @@ public class RobustMeanSquaredErrorFunction<T>
         public void update( EfficientLocallyQuadraticLossDefinedWithModelFunction<T> loss )
         {
             // Create matrix to speed up computations.
-            Matrix JW = Matrix.emptyWithSizeOf( loss.modelFunction.getJacobian() );
+            MatrixReal JW = MatrixReal.emptyWithSizeOf( loss.modelFunction.getJacobian() );
             // Initialize cost, gradient, and Gauss-Newton matrix.
             loss.cost = 0.0;
             loss.gradient.setToZero();
@@ -172,10 +172,10 @@ public class RobustMeanSquaredErrorFunction<T>
                 // Set the input.
                 loss.modelFunction.setInput( input );
                 // Compute quantities involved in the cost and gradient.
-                Matrix modelFunctionOutput = loss.modelFunction.getOutput();
+                MatrixReal modelFunctionOutput = loss.modelFunction.getOutput();
                 double errorSquared = modelFunctionOutput.normFrobeniusSquared();
                 double robustWeight = robustFunction.f1( errorSquared );
-                Matrix J = loss.modelFunction.getJacobian();
+                MatrixReal J = loss.modelFunction.getJacobian();
                 JW.setTo( J ).scaleInplace( robustWeight );
                 // Add contribution to cost, gradient, and Gauss-Newton matrix.
                 loss.cost += modelFunctionOutput.normFrobeniusSquared();

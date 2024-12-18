@@ -218,7 +218,7 @@ public class UnitQuaternion
     }
     
     
-    public Matrix toRotationMatrix()
+    public MatrixReal toRotationMatrix()
     {
         double ri = this.w() * this.x();
         ri += ri;
@@ -239,7 +239,7 @@ public class UnitQuaternion
         double kk = this.z() * this.z();
         kk += kk;
         
-        return Matrix.fromEntries3x3(
+        return MatrixReal.fromEntries3x3(
                 1.0 -jj -kk  , ij - rk      , ik + rj ,
                 ij + rk      , 1.0 -ii -kk  , jk - ri ,
                 ik - rj      , jk + ri      , 1.0 -ii -jj );
@@ -374,7 +374,7 @@ public class UnitQuaternion
     }
     
     
-    public static UnitQuaternion fromRotationMatrix( Matrix R )
+    public static UnitQuaternion fromRotationMatrix( MatrixReal R )
     {
         if(  R.rows() != 3  ||  R.cols() != 3  ) {
             throw new IllegalArgumentException( "3D rotation matrix expected." );

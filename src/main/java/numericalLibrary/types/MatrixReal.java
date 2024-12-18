@@ -13,11 +13,11 @@ import numericalLibrary.algebraicStructures.VectorSpaceElement;
 /**
  * Implements matrix with real entries.
  */
-public class Matrix
+public class MatrixReal
     implements
-        AdditiveAbelianGroupElement<Matrix>,
-        VectorSpaceElement<Matrix>,
-        MetricSpaceElement<Matrix>
+        AdditiveAbelianGroupElement<MatrixReal>,
+        VectorSpaceElement<MatrixReal>,
+        MetricSpaceElement<MatrixReal>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -86,10 +86,10 @@ public class Matrix
      * 
      * @return  transpose of {@code this}.
      */
-    public Matrix transpose()
+    public MatrixReal transpose()
     {
-        Matrix output = Matrix.empty( this.cols() , this.rows() );
-        Matrix.transposeAlgorithm( this , output );
+        MatrixReal output = MatrixReal.empty( this.cols() , this.rows() );
+        MatrixReal.transposeAlgorithm( this , output );
         return output;
     }
     
@@ -97,33 +97,33 @@ public class Matrix
     /**
      * Sets {@code this} to the transpose of {@code other}.
      * 
-     * @param other     {@link Matrix} whose transpose will be set.
+     * @param other     {@link MatrixReal} whose transpose will be set.
      * @return  transpose of {@code other} stored in {@code this}.
      * 
      * @throws IllegalArgumentException if {@code this} has different size as the transpose of {@code other}.
      */
-    public Matrix setToTransposeOf( Matrix other )
+    public MatrixReal setToTransposeOf( MatrixReal other )
     {
         this.assertSize( other.cols() , other.rows() );
-        Matrix.transposeAlgorithm( other , this );
+        MatrixReal.transposeAlgorithm( other , this );
         return this;
     }
     
     
     /**
-     * Sets {@code this} to the product of left {@link Matrix} and right {@link Matrix}.
+     * Sets {@code this} to the product of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as  {@code left * right}.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor of the {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor of the {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left} columns.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right}.
      */
-    public Matrix setToLeftTimesRight( Matrix left , Matrix right )
+    public MatrixReal setToLeftTimesRight( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -137,19 +137,19 @@ public class Matrix
     
     
     /**
-     * Sets {@code this} to the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * Sets {@code this} to the product of left {@link MatrixReal} and transpose of right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left * right^T}.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor to be transposed before {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor to be transposed before {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same columns as {@code left}.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right} rows.
      */
-    public Matrix setToLeftTimesRightTranspose( Matrix left , Matrix right )
+    public MatrixReal setToLeftTimesRightTranspose( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -163,19 +163,19 @@ public class Matrix
     
     
     /**
-     * Sets {@code this} to the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * Sets {@code this} to the product of transpose of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left^T * right}.
      * 
-     * @param left     left factor to be transposed before {@link Matrix} multiplication.
-     * @param right    right factor of {@link Matrix} multiplication.
+     * @param left     left factor to be transposed before {@link MatrixReal} multiplication.
+     * @param right    right factor of {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} transpose and {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left}.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left} columns, or columns as {@code right}.
      */
-    public Matrix setToLeftTransposeTimesRight( Matrix left , Matrix right )
+    public MatrixReal setToLeftTransposeTimesRight( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -220,7 +220,7 @@ public class Matrix
     /**
      * {@inheritDoc}
      */
-    public boolean equals( Matrix other )
+    public boolean equals( MatrixReal other )
     {
         if( !this.isSameSize( other ) ) {
             return false;
@@ -241,7 +241,7 @@ public class Matrix
      * 
      * @throws IllegalArgumentException     if {@code other} has not the same size as {@code this}.
      */
-    public Matrix setTo( Matrix other )
+    public MatrixReal setTo( MatrixReal other )
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
@@ -256,9 +256,9 @@ public class Matrix
     /**
      * {@inheritDoc}
      */
-    public Matrix copy()
+    public MatrixReal copy()
     {
-        Matrix c = Matrix.emptyWithSizeOf( this );
+        MatrixReal c = MatrixReal.emptyWithSizeOf( this );
         c.setTo( this );
         return c;
     }
@@ -267,7 +267,7 @@ public class Matrix
     /**
      * {@inheritDoc}
      */
-    public boolean equalsApproximately( Matrix other , double tolerance )
+    public boolean equalsApproximately( MatrixReal other , double tolerance )
     {
         if( !this.isSameSize( other ) ) {
             return false;
@@ -289,10 +289,10 @@ public class Matrix
      * 
      * @throws IllegalArgumentException if {@code this} has different size as {@code other}.
      */
-    public Matrix add( Matrix other )
+    public MatrixReal add( MatrixReal other )
     {
         this.assertSameSize( other );
-        Matrix output = Matrix.emptyWithSizeOf( this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) + other.entryUnchecked(i,j) );
@@ -307,7 +307,7 @@ public class Matrix
      * 
      * @throws IllegalArgumentException if {@code this} has different size as {@code other}.
      */
-    public Matrix addInplace( Matrix other )
+    public MatrixReal addInplace( MatrixReal other )
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
@@ -322,15 +322,15 @@ public class Matrix
     /**
      * {@inheritDoc}
      */
-    public Matrix identityAdditive()
+    public MatrixReal identityAdditive()
     {
-        return Matrix.zero( this.rows() , this.cols() );
+        return MatrixReal.zero( this.rows() , this.cols() );
     }
 
     
-    public Matrix inverseAdditive()
+    public MatrixReal inverseAdditive()
     {
-        Matrix output = Matrix.emptyWithSizeOf( this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 output.setEntryUnchecked( i,j , -this.entryUnchecked(i,j) );
@@ -340,7 +340,7 @@ public class Matrix
     }
 
 
-    public Matrix inverseAdditiveInplace()
+    public MatrixReal inverseAdditiveInplace()
     {
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -351,10 +351,10 @@ public class Matrix
     }
 
 
-    public Matrix subtract( Matrix other )
+    public MatrixReal subtract( MatrixReal other )
     {
         this.assertSameSize( other );
-        Matrix output = Matrix.emptyWithSizeOf( this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) - other.entryUnchecked(i,j) );
@@ -364,7 +364,7 @@ public class Matrix
     }
 
 
-    public Matrix subtractInplace( Matrix other )
+    public MatrixReal subtractInplace( MatrixReal other )
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
@@ -382,28 +382,28 @@ public class Matrix
      * The multiplication is performed as  this * other.
      * 
      * @param other     right factor in the matrix multiplication operation.
-     * @return  new {@link Matrix} that contains the multiplication result.
+     * @return  new {@link MatrixReal} that contains the multiplication result.
      * 
      * @throws IllegalArgumentException     if {@code other} does not have same rows as {@code this} columns.
      */
-    public Matrix multiply( Matrix other )
+    public MatrixReal multiply( MatrixReal other )
     {
         other.assertRows( this.cols() );
-        Matrix output = Matrix.zero( this.rows() , other.cols() );
+        MatrixReal output = MatrixReal.zero( this.rows() , other.cols() );
         output.addLeftTimesRightAlgorithm( this , other );
         return output;
     }
     
     
-    public Matrix identityMultiplicativeLeft()
+    public MatrixReal identityMultiplicativeLeft()
     {
-        return Matrix.one( this.Nrows );
+        return MatrixReal.one( this.Nrows );
     }
     
     
-    public Matrix identityMultiplicativeRight()
+    public MatrixReal identityMultiplicativeRight()
     {
-        return Matrix.one( this.Ncols );
+        return MatrixReal.one( this.Ncols );
     }
     
     
@@ -444,19 +444,19 @@ public class Matrix
     
     
     /**
-     * Adds the product of left {@link Matrix} and right {@link Matrix}.
+     * Adds the product of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as  {@code left * right}.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor of the {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor of the {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left} columns.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right}.
      */
-    public Matrix addLeftTimesRight( Matrix left , Matrix right )
+    public MatrixReal addLeftTimesRight( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -468,19 +468,19 @@ public class Matrix
     
     
     /**
-     * Adds the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * Adds the product of left {@link MatrixReal} and transpose of right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left * right^T}.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor to be transpose before {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor to be transpose before {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same columns as {@code left}.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left}, or columns as {@code right} rows.
      */
-    public Matrix addLeftTimesRightTranspose( Matrix left , Matrix right )
+    public MatrixReal addLeftTimesRightTranspose( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -492,19 +492,19 @@ public class Matrix
     
     
     /**
-     * Adds the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * Adds the product of transpose of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left^T * right}.
      * 
-     * @param left     left factor to be transposed before {@link Matrix} multiplication.
-     * @param right    right factor of {@link Matrix} multiplication.
+     * @param left     left factor to be transposed before {@link MatrixReal} multiplication.
+     * @param right    right factor of {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} transpose and {@code right} is added.
      * 
      * @throws IllegalArgumentException     if {@code this} is {@code left} or {@code right}.
      * @throws IllegalArgumentException     if {@code right} does not have same rows as {@code left}.
      * @throws IllegalArgumentException     if {@code this} does not have same rows as {@code left} columns, or columns as {@code right}.
      */
-    public Matrix addLeftTransposeTimesRight( Matrix left , Matrix right )
+    public MatrixReal addLeftTransposeTimesRight( MatrixReal left , MatrixReal right )
     {
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
@@ -515,9 +515,9 @@ public class Matrix
     }
     
     
-    public Matrix scale( double scalar )
+    public MatrixReal scale( double scalar )
     {
-        Matrix output = Matrix.emptyWithSizeOf( this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) * scalar );
@@ -527,7 +527,7 @@ public class Matrix
     }
     
     
-    public Matrix scaleInplace( double scalar )
+    public MatrixReal scaleInplace( double scalar )
     {
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -562,19 +562,19 @@ public class Matrix
     }
     
     
-    public Matrix normalizeFrobenius()
+    public MatrixReal normalizeFrobenius()
     {
         return this.scale( 1.0/this.normFrobenius() );
     }
     
     
-    public Matrix normalizeFrobeniusInplace()
+    public MatrixReal normalizeFrobeniusInplace()
     {
         return this.scaleInplace( 1.0/this.normFrobenius() );
     }
     
     
-    public double distanceFrom( Matrix other )
+    public double distanceFrom( MatrixReal other )
     {
         this.assertSameSize( other );
         double dist2 = 0.0;
@@ -588,87 +588,87 @@ public class Matrix
     }
     
     
-    public Matrix choleskyDecomposition()
+    public MatrixReal choleskyDecomposition()
     {
         this.assertIsSquare();
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        Matrix.choleskyDecompositionAlgorithm( this , output );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        MatrixReal.choleskyDecompositionAlgorithm( this , output );
         return output;
     }
     
     
-    public Matrix choleskyDecompositionInplace()
+    public MatrixReal choleskyDecompositionInplace()
     {
         this.assertIsSquare();
-        Matrix.choleskyDecompositionAlgorithm( this , this );
+        MatrixReal.choleskyDecompositionAlgorithm( this , this );
         return this;
     }
     
     
-    public Matrix LDLTDecomposition()
+    public MatrixReal LDLTDecomposition()
     {
         this.assertIsSquare();
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        Matrix.ldltDecompositionAlgorithm( this , output );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        MatrixReal.ldltDecompositionAlgorithm( this , output );
         return output;
     }
     
     
-    public Matrix LDLTDecompositionInplace()
+    public MatrixReal LDLTDecompositionInplace()
     {
         this.assertIsSquare();
-        Matrix.ldltDecompositionAlgorithm( this , this );
+        MatrixReal.ldltDecompositionAlgorithm( this , this );
         return this;
     }
     
     
-    public Matrix divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( Matrix L )
+    public MatrixReal divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( MatrixReal L )
     {
         L.assertIsSquare();
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        Matrix.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( output , L , this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        MatrixReal.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( output , L , this );
         return output;
     }
 
 
-    public Matrix divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( Matrix L )
+    public MatrixReal divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( MatrixReal L )
     {
         L.assertIsSquare();
-        Matrix.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( this , L , this );
+        MatrixReal.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( this , L , this );
         return this;
     }
     
     
-    public Matrix divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( Matrix L )
+    public MatrixReal divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( MatrixReal L )
     {
         L.assertIsSquare();
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        Matrix.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , output , this );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        MatrixReal.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , output , this );
         return output;
     }
 
 
-    public Matrix divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( Matrix L )
+    public MatrixReal divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( MatrixReal L )
     {
         L.assertIsSquare();
-        Matrix.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , this , this );
+        MatrixReal.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( L , this , this );
         return this;
     }
     
     
-    public Matrix divideRightByPositiveDefiniteUsingItsLDLTDecomposition( Matrix LD )
+    public MatrixReal divideRightByPositiveDefiniteUsingItsLDLTDecomposition( MatrixReal LD )
     {
         LD.assertIsSquare();
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        Matrix.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , output );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        MatrixReal.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , output );
         return output;
     }
     
     
-    public Matrix divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( Matrix LD )
+    public MatrixReal divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( MatrixReal LD )
     {
         LD.assertIsSquare();
-        Matrix.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , this );
+        MatrixReal.divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( this , LD , this );
         return this;
     }
     
@@ -695,7 +695,7 @@ public class Matrix
     }
     
     
-    public Matrix setSubmatrix( int i0 , int j0 , Matrix other )
+    public MatrixReal setSubmatrix( int i0 , int j0 , MatrixReal other )
     {
         this.assertIndexBounds( i0 , j0 );
         this.assertIndexBounds( i0 + other.rows() , j0 + other.cols() );
@@ -708,7 +708,7 @@ public class Matrix
     }
     
     
-    public Matrix submatrix( int i , int j , int numberOfRows , int numberOfColumns )
+    public MatrixReal submatrix( int i , int j , int numberOfRows , int numberOfColumns )
     {
         this.assertIndexBounds( i , j );
         this.assertIndexBounds( i+numberOfRows , j+numberOfColumns );
@@ -716,10 +716,10 @@ public class Matrix
     }
     
     
-    public Matrix submatrixFromRow( int i )
+    public MatrixReal submatrixFromRow( int i )
     {
         this.assertRowIndexBounds( i );
-        Matrix output = Matrix.empty( 1 , this.cols() );
+        MatrixReal output = MatrixReal.empty( 1 , this.cols() );
         for( int j=0; j<this.cols(); j++ ) {
             output.setEntryUnchecked( 0,j , this.entryUnchecked( i , j ) );
         }
@@ -727,7 +727,7 @@ public class Matrix
     }
     
     
-    public Matrix submatrixFromRows( int i , int numberOfRows )
+    public MatrixReal submatrixFromRows( int i , int numberOfRows )
     {
         this.assertRowIndexBounds( i );
         this.assertRowIndexBounds( i+numberOfRows );
@@ -735,10 +735,10 @@ public class Matrix
     }
     
     
-    public Matrix submatrixFromColumn( int j )
+    public MatrixReal submatrixFromColumn( int j )
     {
         this.assertColumnIndexBounds( j );
-        Matrix output = Matrix.empty( this.rows() , 1 );
+        MatrixReal output = MatrixReal.empty( this.rows() , 1 );
         for( int i=0; i<this.rows(); i++ ) {
             output.setEntryUnchecked( i,0 , this.entryUnchecked( i , j ) );
         }
@@ -746,7 +746,7 @@ public class Matrix
     }
     
     
-    public Matrix submatrixFromColumns( int j , int numberOfColumns )
+    public MatrixReal submatrixFromColumns( int j , int numberOfColumns )
     {
         this.assertColumnIndexBounds( j );
         this.assertColumnIndexBounds( j+numberOfColumns );
@@ -771,12 +771,12 @@ public class Matrix
     
     
     /**
-     * Returns the {@link Matrix} elements stored in a flat array.
+     * Returns the {@link MatrixReal} elements stored in a flat array.
      * <p>
-     * The {@link Matrix} elements are stored row after row, so the output array will be:
+     * The {@link MatrixReal} elements are stored row after row, so the output array will be:
      * output = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
      * 
-     * @return  {@link Matrix} elements stored in a flat array.
+     * @return  {@link MatrixReal} elements stored in a flat array.
      */
     public double[] toFlatArray()
     {
@@ -821,10 +821,10 @@ public class Matrix
     
     
     /**
-     * Returns result of applying the {@link Matrix} transformation to a {@link Vector3} in a new {@link Vector3}.
+     * Returns result of applying the {@link MatrixReal} transformation to a {@link Vector3} in a new {@link Vector3}.
      * 
-     * @param v     {@link Vector3} to which the {@link Matrix} transformation is applied.
-     * @return  result of applying the {@link Matrix} transformation to a {@link Vector3} in a new {@link Vector3}.
+     * @param v     {@link Vector3} to which the {@link MatrixReal} transformation is applied.
+     * @return  result of applying the {@link MatrixReal} transformation to a {@link Vector3} in a new {@link Vector3}.
      */
     public Vector3 applyToVector3( Vector3 v )
     {
@@ -852,22 +852,22 @@ public class Matrix
      * 
      * @return  {@code true} if {@code this} has same size as {@code other}.
      */
-    public boolean isSameSize( Matrix other )
+    public boolean isSameSize( MatrixReal other )
     {
         return (  this.rows() == other.rows()  &&  this.cols() == other.cols()  );
     }
     
     
-    public Matrix abs()
+    public MatrixReal abs()
     {
-        Matrix output = Matrix.emptyWithSizeOf( this );
-        return Matrix.absPrivate( this , output );
+        MatrixReal output = MatrixReal.emptyWithSizeOf( this );
+        return MatrixReal.absPrivate( this , output );
     }
     
     
-    public Matrix absInplace()
+    public MatrixReal absInplace()
     {
-        return Matrix.absPrivate( this , this );
+        return MatrixReal.absPrivate( this , this );
     }
     
     
@@ -913,9 +913,9 @@ public class Matrix
      * @param numberOfColumns   number of columns of the empty matrix.
      * @return  new empty matrix with the given size.
      */
-    public static Matrix empty( int numberOfRows , int numberOfColumns )
+    public static MatrixReal empty( int numberOfRows , int numberOfColumns )
     {
-        return new Matrix( numberOfRows , numberOfColumns );
+        return new MatrixReal( numberOfRows , numberOfColumns );
     }
     
     
@@ -925,9 +925,9 @@ public class Matrix
      * @param other     matrix whose size will be copied.
      * @return  new empty matrix with size as {@code other}.
      */
-    public static Matrix emptyWithSizeOf( Matrix other )
+    public static MatrixReal emptyWithSizeOf( MatrixReal other )
     {
-        return Matrix.empty( other.rows() , other.cols() );
+        return MatrixReal.empty( other.rows() , other.cols() );
     }
     
     
@@ -938,15 +938,15 @@ public class Matrix
      * @param numberOfColumns   number of columns for the returned matrix.
      * @return  matrix full of zeros with the given size.
      */
-    public static Matrix zero( int numberOfRows , int numberOfColumns )
+    public static MatrixReal zero( int numberOfRows , int numberOfColumns )
     {
-        return Matrix.empty( numberOfRows , numberOfColumns );
+        return MatrixReal.empty( numberOfRows , numberOfColumns );
     }
     
     
-    public static Matrix one( int dimension )
+    public static MatrixReal one( int dimension )
     {
-        Matrix one = Matrix.empty( dimension , dimension );
+        MatrixReal one = MatrixReal.empty( dimension , dimension );
         for( int i=0; i<dimension; i++ ) {
             one.setEntryUnchecked( i,i , 1.0 );
         }
@@ -954,9 +954,9 @@ public class Matrix
     }
     
     
-    public static Matrix random( int numberOfRows , int numberOfColumns , Random randomNumberGenerator )
+    public static MatrixReal random( int numberOfRows , int numberOfColumns , Random randomNumberGenerator )
     {
-        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
+        MatrixReal output = MatrixReal.empty( numberOfRows , numberOfColumns );
         for( int i=0; i<numberOfRows; i++ ) {
             for( int j=0; j<numberOfColumns; j++ ) {
                 output.setEntryUnchecked( i,j , randomNumberGenerator.nextGaussian() );
@@ -967,24 +967,24 @@ public class Matrix
     
     
     /**
-     * Returns a new {@link Matrix} built from a flat array.
+     * Returns a new {@link MatrixReal} built from a flat array.
      * <p>
-     * The {@link Matrix} elements must be stored row after row, so the flatArray array must have the form:
+     * The {@link MatrixReal} elements must be stored row after row, so the flatArray array must have the form:
      * flatArray = { a11 , a12 , ... , a1m , a21 , a22 , ... , a2m , an1 , an2 , ... , anm }
      * 
-     * @param flatArray     flat array that contains the {@link Matrix} elements row after row.
-     * @param numberOfRows  number of rows of the output {@link Matrix}.
-     * @param numberOfColumns   number of columns of the output {@link Matrix}.
-     * @return  new {@link Matrix} build from a flat array.
+     * @param flatArray     flat array that contains the {@link MatrixReal} elements row after row.
+     * @param numberOfRows  number of rows of the output {@link MatrixReal}.
+     * @param numberOfColumns   number of columns of the output {@link MatrixReal}.
+     * @return  new {@link MatrixReal} build from a flat array.
      * 
-     * @throws IllegalArgumentException if length of flatArray does not match provided {@link Matrix} size.
+     * @throws IllegalArgumentException if length of flatArray does not match provided {@link MatrixReal} size.
      */
-    public static Matrix fromFlatArray( double[] flatArray , int numberOfRows , int numberOfColumns )
+    public static MatrixReal fromFlatArray( double[] flatArray , int numberOfRows , int numberOfColumns )
     {
         if( numberOfRows * numberOfColumns != flatArray.length ) {
             throw new IllegalArgumentException( "Length of flatArray (" + flatArray.length + ") does not match size of matrix ( " + numberOfRows + " x " + numberOfColumns + " )" );
         }
-        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
+        MatrixReal output = MatrixReal.empty( numberOfRows , numberOfColumns );
         int c = 0;
         for( int i=0; i<output.rows(); i++ ) {
             for( int j=0; j<output.cols(); j++ ) {
@@ -996,16 +996,16 @@ public class Matrix
     
     
     /**
-     * Returns a new column {@link Matrix} built from an array.
+     * Returns a new column {@link MatrixReal} built from an array.
      * <p>
      * The size of the returned matrix is ( array.length , 1 ).
      * 
-     * @param array     array that contains the entries of the column {@link Matrix}.
-     * @return  new column {@link Matrix} built from an array.
+     * @param array     array that contains the entries of the column {@link MatrixReal}.
+     * @return  new column {@link MatrixReal} built from an array.
      */
-    public static Matrix fromArrayAsColumn( double[] array )
+    public static MatrixReal fromArrayAsColumn( double[] array )
     {
-        Matrix output = Matrix.empty( array.length , 1 );
+        MatrixReal output = MatrixReal.empty( array.length , 1 );
         for( int i=0; i<array.length; i++ ) {
             output.setEntryUnchecked( i,0 , array[i] );
         }
@@ -1014,16 +1014,16 @@ public class Matrix
     
     
     /**
-     * Returns a new row {@link Matrix} built from an array.
+     * Returns a new row {@link MatrixReal} built from an array.
      * <p>
      * The size of the returned matrix is ( 1 , array.length )
      * 
-     * @param array     array that contains the entries of the of the row {@link Matrix}.
-     * @return  new row {@link Matrix} built from an array.
+     * @param array     array that contains the entries of the of the row {@link MatrixReal}.
+     * @return  new row {@link MatrixReal} built from an array.
      */
-    public static Matrix fromArrayAsRow( double[] array )
+    public static MatrixReal fromArrayAsRow( double[] array )
     {
-        Matrix output = Matrix.empty( 1 , array.length );
+        MatrixReal output = MatrixReal.empty( 1 , array.length );
         for( int j=0; j<array.length; j++ ) {
             output.setEntryUnchecked( 0,j , array[j] );
         }
@@ -1032,21 +1032,21 @@ public class Matrix
     
     
     /**
-     * Returns a new {@link Matrix} built from a 2d array.
+     * Returns a new {@link MatrixReal} built from a 2d array.
      * <p>
      * The size of the returned matrix is set from the dimensions of the input 2d array:
      * <ul>
      *  <li> array.length -> number of rows
      *  <li> array[0].length -> number of columns
-     *  <li> array[i][j] is obtained from {@link Matrix#entry(int, int)}
+     *  <li> array[i][j] is obtained from {@link MatrixReal#entry(int, int)}
      * </ul>
      * 
-     * @param array     2d array that contains the {@link Matrix} entries.
-     * @return  new {@link Matrix} built from a 2d array.
+     * @param array     2d array that contains the {@link MatrixReal} entries.
+     * @return  new {@link MatrixReal} built from a 2d array.
      */
-    public static Matrix fromArray2D( double[][] array )
+    public static MatrixReal fromArray2D( double[][] array )
     {
-        Matrix output = new Matrix( array.length , array[0].length );
+        MatrixReal output = new MatrixReal( array.length , array[0].length );
         for( int i=0; i<output.rows(); i++ ) {
             for( int j=0; j<output.cols(); j++ ) {
                 output.setEntryUnchecked( i,j , array[i][j] );
@@ -1057,17 +1057,17 @@ public class Matrix
     
     
     /**
-     * Returns a new 2x2 {@link Matrix} from its entries.
+     * Returns a new 2x2 {@link MatrixReal} from its entries.
      * 
      * @param a11    entry stored in (0,0)
      * @param a12    entry stored in (0,1)
      * @param a21    entry stored in (1,0)
      * @param a22    entry stored in (1,1)
-     * @return  new 2x2 {@link Matrix} from its entries.
+     * @return  new 2x2 {@link MatrixReal} from its entries.
      */
-    public static Matrix fromEntries2x2( double a11 , double a12 , double a21 , double a22 )
+    public static MatrixReal fromEntries2x2( double a11 , double a12 , double a21 , double a22 )
     {
-        Matrix output = Matrix.empty( 2 , 2 );
+        MatrixReal output = MatrixReal.empty( 2 , 2 );
         output.setEntryUnchecked( 0,0 , a11 );    output.setEntryUnchecked( 0,1 , a12 );
         output.setEntryUnchecked( 1,0 , a21 );    output.setEntryUnchecked( 1,1 , a22 );
         return output;
@@ -1075,7 +1075,7 @@ public class Matrix
     
     
     /**
-     * Returns a new 3x3 {@link Matrix} from its entries.
+     * Returns a new 3x3 {@link MatrixReal} from its entries.
      * 
      * @param a11   entry stored in (0,0)
      * @param a12   entry stored in (0,1)
@@ -1086,11 +1086,11 @@ public class Matrix
      * @param a31   entry stored in (2,0)
      * @param a32   entry stored in (2,1)
      * @param a33   entry stored in (2,2)
-     * @return  new 3x3 {@link Matrix} from its entries.
+     * @return  new 3x3 {@link MatrixReal} from its entries.
      */
-    public static Matrix fromEntries3x3( double a11 , double a12 , double a13 , double a21 , double a22 , double a23 , double a31 , double a32 , double a33 )
+    public static MatrixReal fromEntries3x3( double a11 , double a12 , double a13 , double a21 , double a22 , double a23 , double a31 , double a32 , double a33 )
     {
-        Matrix output = Matrix.empty( 3 , 3 );
+        MatrixReal output = MatrixReal.empty( 3 , 3 );
         output.setEntryUnchecked( 0,0 , a11 );    output.setEntryUnchecked( 0,1 , a12 );    output.setEntryUnchecked( 0,2 , a13 );
         output.setEntryUnchecked( 1,0 , a21 );    output.setEntryUnchecked( 1,1 , a22 );    output.setEntryUnchecked( 1,2 , a23 );
         output.setEntryUnchecked( 2,0 , a31 );    output.setEntryUnchecked( 2,1 , a32 );    output.setEntryUnchecked( 2,2 , a33 );
@@ -1099,14 +1099,14 @@ public class Matrix
     
     
     /**
-     * Returns a new column {@link Matrix} from a {@link Vector2}.
+     * Returns a new column {@link MatrixReal} from a {@link Vector2}.
      * 
-     * @param v     {@link Vector2} from which the column {@link Matrix} will be built.
-     * @return  new column {@link Matrix} from a {@link Vector2}.
+     * @param v     {@link Vector2} from which the column {@link MatrixReal} will be built.
+     * @return  new column {@link MatrixReal} from a {@link Vector2}.
      */
-    public static Matrix fromVector2AsColumn( Vector2 v )
+    public static MatrixReal fromVector2AsColumn( Vector2 v )
     {
-        Matrix output = Matrix.empty( 2 , 1 );
+        MatrixReal output = MatrixReal.empty( 2 , 1 );
         output.setEntryUnchecked( 0,0 , v.x() );
         output.setEntryUnchecked( 1,0 , v.y() );
         return output;
@@ -1114,14 +1114,14 @@ public class Matrix
     
     
     /**
-     * Returns a new row {@link Matrix} from a {@link Vector2}.
+     * Returns a new row {@link MatrixReal} from a {@link Vector2}.
      * 
-     * @param v     {@link Vector2} from which the row {@link Matrix} will be built.
-     * @return  new row {@link Matrix} from a {@link Vector2}.
+     * @param v     {@link Vector2} from which the row {@link MatrixReal} will be built.
+     * @return  new row {@link MatrixReal} from a {@link Vector2}.
      */
-    public static Matrix fromVector2AsRow( Vector2 v )
+    public static MatrixReal fromVector2AsRow( Vector2 v )
     {
-        Matrix output = Matrix.empty( 1 , 2 );
+        MatrixReal output = MatrixReal.empty( 1 , 2 );
         output.setEntryUnchecked( 0,0 , v.x() );
         output.setEntryUnchecked( 0,1 , v.y() );
         return output;
@@ -1129,14 +1129,14 @@ public class Matrix
     
     
     /**
-     * Returns a new column {@link Matrix} from a {@link Vector3}.
+     * Returns a new column {@link MatrixReal} from a {@link Vector3}.
      * 
-     * @param v     {@link Vector3} from which the column {@link Matrix} will be built.
-     * @return  new column {@link Matrix} from a {@link Vector3}.
+     * @param v     {@link Vector3} from which the column {@link MatrixReal} will be built.
+     * @return  new column {@link MatrixReal} from a {@link Vector3}.
      */
-    public static Matrix fromVector3AsColumn( Vector3 v )
+    public static MatrixReal fromVector3AsColumn( Vector3 v )
     {
-        Matrix output = Matrix.empty( 3 , 1 );
+        MatrixReal output = MatrixReal.empty( 3 , 1 );
         output.setEntryUnchecked( 0,0 , v.x() );
         output.setEntryUnchecked( 1,0 , v.y() );
         output.setEntryUnchecked( 2,0 , v.z() );
@@ -1145,14 +1145,14 @@ public class Matrix
     
     
     /**
-     * Returns a new row {@link Matrix} from a {@link Vector3}.
+     * Returns a new row {@link MatrixReal} from a {@link Vector3}.
      * 
-     * @param v     {@link Vector3} from which the row {@link Matrix} will be built.
-     * @return  new row {@link Matrix} from a {@link Vector3}.
+     * @param v     {@link Vector3} from which the row {@link MatrixReal} will be built.
+     * @return  new row {@link MatrixReal} from a {@link Vector3}.
      */
-    public static Matrix fromVector3AsRow( Vector3 v )
+    public static MatrixReal fromVector3AsRow( Vector3 v )
     {
-        Matrix output = Matrix.empty( 1 , 3 );
+        MatrixReal output = MatrixReal.empty( 1 , 3 );
         output.setEntryUnchecked( 0,0 , v.x() );
         output.setEntryUnchecked( 0,1 , v.y() );
         output.setEntryUnchecked( 0,2 , v.z() );
@@ -1160,9 +1160,9 @@ public class Matrix
     }
     
     
-    public static Matrix diagonal( double[] diagonalElements )
+    public static MatrixReal diagonal( double[] diagonalElements )
     {
-        Matrix output = Matrix.zero( diagonalElements.length , diagonalElements.length );
+        MatrixReal output = MatrixReal.zero( diagonalElements.length , diagonalElements.length );
         for( int i=0; i<diagonalElements.length; i++ ) {
             output.setEntryUnchecked( i,i , diagonalElements[i] );
         }
@@ -1170,20 +1170,20 @@ public class Matrix
     }
     
     
-    public static Matrix blockDiagonal( List<Matrix> lrm )
+    public static MatrixReal blockDiagonal( List<MatrixReal> lrm )
     {
         // first we obtain the size of the matrix
         int nrows = 0;
         int ncols = 0;
-        for( Matrix rm : lrm ) {
+        for( MatrixReal rm : lrm ) {
             nrows += rm.rows();
             ncols += rm.cols();
         }
         // then, we create the matrix, and we fill the content
-        Matrix output = Matrix.zero( nrows , ncols );
+        MatrixReal output = MatrixReal.zero( nrows , ncols );
         int i0 = 0;
         int j0 = 0;
-        for( Matrix rm : lrm ) {
+        for( MatrixReal rm : lrm ) {
             for( int i=0; i<rm.rows(); i++ ) {
                 for( int j=0; j<rm.cols(); j++ ) {
                     output.setEntryUnchecked( i0+i , j0+j , rm.entryUnchecked(i,j) );
@@ -1196,17 +1196,17 @@ public class Matrix
     }
     
     
-    public static Matrix rotation2d( double rotationAngle )
+    public static MatrixReal rotation2d( double rotationAngle )
     {
-        return Matrix.fromEntries2x2(
+        return MatrixReal.fromEntries2x2(
                 Math.cos( rotationAngle ) , -Math.sin( rotationAngle ) ,
                 Math.sin( rotationAngle ) ,  Math.cos( rotationAngle ) );
     }
     
     
-    public static Matrix LfromLDLTDecomposition( Matrix LDLTDecomposition )
+    public static MatrixReal LfromLDLTDecomposition( MatrixReal LDLTDecomposition )
     {
-        Matrix L = LDLTDecomposition.copy();
+        MatrixReal L = LDLTDecomposition.copy();
         for( int i=0; i<L.cols(); i++ ) {
             L.setEntryUnchecked( i,i , 1.0 );
         }
@@ -1214,15 +1214,15 @@ public class Matrix
     }
     
     
-    public static Matrix DfromLDLTDecomposition( Matrix LDLTDecomposition )
+    public static MatrixReal DfromLDLTDecomposition( MatrixReal LDLTDecomposition )
     {
-        return Matrix.diagonal( LDLTDecomposition.diagonalElements() );
+        return MatrixReal.diagonal( LDLTDecomposition.diagonalElements() );
     }
     
     
     public static void setAssertions( boolean areAssertionsActive )
     {
-        Matrix.assertionsOn = areAssertionsActive;
+        MatrixReal.assertionsOn = areAssertionsActive;
     }
     
     
@@ -1232,12 +1232,12 @@ public class Matrix
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Constructs a {@link Matrix}.
+     * Constructs a {@link MatrixReal}.
      * 
      * @param numberOfRows  number of rows for the new matrix.
      * @param numberOfColumns   number of columns for the new matrix.
      */
-    private Matrix( int numberOfRows , int numberOfColumns )
+    private MatrixReal( int numberOfRows , int numberOfColumns )
     {
         this.Nrows = numberOfRows;
         this.Ncols = numberOfColumns;
@@ -1262,9 +1262,9 @@ public class Matrix
     }
     
     
-    private Matrix submatrixFast( int i , int j , int numberOfRows , int numberOfColumns )
+    private MatrixReal submatrixFast( int i , int j , int numberOfRows , int numberOfColumns )
     {
-        Matrix output = Matrix.empty( numberOfRows , numberOfColumns );
+        MatrixReal output = MatrixReal.empty( numberOfRows , numberOfColumns );
         for( int ii=0; ii<numberOfRows; ii++ ) {
             for( int jj=0; jj<numberOfColumns; jj++ ) {
                 output.setEntryUnchecked( ii,jj , this.entryUnchecked( i+ii , j+jj ) );
@@ -1276,7 +1276,7 @@ public class Matrix
     
     private void assertRowIndexBounds( int i )
     {
-        if(  Matrix.assertionsOn  &&  (  i < 0  ||  this.rows() < i  )  ) {
+        if(  MatrixReal.assertionsOn  &&  (  i < 0  ||  this.rows() < i  )  ) {
             throw new IllegalArgumentException( "Row index out of bounds: " + i + " not in 0..." + this.rows() );
         }
     }
@@ -1284,7 +1284,7 @@ public class Matrix
     
     private void assertColumnIndexBounds( int j )
     {
-        if(  Matrix.assertionsOn  &&  (  j < 0  ||  this.cols() < j  )  ) {
+        if(  MatrixReal.assertionsOn  &&  (  j < 0  ||  this.cols() < j  )  ) {
             throw new IllegalArgumentException( "Column index out of bounds: " + j + " not in 0..." + this.cols() );
         }
     }
@@ -1310,7 +1310,7 @@ public class Matrix
      */
     private void assertRows( int rowsExpected )
     {
-        if(  Matrix.assertionsOn  &&  this.rows() != rowsExpected  ) {
+        if(  MatrixReal.assertionsOn  &&  this.rows() != rowsExpected  ) {
             throw new IllegalArgumentException( "Rows required: " + rowsExpected + " . Rows found: " + this.rows() );
         }
     }
@@ -1329,7 +1329,7 @@ public class Matrix
      */
     private void assertColumns( int columnsExpected )
     {
-        if(  Matrix.assertionsOn  &&  this.cols() != columnsExpected  ) {
+        if(  MatrixReal.assertionsOn  &&  this.cols() != columnsExpected  ) {
             throw new IllegalArgumentException( "Columns required: " + columnsExpected + " . Columns found: " + this.cols() );
         }
     }
@@ -1350,7 +1350,7 @@ public class Matrix
      */
     private void assertSize( int rowsExpected , int colsExpected )
     {
-        if(  Matrix.assertionsOn  &&  (  this.rows() != rowsExpected  ||  this.cols() != colsExpected  )  ) {
+        if(  MatrixReal.assertionsOn  &&  (  this.rows() != rowsExpected  ||  this.cols() != colsExpected  )  ) {
             throw new IllegalArgumentException( "Size required: " + rowsExpected + " x " + colsExpected +
                                                 " . Size found: " + this.size() );
         }
@@ -1364,9 +1364,9 @@ public class Matrix
      * 
      * @throws IllegalArgumentException     if the sizes of {@code this} and {@code other} do not match.
      */
-    private void assertSameSize( Matrix other )
+    private void assertSameSize( MatrixReal other )
     {
-        if(  Matrix.assertionsOn  &&  !this.isSameSize( other )  ) {
+        if(  MatrixReal.assertionsOn  &&  !this.isSameSize( other )  ) {
             throw new IllegalArgumentException( "Same matrix size is required: " + this.size() + " != " + other.size() );
         }
     }
@@ -1379,25 +1379,25 @@ public class Matrix
      */
     private void assertIsSquare()
     {
-        if(  Matrix.assertionsOn  &&  !this.isSquare()  ) {
+        if(  MatrixReal.assertionsOn  &&  !this.isSquare()  ) {
             throw new IllegalArgumentException( "Square matrix is required: " + this.size() + " is not square." );
         }
     }
     
     
     /**
-     * Adds the product of left {@link Matrix} and right {@link Matrix}.
+     * Adds the product of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as  {@code left * right}.
      * {@code this} must have the same rows as {@code left}, and same columns as {@code right}.
      * {@code this} must also be different from {@code left} and {@code right}.
      * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor of the {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor of the {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and {@code right} is added.
      */
-    private Matrix addLeftTimesRightAlgorithm( Matrix left , Matrix right )
+    private MatrixReal addLeftTimesRightAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -1411,18 +1411,18 @@ public class Matrix
     
     
     /**
-     * Adds the product of left {@link Matrix} and transpose of right {@link Matrix}.
+     * Adds the product of left {@link MatrixReal} and transpose of right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left * right^T}.
      * {@code this} must have the same rows as {@code left}, and same columns as rows of {@code right}.
      * {@code this} must also be different from {@code left} and {@code right}.
      * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
      * 
-     * @param left     left factor of the {@link Matrix} multiplication.
-     * @param right    right factor to be transpose before {@link Matrix} multiplication.
+     * @param left     left factor of the {@link MatrixReal} multiplication.
+     * @param right    right factor to be transpose before {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of {@code left} and transpose of {@code right} is added.
      */
-    private Matrix addLeftTimesRightTransposeAlgorithm( Matrix left , Matrix right )
+    private MatrixReal addLeftTimesRightTransposeAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -1436,18 +1436,18 @@ public class Matrix
     
     
     /**
-     * Adds the product of transpose of left {@link Matrix} and right {@link Matrix}.
+     * Adds the product of transpose of left {@link MatrixReal} and right {@link MatrixReal}.
      * <p>
      * The multiplication is performed as {@code left^T * right}.
      * {@code this} must have the same rows as columns of {@code left}, and same columns as {@code right}.
      * {@code this} must also be different from {@code left} and {@code right}.
      * This method does not perform any checks because it assumes that the developer will take care of the inputs or implement the checks in the methods using this method.
      * 
-     * @param left     left factor to be transpose before {@link Matrix} multiplication.
-     * @param right    right factor of the {@link Matrix} multiplication.
+     * @param left     left factor to be transpose before {@link MatrixReal} multiplication.
+     * @param right    right factor of the {@link MatrixReal} multiplication.
      * @return  {@code this} reference to which the product of transpose of {@code left} and {@code right} is added.
      */
-    private Matrix addLeftTransposeTimesRightAlgorithm( Matrix left , Matrix right )
+    private MatrixReal addLeftTransposeTimesRightAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.cols(); j++ ) {
@@ -1471,7 +1471,7 @@ public class Matrix
      * @param input     matrix to be transposed.
      * @param output    resulting transposed matrix.
      */
-    private static void transposeAlgorithm( Matrix input , Matrix output )
+    private static void transposeAlgorithm( MatrixReal input , MatrixReal output )
     {
         for( int i=0; i<input.cols(); i++ ) {
             for( int j=0; j<input.rows(); j++ ) {
@@ -1485,12 +1485,12 @@ public class Matrix
      * Performs a Cholesky decomposition of the form A = L * L^T.
      * <p>
      * This algorithm allows to perform an in-place decomposition.
-     * That means that both inputs can be the same {@link Matrix}, and the output would be stored in the input.
+     * That means that both inputs can be the same {@link MatrixReal}, and the output would be stored in the input.
      * 
-     * @param A     input square {@link Matrix} from which the Cholesky decomposition is requested.
-     * @param L     output square {@link Matrix} containing the Cholesky decomposition of input A.
+     * @param A     input square {@link MatrixReal} from which the Cholesky decomposition is requested.
+     * @param L     output square {@link MatrixReal} containing the Cholesky decomposition of input A.
      */
-    private static void choleskyDecompositionAlgorithm( Matrix A , Matrix L )
+    private static void choleskyDecompositionAlgorithm( MatrixReal A , MatrixReal L )
     {
         // for each column
         for( int j=0; j<A.cols(); j++ ) {
@@ -1522,7 +1522,7 @@ public class Matrix
     }
     
     
-    private static void ldltDecompositionAlgorithm( Matrix A , Matrix LD )
+    private static void ldltDecompositionAlgorithm( MatrixReal A , MatrixReal LD )
     {
         // for each column
         for( int j=0; j<A.cols(); j++ ) {
@@ -1560,13 +1560,13 @@ public class Matrix
     /**
      * Solves the equation  X * L * L^T = B  for X.
      * <p>
-     * L must be a lower triangular square {@link Matrix}.
+     * L must be a lower triangular square {@link MatrixReal}.
      * 
-     * @param X     output {@link Matrix} that will contain the solution to  X * L * L^T = B . It must have the same size as B.
-     * @param L     Cholesky decomposition of positive definite {@link Matrix} that will right divide  B.
-     * @param B     {@link Matrix} to be right divided by the positive definite {@link Matrix} whose Cholesky decomposition is  L .
+     * @param X     output {@link MatrixReal} that will contain the solution to  X * L * L^T = B . It must have the same size as B.
+     * @param L     Cholesky decomposition of positive definite {@link MatrixReal} that will right divide  B.
+     * @param B     {@link MatrixReal} to be right divided by the positive definite {@link MatrixReal} whose Cholesky decomposition is  L .
      */
-    private static void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( Matrix X , Matrix L , Matrix B )
+    private static void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( MatrixReal X , MatrixReal L , MatrixReal B )
     {
         // we take each row from X and B independently
         for( int i=0; i<B.rows(); i++ ) {
@@ -1590,7 +1590,7 @@ public class Matrix
     }
     
     
-    private static void divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( Matrix A , Matrix LD , Matrix B )
+    private static void divideRightByPositiveDefiniteUsingItsLDLTDecompositionAlgorithm( MatrixReal A , MatrixReal LD , MatrixReal B )
     {
         // we take each pair of rows of K and M independently
         for( int i=0; i<A.rows(); i++ ) {
@@ -1617,13 +1617,13 @@ public class Matrix
     /**
      * Solves the equation  L * L^T * X = B  for X.
      * <p>
-     * L must be a lower triangular square {@link Matrix}.
+     * L must be a lower triangular square {@link MatrixReal}.
      * 
-     * @param X     output {@link Matrix} that will contain the solution to  L * L^T * X = B . It must have the same size as B.
-     * @param L     Cholesky decomposition of positive definite {@link Matrix} that will left divide  B.
-     * @param B     {@link Matrix} to be left divided by the positive definite {@link Matrix} whose Cholesky decomposition is  L .
+     * @param X     output {@link MatrixReal} that will contain the solution to  L * L^T * X = B . It must have the same size as B.
+     * @param L     Cholesky decomposition of positive definite {@link MatrixReal} that will left divide  B.
+     * @param B     {@link MatrixReal} to be left divided by the positive definite {@link MatrixReal} whose Cholesky decomposition is  L .
      */
-    private static void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( Matrix L , Matrix X , Matrix B )
+    private static void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( MatrixReal L , MatrixReal X , MatrixReal B )
     {
         // Take each column from X and B independently.
         for( int j=0; j<B.cols(); j++ ) {
@@ -1647,7 +1647,7 @@ public class Matrix
     }
     
     
-    private static Matrix absPrivate( Matrix input , Matrix output )
+    private static MatrixReal absPrivate( MatrixReal input , MatrixReal output )
     {
         for( int i=0; i<input.rows(); i++ ) {
             for( int j=0; j<input.cols(); j++ ) {

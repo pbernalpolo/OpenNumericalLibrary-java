@@ -2,7 +2,7 @@ package numericalLibrary.optimization.algorithms;
 
 
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
-import numericalLibrary.types.Matrix;
+import numericalLibrary.types.MatrixReal;
 
 
 
@@ -16,7 +16,7 @@ import numericalLibrary.types.Matrix;
  * where:
  * <ul>
  *  <li> F is a {@link LocallyQuadraticLoss},
- *  <li> \theta is the parameter vector, represented as a column {@link Matrix}.
+ *  <li> \theta is the parameter vector, represented as a column {@link MatrixReal}.
  * </ul>
  * <p>
  * The Gauss-Newton parameter update step takes the form:
@@ -64,18 +64,18 @@ public class GaussNewtonAlgorithm
     /**
      * {@inheritDoc}
      * 
-     * @throws IllegalStateException if a non positive-definite {@link Matrix} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
+     * @throws IllegalStateException if a non positive-definite {@link MatrixReal} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
      */
-    public Matrix getDeltaParameters()
+    public MatrixReal getDeltaParameters()
     {
-        Matrix gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
-        Matrix L = null;
+        MatrixReal gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
+        MatrixReal L = null;
         try {
             L = gaussNewtonMatrix.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Using the Levenberg-Marquardt algorithm with a small damping factor can help." );
         }
-        Matrix gradient = this.lossFunction.getGradient();
+        MatrixReal gradient = this.lossFunction.getGradient();
         return gradient.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     
