@@ -29,12 +29,12 @@ public interface AdditiveAbelianGroupElement<T extends AdditiveAbelianGroupEleme
     
     
     /**
-     * Returns the identity element under the multiplication operation.
+     * Returns the identity element under the addition operation.
      * <p>
-     * That is the element e in the group such that for every element a in the group  e * a == a  and  a * e == a .
+     * That is the element e in the group such that for every element a in the group  e + a == a  and  a + e == a .
      * Result is returned as a new instance.
      * 
-     * @return  identity element under the multiplication operation.
+     * @return  identity element under the addition operation.
      */
     T identityAdditive();
     

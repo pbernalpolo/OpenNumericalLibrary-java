@@ -112,7 +112,7 @@ public abstract class IterativeOptimizationAlgorithm<T extends Loss>
     {
         // Check that the parameter vector is well defined.
         MatrixReal theta = this.lossFunction.getParameters();
-        if( theta.cols() != 1 ) {
+        if( theta.columns() != 1 ) {
             throw new IllegalArgumentException( "Parameter vector returned by loss function must be a column matrix." );
         }
         // Initialize stopping criterion.

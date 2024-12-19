@@ -376,7 +376,7 @@ public class UnitQuaternion
     
     public static UnitQuaternion fromRotationMatrix( MatrixReal R )
     {
-        if(  R.rows() != 3  ||  R.cols() != 3  ) {
+        if(  R.rows() != 3  ||  R.columns() != 3  ) {
             throw new IllegalArgumentException( "3D rotation matrix expected." );
         }
         double R11 = R.entry(0,0);

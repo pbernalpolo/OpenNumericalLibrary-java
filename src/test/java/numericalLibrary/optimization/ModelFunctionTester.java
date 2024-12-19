@@ -77,7 +77,7 @@ public interface ModelFunctionTester<T>
         ModelFunction<T> modelFunction = this.getModelFunction();
         MatrixReal parameters = modelFunction.getParameters();
         // They must be a column matrix.
-        assertEquals( 1 , parameters.cols() );
+        assertEquals( 1 , parameters.columns() );
     }
     
     
@@ -187,7 +187,7 @@ public interface ModelFunctionTester<T>
         // Get the Jacobian.
         MatrixReal jacobian = modelFunction.getJacobian();
         // Check that the Jacobian has as many columns as the number of parameters.
-        assertEquals( parameters.rows() , jacobian.cols() );
+        assertEquals( parameters.rows() , jacobian.columns() );
     }
     
 }
