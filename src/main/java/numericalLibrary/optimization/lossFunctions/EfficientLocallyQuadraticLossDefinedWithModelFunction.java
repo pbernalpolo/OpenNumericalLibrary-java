@@ -82,7 +82,7 @@ abstract class EfficientLocallyQuadraticLossDefinedWithModelFunction<T>
     public EfficientLocallyQuadraticLossDefinedWithModelFunction( ModelFunction<T> modelFunction )
     {
         MatrixReal theta = modelFunction.getParameters();
-        if( theta.cols() != 1 ) {
+        if( theta.columns() != 1 ) {
             throw new IllegalArgumentException( "Parameter vector returned by modelFunction must be a column matrix." );
         }
         this.modelFunction = modelFunction;

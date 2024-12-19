@@ -23,8 +23,8 @@ public class MatrixReal
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     private final double[][] x;  // matrix values
-    private final int Nrows;
-    private final int Ncols;
+    private final int nRows;
+    private final int nCols;
     
     ////////////////////////////////////////////////////////////////
     // PRIVATE STATIC VARIABLES
@@ -44,7 +44,7 @@ public class MatrixReal
      */
     public int rows()
     {
-        return this.Nrows;
+        return this.nRows;
     }
     
     
@@ -53,15 +53,15 @@ public class MatrixReal
      * 
      * @return  number of columns of {@code this}.
      */
-    public int cols()
+    public int columns()
     {
-        return this.Ncols;
+        return this.nCols;
     }
     
     
     public String size()
     {
-        return ( this.rows() + " x " + this.cols() );
+        return ( this.rows() + " x " + this.columns() );
     }
     
     
@@ -88,7 +88,7 @@ public class MatrixReal
      */
     public MatrixReal transpose()
     {
-        MatrixReal output = MatrixReal.empty( this.cols() , this.rows() );
+        MatrixReal output = MatrixReal.empty( this.columns() , this.rows() );
         MatrixReal.transposeAlgorithm( this , output );
         return output;
     }
@@ -104,7 +104,7 @@ public class MatrixReal
      */
     public MatrixReal setToTransposeOf( MatrixReal other )
     {
-        this.assertSize( other.cols() , other.rows() );
+        this.assertSize( other.columns() , other.rows() );
         MatrixReal.transposeAlgorithm( other , this );
         return this;
     }
@@ -128,8 +128,8 @@ public class MatrixReal
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
-        right.assertRows( left.cols() );
-        this.assertSize( left.rows() , right.cols() );
+        right.assertRows( left.columns() );
+        this.assertSize( left.rows() , right.columns() );
         this.setToZero();
         this.addLeftTimesRightAlgorithm( left , right );
         return this;
@@ -154,7 +154,7 @@ public class MatrixReal
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
-        right.assertColumns( left.cols() );
+        right.assertColumns( left.columns() );
         this.assertSize( left.rows() , right.rows() );
         this.setToZero();
         this.addLeftTimesRightTransposeAlgorithm( left , right );
@@ -181,7 +181,7 @@ public class MatrixReal
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
         right.assertRows( left.rows() );
-        this.assertSize( left.cols() , right.cols() );
+        this.assertSize( left.columns() , right.columns() );
         this.setToZero();
         this.addLeftTransposeTimesRightAlgorithm( left , right );
         return this;
@@ -207,7 +207,7 @@ public class MatrixReal
     {
         StringBuilder sb = new StringBuilder();
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 sb.append( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
             }
             sb.append( "\n" );
@@ -226,7 +226,7 @@ public class MatrixReal
             return false;
         }
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 if( this.entryUnchecked(i,j) != other.entryUnchecked(i,j) ) {
                     return false;
                 }
@@ -245,7 +245,7 @@ public class MatrixReal
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 this.setEntryUnchecked( i,j , other.entryUnchecked(i,j) );
             }
         }
@@ -273,7 +273,7 @@ public class MatrixReal
             return false;
         }
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
                 if( Math.abs( dif ) > tolerance ) {
                     return false;
@@ -294,7 +294,7 @@ public class MatrixReal
         this.assertSameSize( other );
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) + other.entryUnchecked(i,j) );
             }
         }
@@ -311,7 +311,7 @@ public class MatrixReal
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 this.x[i][j] += other.entryUnchecked(i,j);
             }
         }
@@ -324,51 +324,65 @@ public class MatrixReal
      */
     public MatrixReal identityAdditive()
     {
-        return MatrixReal.zero( this.rows() , this.cols() );
+        return MatrixReal.zero( this.rows() , this.columns() );
     }
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MatrixReal setToZero()
+    {
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                this.setEntryUnchecked( i,j , 0.0 );
+            }
+        }
+        return this;
+    }
+    
     
     public MatrixReal inverseAdditive()
     {
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , -this.entryUnchecked(i,j) );
             }
         }
         return output;
     }
-
-
+    
+    
     public MatrixReal inverseAdditiveInplace()
     {
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 this.x[i][j] = -this.entryUnchecked(i,j);
             }
         }
         return this;
     }
-
-
+    
+    
     public MatrixReal subtract( MatrixReal other )
     {
         this.assertSameSize( other );
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) - other.entryUnchecked(i,j) );
             }
         }
         return output;
     }
-
-
+    
+    
     public MatrixReal subtractInplace( MatrixReal other )
     {
         this.assertSameSize( other );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 this.x[i][j] -= other.entryUnchecked(i,j);
             }
         }
@@ -388,8 +402,8 @@ public class MatrixReal
      */
     public MatrixReal multiply( MatrixReal other )
     {
-        other.assertRows( this.cols() );
-        MatrixReal output = MatrixReal.zero( this.rows() , other.cols() );
+        other.assertRows( this.columns() );
+        MatrixReal output = MatrixReal.zero( this.rows() , other.columns() );
         output.addLeftTimesRightAlgorithm( this , other );
         return output;
     }
@@ -397,13 +411,13 @@ public class MatrixReal
     
     public MatrixReal identityMultiplicativeLeft()
     {
-        return MatrixReal.one( this.Nrows );
+        return MatrixReal.one( this.nRows );
     }
     
     
     public MatrixReal identityMultiplicativeRight()
     {
-        return MatrixReal.one( this.Ncols );
+        return MatrixReal.one( this.nCols );
     }
     
     
@@ -461,8 +475,8 @@ public class MatrixReal
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
-        right.assertRows( left.cols() );
-        this.assertSize( left.rows() , right.cols() );
+        right.assertRows( left.columns() );
+        this.assertSize( left.rows() , right.columns() );
         return this.addLeftTimesRightAlgorithm( left , right );
     }
     
@@ -485,7 +499,7 @@ public class MatrixReal
         if(  this == left  ||  this == right  ) {
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
-        right.assertColumns( left.cols() );
+        right.assertColumns( left.columns() );
         this.assertSize( left.rows() , right.rows() );
         return this.addLeftTimesRightTransposeAlgorithm( left , right );
     }
@@ -510,7 +524,7 @@ public class MatrixReal
             throw new IllegalArgumentException( "\"this\" must be different from \"left\" and \"right\"." );
         }
         right.assertRows( left.rows() );
-        this.assertSize( left.cols() , right.cols() );
+        this.assertSize( left.columns() , right.columns() );
         return this.addLeftTransposeTimesRightAlgorithm( left , right );
     }
     
@@ -519,7 +533,7 @@ public class MatrixReal
     {
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , this.entryUnchecked(i,j) * scalar );
             }
         }
@@ -530,7 +544,7 @@ public class MatrixReal
     public MatrixReal scaleInplace( double scalar )
     {
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 this.x[i][j] *= scalar;
             }
         }
@@ -548,7 +562,7 @@ public class MatrixReal
     {
         double norm2 = 0.0;
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 norm2 += this.entryUnchecked(i,j) * this.entryUnchecked(i,j);
             }
         }
@@ -579,7 +593,7 @@ public class MatrixReal
         this.assertSameSize( other );
         double dist2 = 0.0;
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
                 dist2 += dif * dif;
             }
@@ -675,7 +689,7 @@ public class MatrixReal
     
     public double[] diagonalElements()
     {
-        int nElements = ( this.rows() < this.cols() )? this.rows() : this.cols() ;
+        int nElements = ( this.rows() < this.columns() )? this.rows() : this.columns() ;
         double[] d = new double[ nElements ];
         for( int i=0; i<nElements; i++ ) {
             d[i] = this.entryUnchecked( i , i );
@@ -698,9 +712,9 @@ public class MatrixReal
     public MatrixReal setSubmatrix( int i0 , int j0 , MatrixReal other )
     {
         this.assertIndexBounds( i0 , j0 );
-        this.assertIndexBounds( i0 + other.rows() , j0 + other.cols() );
+        this.assertIndexBounds( i0 + other.rows() , j0 + other.columns() );
         for( int i=0; i<other.rows(); i++ ) {
-            for( int j=0; j<other.cols(); j++ ) {
+            for( int j=0; j<other.columns(); j++ ) {
                 this.setEntryUnchecked( i0+i , j0+j , other.entryUnchecked(i,j) );
             }
         }
@@ -719,8 +733,8 @@ public class MatrixReal
     public MatrixReal submatrixFromRow( int i )
     {
         this.assertRowIndexBounds( i );
-        MatrixReal output = MatrixReal.empty( 1 , this.cols() );
-        for( int j=0; j<this.cols(); j++ ) {
+        MatrixReal output = MatrixReal.empty( 1 , this.columns() );
+        for( int j=0; j<this.columns(); j++ ) {
             output.setEntryUnchecked( 0,j , this.entryUnchecked( i , j ) );
         }
         return output;
@@ -731,7 +745,7 @@ public class MatrixReal
     {
         this.assertRowIndexBounds( i );
         this.assertRowIndexBounds( i+numberOfRows );
-        return this.submatrixFast( i , 0 , numberOfRows , this.cols() );
+        return this.submatrixFast( i , 0 , numberOfRows , this.columns() );
     }
     
     
@@ -780,10 +794,10 @@ public class MatrixReal
      */
     public double[] toFlatArray()
     {
-        double[] output = new double[ this.rows() * this.cols() ];
+        double[] output = new double[ this.rows() * this.columns() ];
         int c = 0;
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 output[c++] = this.entryUnchecked( i , j );
             }
         }
@@ -793,8 +807,8 @@ public class MatrixReal
     
     public double[] rowAsArray( int i )
     {
-        double[] row = new double[this.cols()];
-        for( int j=0; j<this.cols(); j++ ) {
+        double[] row = new double[this.columns()];
+        for( int j=0; j<this.columns(); j++ ) {
             row[j] = this.entryUnchecked(i,j);
         }
         return row;
@@ -843,7 +857,7 @@ public class MatrixReal
      */
     public boolean isSquare()
     {
-        return ( this.rows() == this.cols() );
+        return ( this.rows() == this.columns() );
     }
     
     
@@ -854,7 +868,7 @@ public class MatrixReal
      */
     public boolean isSameSize( MatrixReal other )
     {
-        return (  this.rows() == other.rows()  &&  this.cols() == other.cols()  );
+        return (  this.rows() == other.rows()  &&  this.columns() == other.columns()  );
     }
     
     
@@ -875,7 +889,7 @@ public class MatrixReal
     {
         double output = Double.NEGATIVE_INFINITY;
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 double entry = this.entryUnchecked( i , j );
                 if( entry > output ) {
                     output = entry;
@@ -890,7 +904,7 @@ public class MatrixReal
     {
         double output = Double.POSITIVE_INFINITY;
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 double entry = this.entryUnchecked( i , j );
                 if( entry < output ) {
                     output = entry;
@@ -927,7 +941,7 @@ public class MatrixReal
      */
     public static MatrixReal emptyWithSizeOf( MatrixReal other )
     {
-        return MatrixReal.empty( other.rows() , other.cols() );
+        return MatrixReal.empty( other.rows() , other.columns() );
     }
     
     
@@ -987,7 +1001,7 @@ public class MatrixReal
         MatrixReal output = MatrixReal.empty( numberOfRows , numberOfColumns );
         int c = 0;
         for( int i=0; i<output.rows(); i++ ) {
-            for( int j=0; j<output.cols(); j++ ) {
+            for( int j=0; j<output.columns(); j++ ) {
                 output.setEntryUnchecked( i , j , flatArray[c++] );
             }
         }
@@ -1048,7 +1062,7 @@ public class MatrixReal
     {
         MatrixReal output = new MatrixReal( array.length , array[0].length );
         for( int i=0; i<output.rows(); i++ ) {
-            for( int j=0; j<output.cols(); j++ ) {
+            for( int j=0; j<output.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , array[i][j] );
             }
         }
@@ -1177,7 +1191,7 @@ public class MatrixReal
         int ncols = 0;
         for( MatrixReal rm : lrm ) {
             nrows += rm.rows();
-            ncols += rm.cols();
+            ncols += rm.columns();
         }
         // then, we create the matrix, and we fill the content
         MatrixReal output = MatrixReal.zero( nrows , ncols );
@@ -1185,12 +1199,12 @@ public class MatrixReal
         int j0 = 0;
         for( MatrixReal rm : lrm ) {
             for( int i=0; i<rm.rows(); i++ ) {
-                for( int j=0; j<rm.cols(); j++ ) {
+                for( int j=0; j<rm.columns(); j++ ) {
                     output.setEntryUnchecked( i0+i , j0+j , rm.entryUnchecked(i,j) );
                 }
             }
             i0 += rm.rows();
-            j0 += rm.cols();
+            j0 += rm.columns();
         }
         return output;
     }
@@ -1207,7 +1221,7 @@ public class MatrixReal
     public static MatrixReal LfromLDLTDecomposition( MatrixReal LDLTDecomposition )
     {
         MatrixReal L = LDLTDecomposition.copy();
-        for( int i=0; i<L.cols(); i++ ) {
+        for( int i=0; i<L.columns(); i++ ) {
             L.setEntryUnchecked( i,i , 1.0 );
         }
         return L;
@@ -1239,8 +1253,8 @@ public class MatrixReal
      */
     private MatrixReal( int numberOfRows , int numberOfColumns )
     {
-        this.Nrows = numberOfRows;
-        this.Ncols = numberOfColumns;
+        this.nRows = numberOfRows;
+        this.nCols = numberOfColumns;
         this.x = new double[numberOfRows][numberOfColumns];
     }
 
@@ -1284,8 +1298,8 @@ public class MatrixReal
     
     private void assertColumnIndexBounds( int j )
     {
-        if(  MatrixReal.assertionsOn  &&  (  j < 0  ||  this.cols() < j  )  ) {
-            throw new IllegalArgumentException( "Column index out of bounds: " + j + " not in 0..." + this.cols() );
+        if(  MatrixReal.assertionsOn  &&  (  j < 0  ||  this.columns() < j  )  ) {
+            throw new IllegalArgumentException( "Column index out of bounds: " + j + " not in 0..." + this.columns() );
         }
     }
     
@@ -1329,8 +1343,8 @@ public class MatrixReal
      */
     private void assertColumns( int columnsExpected )
     {
-        if(  MatrixReal.assertionsOn  &&  this.cols() != columnsExpected  ) {
-            throw new IllegalArgumentException( "Columns required: " + columnsExpected + " . Columns found: " + this.cols() );
+        if(  MatrixReal.assertionsOn  &&  this.columns() != columnsExpected  ) {
+            throw new IllegalArgumentException( "Columns required: " + columnsExpected + " . Columns found: " + this.columns() );
         }
     }
     
@@ -1350,7 +1364,7 @@ public class MatrixReal
      */
     private void assertSize( int rowsExpected , int colsExpected )
     {
-        if(  MatrixReal.assertionsOn  &&  (  this.rows() != rowsExpected  ||  this.cols() != colsExpected  )  ) {
+        if(  MatrixReal.assertionsOn  &&  (  this.rows() != rowsExpected  ||  this.columns() != colsExpected  )  ) {
             throw new IllegalArgumentException( "Size required: " + rowsExpected + " x " + colsExpected +
                                                 " . Size found: " + this.size() );
         }
@@ -1400,8 +1414,8 @@ public class MatrixReal
     private MatrixReal addLeftTimesRightAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
-                for( int k=0; k<left.cols(); k++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                for( int k=0; k<left.columns(); k++ ) {
                     this.x[i][j] += left.entryUnchecked(i,k) * right.entryUnchecked(k,j);
                 }
             }
@@ -1425,8 +1439,8 @@ public class MatrixReal
     private MatrixReal addLeftTimesRightTransposeAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
-                for( int k=0; k<left.cols(); k++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                for( int k=0; k<left.columns(); k++ ) {
                     this.x[i][j] += left.entryUnchecked(i,k) * right.entryUnchecked(j,k);
                 }
             }
@@ -1450,7 +1464,7 @@ public class MatrixReal
     private MatrixReal addLeftTransposeTimesRightAlgorithm( MatrixReal left , MatrixReal right )
     {
         for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.cols(); j++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
                 for( int k=0; k<left.rows(); k++ ) {
                     this.x[i][j] += left.entryUnchecked(k,i) * right.entryUnchecked(k,j);
                 }
@@ -1473,7 +1487,7 @@ public class MatrixReal
      */
     private static void transposeAlgorithm( MatrixReal input , MatrixReal output )
     {
-        for( int i=0; i<input.cols(); i++ ) {
+        for( int i=0; i<input.columns(); i++ ) {
             for( int j=0; j<input.rows(); j++ ) {
                 output.setEntryUnchecked( i,j , input.entryUnchecked(j,i) );
             }
@@ -1493,7 +1507,7 @@ public class MatrixReal
     private static void choleskyDecompositionAlgorithm( MatrixReal A , MatrixReal L )
     {
         // for each column
-        for( int j=0; j<A.cols(); j++ ) {
+        for( int j=0; j<A.columns(); j++ ) {
             double sumD = 0.0;  // sum for the diagonal term
             // we first fill with 0.0 until diagonal
             for( int i=0; i<j; i++ ) {
@@ -1525,7 +1539,7 @@ public class MatrixReal
     private static void ldltDecompositionAlgorithm( MatrixReal A , MatrixReal LD )
     {
         // for each column
-        for( int j=0; j<A.cols(); j++ ) {
+        for( int j=0; j<A.columns(); j++ ) {
             double sumD = A.entryUnchecked(j,j);  // sum for the diagonal term
             // we first fill with 0.0 until diagonal
             for( int i=0; i<j; i++ ) {
@@ -1571,7 +1585,7 @@ public class MatrixReal
         // we take each row from X and B independently
         for( int i=0; i<B.rows(); i++ ) {
             // first we solve ( y * L^T = B_i )
-            for( int j=0; j<B.cols(); j++ ) {
+            for( int j=0; j<B.columns(); j++ ) {
                 double sum = B.entryUnchecked(i,j);
                 for( int k=0; k<j; k++ ) {
                     sum -= X.entryUnchecked(i,k) * L.entryUnchecked(j,k);
@@ -1579,9 +1593,9 @@ public class MatrixReal
                 X.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
             }
             // now we solve ( X_i * L = y )
-            for( int j=X.cols()-1; j>-1; j-- ) {
+            for( int j=X.columns()-1; j>-1; j-- ) {
                 double sum = X.entryUnchecked(i,j);
-                for( int k=j+1; k<X.cols(); k++ ) {
+                for( int k=j+1; k<X.columns(); k++ ) {
                     sum -= X.entryUnchecked(i,k) * L.entryUnchecked(k,j);
                 }
                 X.setEntryUnchecked( i,j , sum/L.entryUnchecked(j,j) );
@@ -1603,7 +1617,7 @@ public class MatrixReal
                 B.setEntryUnchecked( i,j , sum/LD.entryUnchecked(j,j) );
             }
             // now we solve (K_i*L = y)
-            for( int j=A.cols()-1; j>-1; j-- ) {
+            for( int j=A.columns()-1; j>-1; j-- ) {
                 double sum = B.entryUnchecked(i,j);
                 for( int k=j+1; k<LD.rows(); k++ ) {
                     sum -= B.entryUnchecked(i,k) * LD.entryUnchecked(k,j);
@@ -1626,7 +1640,7 @@ public class MatrixReal
     private static void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionAlgorithm( MatrixReal L , MatrixReal X , MatrixReal B )
     {
         // Take each column from X and B independently.
-        for( int j=0; j<B.cols(); j++ ) {
+        for( int j=0; j<B.columns(); j++ ) {
             // Solve ( L * y = B_j ).
             for( int i=0; i<B.rows(); i++ ) {
                 double sum = B.entryUnchecked(i,j);
@@ -1650,7 +1664,7 @@ public class MatrixReal
     private static MatrixReal absPrivate( MatrixReal input , MatrixReal output )
     {
         for( int i=0; i<input.rows(); i++ ) {
-            for( int j=0; j<input.cols(); j++ ) {
+            for( int j=0; j<input.columns(); j++ ) {
                 output.setEntryUnchecked( i,j , Math.abs( input.entryUnchecked(i,j) ) );
             }
         }
