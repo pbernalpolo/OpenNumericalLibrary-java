@@ -17,7 +17,7 @@ import numericalLibrary.types.MatrixReal;
 /**
  * Implements test methods for {@link GradientDescentAlgorithm}.
  */
-public class GradientDescentAlgorithmTest
+class GradientDescentAlgorithmTest
 {
     ////////////////////////////////////////////////////////////////
     // TEST METHODS

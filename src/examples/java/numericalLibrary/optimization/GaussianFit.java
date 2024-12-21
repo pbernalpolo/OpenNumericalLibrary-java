@@ -19,7 +19,7 @@ import numericalLibrary.util.GaussianFunction;
 /**
  * Example that shows how to set up and use {@link IterativeOptimizationAlgorithm}s to fit a Gaussian function to empirical data.
  */
-public class GaussianFit
+class GaussianFit
 {
     ////////////////////////////////////////////////////////////////
     // ENTRY POINT

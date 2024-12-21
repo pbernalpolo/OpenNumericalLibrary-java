@@ -21,7 +21,7 @@ import numericalLibrary.types.Vector3;
 /**
  * Implements test methods for {@link UnitQuaternionAtlas}.
  */
-public abstract class UnitQuaternionAtlasTester
+abstract class UnitQuaternionAtlasTester
     implements AtlasTester<UnitQuaternion, Vector3>
 {
     ////////////////////////////////////////////////////////////////

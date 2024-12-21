@@ -17,7 +17,7 @@ import numericalLibrary.types.Vector3;
 /**
  * Implements test methods for {@link UnitQuaternionDifferentiableAtlas}.
  */
-public abstract class UnitQuaternionDifferentiableAtlasTester
+abstract class UnitQuaternionDifferentiableAtlasTester
     extends UnitQuaternionAtlasTester
 {
     ////////////////////////////////////////////////////////////////

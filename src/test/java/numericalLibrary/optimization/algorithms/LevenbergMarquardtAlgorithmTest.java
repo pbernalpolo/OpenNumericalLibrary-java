@@ -17,7 +17,7 @@ import numericalLibrary.types.MatrixReal;
 /**
  * Implements test methods for {@link LevenbergMarquardtAlgorithm}.
  */
-public class LevenbergMarquardtAlgorithmTest
+class LevenbergMarquardtAlgorithmTest
 {
     ////////////////////////////////////////////////////////////////
     // TEST METHODS

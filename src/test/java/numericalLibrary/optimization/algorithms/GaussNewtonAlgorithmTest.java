@@ -17,7 +17,7 @@ import numericalLibrary.types.MatrixReal;
 /**
  * Implements test methods for {@link GaussNewtonAlgorithm}.
  */
-public class GaussNewtonAlgorithmTest
+class GaussNewtonAlgorithmTest
 {
     ////////////////////////////////////////////////////////////////
     // TEST METHODS
