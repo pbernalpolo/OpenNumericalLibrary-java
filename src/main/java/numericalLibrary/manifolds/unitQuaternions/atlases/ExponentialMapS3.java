@@ -97,6 +97,44 @@ public class ExponentialMapS3
     /**
      * {@inheritDoc}
      */
+    public MatrixReal jacobianOfChart( UnitQuaternion q )
+    {
+        Vector3 qv = q.vectorPart();
+        double qvnormSquared = qv.normSquared();
+        double qvnorm = Math.sqrt( qvnormSquared );
+        double asinc_qvnorm = ( qvnorm > 0.0 )? Math.asin( qvnorm )/qvnorm : 1.0;
+        MatrixReal submatrix = MatrixReal.one( 3 ).scaleInplace( asinc_qvnorm );
+        submatrix.addInplace( qv.outerProduct( qv ).scaleInplace( ( 1.0/Math.abs( q.w() ) - asinc_qvnorm ) / qvnormSquared ) );
+        submatrix.scaleInplace( 2.0 * Math.signum( q.w() ) );
+        return MatrixReal.zero( 3 , 4 ).setSubmatrix( 0,1 , submatrix );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MatrixReal jacobianOfChartInverse( Vector3 e )
+    {
+        MatrixReal output = MatrixReal.empty( 4 , 3 );
+        double enormSquared = e.normSquared();
+        double enorm = Math.sqrt( enormSquared );
+        double enorm_half = 0.5 * enorm;
+        double sin_enorm_half = Math.sin( enorm_half );
+        double cos_enorm_half = Math.cos( enorm_half );
+        double sinc_enorm_half = ( enorm_half > 0.0 )? sin_enorm_half/enorm_half : 1.0;
+        Vector3 eNormalized = ( enorm > 0.0 )? e.scale( 1.0/enorm ) : Vector3.zero();
+        output.setSubmatrix( 0,0 , eNormalized.scale( -sin_enorm_half ).toMatrixAsRow() );
+        MatrixReal submatrix = MatrixReal.one( 3 ).scaleInplace( sinc_enorm_half );
+        submatrix.addInplace( eNormalized.outerProduct( eNormalized ).scaleInplace( cos_enorm_half - sinc_enorm_half ) );
+        output.setSubmatrix( 1,0 , submatrix );
+        output.scaleInplace( 0.5 );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {
         delta = delta.positiveScalarPartForm();

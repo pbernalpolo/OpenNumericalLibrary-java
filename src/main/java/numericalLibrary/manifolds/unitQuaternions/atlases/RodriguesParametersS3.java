@@ -76,6 +76,33 @@ public class RodriguesParametersS3
     /**
      * {@inheritDoc}
      */
+    public MatrixReal jacobianOfChart( UnitQuaternion q )
+    {
+        MatrixReal output = MatrixReal.empty( 3 , 4 );
+        output.setSubmatrix( 0,0 , q.vectorPart().scaleInplace( -2.0/( q.w() * q.w() ) ).toMatrixAsColumn() );
+        output.setSubmatrix( 0,1 , MatrixReal.one( 3 ).scaleInplace( 2.0/q.w() ) );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MatrixReal jacobianOfChartInverse( Vector3 e )
+    {
+        MatrixReal output = MatrixReal.empty( 4 , 3 );
+        output.setSubmatrix( 0,0 , e.scale( -2.0 ).toMatrixAsRow() );
+        double alpha = 4.0 + e.normSquared();
+        output.setSubmatrix( 1,0 , MatrixReal.one( 3 ).scaleInplace( alpha ).subtractInplace( e.outerProduct( e ) ) );
+        double divisorValue = Math.sqrt( alpha );
+        output.scaleInplace( 1.0/( divisorValue * divisorValue * divisorValue ) );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {
         Vector3 deltav = delta.vectorPart();

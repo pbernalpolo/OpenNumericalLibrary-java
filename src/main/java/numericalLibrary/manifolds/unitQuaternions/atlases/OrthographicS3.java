@@ -115,6 +115,30 @@ public class OrthographicS3
     /**
      * {@inheritDoc}
      */
+    public MatrixReal jacobianOfChart( UnitQuaternion q )
+    {
+        MatrixReal output = MatrixReal.zero( 3 , 4 );
+        output.setSubmatrix( 0,1 , MatrixReal.one( 3 ).scaleInplace( 2.0 * Math.signum( q.w() ) ) );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MatrixReal jacobianOfChartInverse( Vector3 e )
+    {
+        MatrixReal output = MatrixReal.zero( 4 , 3 );
+        output.setSubmatrix( 0,0 , e.scale( -1.0/Math.sqrt( 4.0 - e.normSquared() ) ).toMatrixAsRow() );
+        output.setSubmatrix( 1,0 , MatrixReal.one( 3 ) );
+        output.scaleInplace( 0.5 );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {
         delta = delta.positiveScalarPartForm();
