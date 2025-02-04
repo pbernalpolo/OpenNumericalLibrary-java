@@ -135,8 +135,48 @@ class MatrixTest
             assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
         }
     }
-
-
+    
+    
+    /**
+     * Tests that {@link MatrixReal#choleskyDecomposition()} throws an exception if called on a non-square matrix.
+     */
+    @Test
+    void choleskyDecompositionThrowsExceptionIfNonSquare()
+    {
+        MatrixReal A = MatrixReal.random( 3 , 4 , new Random(42) );
+        boolean exceptionThrown = false;
+        try {
+            A.choleskyDecomposition();
+        } catch( IllegalArgumentException e ) {
+            exceptionThrown = true;
+        }
+        assertTrue( exceptionThrown );
+    }
+    
+    
+    /**
+     * Tests that {@link MatrixReal#choleskyDecomposition()} throws an exception if the matrix contains NaNs.
+     */
+    @Test
+    void choleskyDecompositionThrowsExceptionIfNaN()
+    {
+        int N = 6;
+        for( int i=0; i<N; i++ ) {
+            for( int j=0; j<=i; j++ ) {
+                MatrixReal A = this.randomPositiveDefiniteMatrix( N );
+                A.setEntry( i,j , Double.NaN );
+                boolean exceptionThrown = false;
+                try {
+                    A.choleskyDecomposition();
+                } catch( IllegalArgumentException e ) {
+                    exceptionThrown = true;
+                }
+                assertTrue( exceptionThrown );
+            }
+        }
+    }
+    
+    
     @Test
     void LDLTBehavior()
     {
