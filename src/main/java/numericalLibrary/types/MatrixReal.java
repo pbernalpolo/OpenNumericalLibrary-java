@@ -65,6 +65,13 @@ public class MatrixReal
     }
     
     
+    /**
+     * Sets the value of the entry at i-th row and j-th column.
+     * 
+     * @param i     row index of the entry to be set.
+     * @param j     column index of the entry to be set.
+     * @param value     new value for the entry to be set.
+     */
     public void setEntry( int i , int j , double value )
     {
         this.assertIndexBounds( i , j );
@@ -72,6 +79,13 @@ public class MatrixReal
     }
     
     
+    /**
+     * Gets the value of the entry at i-th row and j-th column.
+     * 
+     * @param i     row index of the entry to get.
+     * @param j     column index of the entry to get.
+     * @return      value of the entry.
+     */
     public double entry( int i , int j )
     {
         this.assertIndexBounds( i , j );
@@ -91,6 +105,106 @@ public class MatrixReal
         MatrixReal output = MatrixReal.empty( this.columns() , this.rows() );
         MatrixReal.transposeAlgorithm( this , output );
         return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                sb.append( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
+            }
+            sb.append( "\n" );
+        }
+        sb.append( "\n" );
+        return sb.toString();
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals( MatrixReal other )
+    {
+        if( !this.isSameSize( other ) ) {
+            return false;
+        }
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                if( this.entryUnchecked(i,j) != other.entryUnchecked(i,j) ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equalsApproximately( MatrixReal other , double tolerance )
+    {
+        if( !this.isSameSize( other ) ) {
+            return false;
+        }
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
+                if( Math.abs( dif ) > tolerance ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNaN()
+    {
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                if( Double.isNaN( this.entry( i , j ) ) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public MatrixReal copy()
+    {
+        MatrixReal c = MatrixReal.emptyWithSizeOf( this );
+        c.setTo( this );
+        return c;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws IllegalArgumentException     if {@code other} has not the same size as {@code this}.
+     */
+    public MatrixReal setTo( MatrixReal other )
+    {
+        this.assertSameSize( other );
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+                this.setEntryUnchecked( i,j , other.entryUnchecked(i,j) );
+            }
+        }
+        return this;
     }
     
     
@@ -202,90 +316,6 @@ public class MatrixReal
     
     /**
      * {@inheritDoc}
-     */
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.columns(); j++ ) {
-                sb.append( String.format( " %15.6e" , this.entryUnchecked(i,j) ) );
-            }
-            sb.append( "\n" );
-        }
-        sb.append( "\n" );
-        return sb.toString();
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals( MatrixReal other )
-    {
-        if( !this.isSameSize( other ) ) {
-            return false;
-        }
-        for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.columns(); j++ ) {
-                if( this.entryUnchecked(i,j) != other.entryUnchecked(i,j) ) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws IllegalArgumentException     if {@code other} has not the same size as {@code this}.
-     */
-    public MatrixReal setTo( MatrixReal other )
-    {
-        this.assertSameSize( other );
-        for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.columns(); j++ ) {
-                this.setEntryUnchecked( i,j , other.entryUnchecked(i,j) );
-            }
-        }
-        return this;
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public MatrixReal copy()
-    {
-        MatrixReal c = MatrixReal.emptyWithSizeOf( this );
-        c.setTo( this );
-        return c;
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equalsApproximately( MatrixReal other , double tolerance )
-    {
-        if( !this.isSameSize( other ) ) {
-            return false;
-        }
-        for( int i=0; i<this.rows(); i++ ) {
-            for( int j=0; j<this.columns(); j++ ) {
-                double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
-                if( Math.abs( dif ) > tolerance ) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-    
-    /**
-     * {@inheritDoc}
      * 
      * @throws IllegalArgumentException if {@code this} has different size as {@code other}.
      */
@@ -342,6 +372,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal inverseAdditive()
     {
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
@@ -354,6 +387,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal inverseAdditiveInplace()
     {
         for( int i=0; i<this.rows(); i++ ) {
@@ -365,6 +401,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal subtract( MatrixReal other )
     {
         this.assertSameSize( other );
@@ -378,6 +417,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal subtractInplace( MatrixReal other )
     {
         this.assertSameSize( other );
@@ -529,6 +571,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal scale( double scalar )
     {
         MatrixReal output = MatrixReal.emptyWithSizeOf( this );
@@ -541,6 +586,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public MatrixReal scaleInplace( double scalar )
     {
         for( int i=0; i<this.rows(); i++ ) {
@@ -588,6 +636,9 @@ public class MatrixReal
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( MatrixReal other )
     {
         this.assertSameSize( other );
@@ -602,6 +653,19 @@ public class MatrixReal
     }
     
     
+    /**
+     * Performs a Cholesky decomposition of the form A = L L^T.
+     * <p>
+     * Result is returned as a new instance.
+     * <p>
+     * The Cholesky decomposition is applied to positive-definite matrices, which is a subset of the symmetric matrices.
+     * The algorithm only considers matrix elements on the diagonal and below it, and assumes that the elements above the diagonal are symmetric.
+     * The user is responsible for calling this method on a symmetric matrix, or to know that the algorithm will only consider the elements on the lower triangular part of the matrix.
+     * 
+     * @return  {@link MatrixReal} L containing the Cholesky decomposition of {@code this} stored in a new instance.
+     * 
+     * @throws IllegalArgumentException if {@code this} is not positive-definite, or if NaNs are found.
+     */
     public MatrixReal choleskyDecomposition()
     {
         this.assertIsSquare();
@@ -611,6 +675,19 @@ public class MatrixReal
     }
     
     
+    /**
+     * Performs a Cholesky decomposition of the form A = L L^T.
+     * <p>
+     * Operation done in-place.
+     * <p>
+     * The Cholesky decomposition is applied to positive-definite matrices, which is a subset of the symmetric matrices.
+     * The algorithm only considers matrix elements on the diagonal and below it, and assumes that the elements above the diagonal are symmetric.
+     * The user is responsible for calling this method on a symmetric matrix, or to know that the algorithm will only consider the elements on the lower triangular part of the matrix.
+     * 
+     * @return  {@link MatrixReal} L containing the Cholesky decomposition of {@code this}. Result is stored in {@code this}.
+     * 
+     * @throws IllegalArgumentException if {@code this} is not positive-definite, or if NaNs are found.
+     */
     public MatrixReal choleskyDecompositionInplace()
     {
         this.assertIsSquare();
@@ -958,6 +1035,12 @@ public class MatrixReal
     }
     
     
+    /**
+     * Creates a square matrix with ones in the diagonal and zeros elsewhere.
+     * 
+     * @param dimension     number of rows or columns of the matrix to be created.
+     * @return  square matrix with ones in the diagonal and zeros elsewhere.
+     */
     public static MatrixReal one( int dimension )
     {
         MatrixReal one = MatrixReal.empty( dimension , dimension );
@@ -1500,9 +1583,15 @@ public class MatrixReal
      * <p>
      * This algorithm allows to perform an in-place decomposition.
      * That means that both inputs can be the same {@link MatrixReal}, and the output would be stored in the input.
+     * <p>
+     * The Cholesky decomposition is applied to positive-definite matrices, which is a subset of the symmetric matrices.
+     * The algorithm only considers matrix elements on the diagonal and below it, and assumes that the elements above the diagonal are symmetric.
+     * The user is responsible for introducing a symmetric matrix, or to know that the algorithm will only consider the elements on the lower triangular part of the matrix.
      * 
      * @param A     input square {@link MatrixReal} from which the Cholesky decomposition is requested.
      * @param L     output square {@link MatrixReal} containing the Cholesky decomposition of input A.
+     * 
+     * @throws IllegalArgumentException if matrix is not positive-definite, or if NaNs are found.
      */
     private static void choleskyDecompositionAlgorithm( MatrixReal A , MatrixReal L )
     {
@@ -1516,21 +1605,24 @@ public class MatrixReal
                 sumD -= L.entryUnchecked(j,i) * L.entryUnchecked(j,i);
             }
             sumD += A.entryUnchecked(j,j);
-            // now we compute the diagonal term
-            if( sumD <= 0.0 ) {
-                throw new IllegalArgumentException( "Matrix must be positive-definite." );
-            }
-            L.setEntryUnchecked( j,j , Math.sqrt(sumD) );
-            // we compute the terms below the diagonal
-            for( int i=j+1; i<A.rows(); i++ ) {
-                // first the sum
-                double sumL = 0.0;
-                for( int k=0; k<j; k++ ) {
-                    sumL -= L.entryUnchecked(j,k) * L.entryUnchecked(i,k);
+            if( sumD > 0.0 ) {
+                // now we compute the diagonal term
+                L.setEntryUnchecked( j,j , Math.sqrt(sumD) );
+                // we compute the terms below the diagonal
+                for( int i=j+1; i<A.rows(); i++ ) {
+                    // first the sum
+                    double sumL = 0.0;
+                    for( int k=0; k<j; k++ ) {
+                        sumL -= L.entryUnchecked(j,k) * L.entryUnchecked(i,k);
+                    }
+                    sumL += A.entryUnchecked(i,j);
+                    // then the division
+                    L.setEntryUnchecked( i,j , sumL/L.entryUnchecked(j,j) );
                 }
-                sumL += A.entryUnchecked(i,j);
-                // then the division
-                L.setEntryUnchecked( i,j , sumL/L.entryUnchecked(j,j) );
+            } else {
+                // By checking if sumD > 0, the exception is also thrown in case of finding a NaN;
+                // this would not happen if we check if sumD <= 0 to throw the exception.
+                throw new IllegalArgumentException( "Matrix must be positive-definite." );
             }
         }
     }

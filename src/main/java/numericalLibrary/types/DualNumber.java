@@ -101,11 +101,10 @@ public class DualNumber
     /**
      * {@inheritDoc}
      */
-    public DualNumber setTo( DualNumber other )
+    public boolean isNaN()
     {
-        this.a = other.re();
-        this.b = other.im();
-        return this;
+        return (  Double.isNaN( this.re() )  ||
+                  Double.isNaN( this.im() )  );
     }
     
     
@@ -115,6 +114,17 @@ public class DualNumber
     public DualNumber copy()
     {
         return new DualNumber( this.re() , this.im() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DualNumber setTo( DualNumber other )
+    {
+        this.a = other.re();
+        this.b = other.im();
+        return this;
     }
     
     

@@ -11,7 +11,9 @@ import numericalLibrary.algebraicStructures.MultiplicativeGroupElement;
 /**
  * Implements unit quaternions.
  * <p>
- * 
+ * This class acts as a Proxy for the {@link Quaternion} class;
+ * it delegates much of the implementation to that class, and hides the parts that do not make sense for unit quaternions.
+ * It also re-implements the parts that can be optimized.
  */
 public class UnitQuaternion
     implements
@@ -21,75 +23,118 @@ public class UnitQuaternion
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
-    private Quaternion q;
+    
+    /**
+     * Wrapped {@link Quaternion} that provides quaternion functionality.
+     */
+    private final Quaternion q;
     
     
     
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
-
+    
+    /**
+     * Returns the real part of the {@link UnitQuaternion}.
+     * 
+     * @return  real part of the {@link UnitQuaternion}.
+     */
     public double w()
     {
         return this.q.w();
     }
-
-
+    
+    
+    /**
+     * Returns the coefficient multiplying the imaginary unit i of the {@link UnitQuaternion}.
+     * 
+     * @return  coefficient multiplying the imaginary unit i of the {@link UnitQuaternion}.
+     */
     public double x()
     {
         return this.q.x();
     }
-
-
+    
+    
+    /**
+     * Returns the coefficient multiplying the imaginary unit j of the {@link UnitQuaternion}.
+     * 
+     * @return  coefficient multiplying the imaginary unit j of the {@link UnitQuaternion}.
+     */
     public double y()
     {
         return this.q.y();
     }
-
-
+    
+    
+    /**
+     * Returns the coefficient multiplying the imaginary unit k of the {@link UnitQuaternion}.
+     * 
+     * @return  coefficient multiplying the imaginary unit k of the {@link UnitQuaternion}.
+     */
     public double z()
     {
         return this.q.z();
     }
     
     
+    /**
+     * Returns the {@link Quaternion} wrapped by this {@link UnitQuaternion}.
+     * 
+     * @return  {@link Quaternion} wrapped by this {@link UnitQuaternion}.
+     */
     public Quaternion quaternion()
     {
         return this.q;
     }
-
     
+    
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return this.q.toString();
     }
-
     
-    public UnitQuaternion print()
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals( UnitQuaternion other )
     {
-        this.q.print();
-        return this;
+        return this.q.equals( other.q );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNaN()
+    {
+        return this.q.isNaN();
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public UnitQuaternion copy()
     {
         return new UnitQuaternion( this.q.copy() );
     }
-
     
+    
+    /**
+     * {@inheritDoc}
+     */
     public UnitQuaternion setTo( UnitQuaternion other )
     {
         this.q.setTo( other.q );
         return this;
     }
     
-    
-    public boolean equals( UnitQuaternion other )
-    {
-        return this.q.equals( other.q );
-    }
-
     
     public UnitQuaternion opposite()
     {
@@ -124,24 +169,37 @@ public class UnitQuaternion
      */
     public UnitQuaternion multiplyInplace( UnitQuaternion other )
     {
-        this.q = this.q.multiplyInplace( other.q );
+        this.q.multiplyInplace( other.q );
         UnitQuaternion.normalizeInplace( this.q );
         return this;
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public UnitQuaternion identityMultiplicative()
     {
         return UnitQuaternion.one();
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The multiplicative inverse of a unit quaternion is just its conjugate.
+     */
     public UnitQuaternion inverseMultiplicative()
     {
         return new UnitQuaternion( this.q.conjugate() );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The multiplicative inverse of a unit quaternion is just its conjugate.
+     */
     public UnitQuaternion inverseMultiplicativeInplace()
     {
         this.q.conjugateInplace();
@@ -155,12 +213,21 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the unit quaternion {@code delta} that satisfies {@code this} = {@code other} * {@code delta}.
+     * 
+     * @param other     unit quaternion from which the {@code delta} must be computed.
+     * @return  unit quaternion {@code delta} that satisfies {@code this} = {@code other} * {@code delta}.
+     */
     public UnitQuaternion delta( UnitQuaternion other )
     {
         return other.inverseMultiplicative().multiply( this );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( UnitQuaternion other )
     {
         // delta_0 = ( other^* * this )_0 = this · other
@@ -169,14 +236,24 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the vector part of {@code this} stored in a new {@link Vector3}.
+     * 
+     * @return  vector part of {@code this} stored in a new {@link Vector3}.
+     */
     public Vector3 vectorPart()
     {
         return this.q.vectorPart();
     }
     
     
+    /**
+     * Returns the norm of the vector part of {@code this} {@link Quaternion}.
+     * 
+     * @return  norm of the vector part of {@code this} {@link Quaternion}.
+     */
     public double vectorPartNorm() {
-        return Math.sqrt(  1.0  -  this.w() * this.w()  );
+        return this.q.vectorPartNorm();
     }
     
     
@@ -194,6 +271,13 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the rotation vector that represents the same rotation transformation than {@code this} unit quaternion.
+     * <p>
+     * The output is stored in a new {@link Vector3}.
+     * 
+     * @return  rotation vector that represents the same rotation transformation than {@code this} unit quaternion.
+     */
     public Vector3 toRotationVector()
     {
         double qvnorm = this.vectorPartNorm();
@@ -218,6 +302,13 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns the rotation matrix that represents the same rotation transformation than {@code this} unit quaternion.
+     * <p>
+     * The output is stored in a new {@link MatrixReal}.
+     * 
+     * @return  rotation matrix that represents the same rotation transformation than {@code this} unit quaternion.
+     */
     public MatrixReal toRotationMatrix()
     {
         double ri = this.w() * this.x();
@@ -313,34 +404,73 @@ public class UnitQuaternion
     ////////////////////////////////////////////////////////////////
     // PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
-
+    
+    /**
+     * Returns the identity element stored in a new instance.
+     * <p>
+     * That is {@code 1  +  0 · i  +  0 · j  +  0 · k }.
+     * 
+     * @return  identity element stored in a new instance.
+     */
     public static UnitQuaternion one()
     {
         return new UnitQuaternion( Quaternion.one() );
     }
     
 
+    /**
+     * Returns the i {@link UnitQuaternion} stored in a new instance.
+     * <p>
+     * That is {@code 0  +  1 · i  +  0 · j  +  0 · k }.
+     * 
+     * @return  i {@link UnitQuaternion} stored in a new instance.
+     */
     public static UnitQuaternion i()
     {
         return new UnitQuaternion( Quaternion.i() );
     }
-
-
+    
+    
+    /**
+     * Returns the j {@link UnitQuaternion} stored in a new instance.
+     * <p>
+     * That is {@code 0  +  0 · i  +  1 · j  +  0 · k }.
+     * 
+     * @return  j {@link UnitQuaternion} stored in a new instance.
+     */
     public static UnitQuaternion j()
     {
         return new UnitQuaternion( Quaternion.j() );
     }
-
-
+    
+    
+    /**
+     * Returns the k {@link UnitQuaternion} stored in a new instance.
+     * <p>
+     * That is {@code 0  +  0 · i  +  0 · j  +  1 · k }.
+     * 
+     * @return  k {@link UnitQuaternion} stored in a new instance.
+     */
     public static UnitQuaternion k()
     {
         return new UnitQuaternion( Quaternion.k() );
     }
     
     
-    public static UnitQuaternion fromNormalizedQuaternion( Quaternion theNormalizedQuaternion )
+    /**
+     * Returns a new {@link UnitQuaternion} that wraps a normalized {@link Quaternion}.
+     * <p>
+     * Note that no checks are performed on the input {@link Quaternion},
+     * and the {@link UnitQuaternion} class assumes the wrapped {@link Quaternion} to be normalized,
+     * so the user is responsible for introducing a normalized {@link Quaternion}.
+     * Failing to introduce a quaternion with unit norm will make the {@link UnitQuaternion} class to behave in an unexpected way.
+     * 
+     * @param normalizedQuaternion  normalized {@link Quaternion} to be wrapped by the returned {@link UnitQuaternion}
+     * @return  new {@link UnitQuaternion} that wraps a normalized {@link Quaternion}.
+     */
+    public static UnitQuaternion fromNormalizedQuaternion( Quaternion normalizedQuaternion )
     {
-        return new UnitQuaternion( theNormalizedQuaternion );
+        return new UnitQuaternion( normalizedQuaternion );
     }
     
     
@@ -359,6 +489,12 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns a new {@link UnitQuaternion} that represents the same rotation transformation as the input rotation vector.
+     * 
+     * @param v     rotation vector that represents the same rotation transformation as the {@link UnitQuaternion} returned by this method.
+     * @return  new {@link UnitQuaternion} that represents the same rotation transformation as the input rotation vector.
+     */
     public static UnitQuaternion fromRotationVector( Vector3 v )
     {
         double vnorm = v.norm();
@@ -374,6 +510,12 @@ public class UnitQuaternion
     }
     
     
+    /**
+     * Returns a new {@link UnitQuaternion} that represents the same rotation transformation as the input rotation matrix.
+     * 
+     * @param R     rotation matrix that represents the same rotation transformation as the {@link UnitQuaternion} returned by this method.
+     * @return  new {@link UnitQuaternion} that represents the same rotation transformation as the input rotation matrix.
+     */
     public static UnitQuaternion fromRotationMatrix( MatrixReal R )
     {
         if(  R.rows() != 3  ||  R.columns() != 3  ) {
@@ -625,7 +767,18 @@ public class UnitQuaternion
     ////////////////////////////////////////////////////////////////
     // PRIVATE CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
-        
+    
+    /**
+     * Constructs a new {@link UnitQuaternion} wrapping a {@link Quaternion}.
+     * <p>
+     * Note that the input {@link Quaternion} must be normalized for this class to work properly.
+     * That is the reason for this method to be private.
+     * On the other hand, the public alternative {@link #fromNormalizedQuaternion(Quaternion)} is provided to make it explicit that a normalized quaternion is required.
+     * 
+     * @param theQuaternion     {@link Quaternion} to be wrapped by the constructed {@link UnitQuaternion}.
+     * 
+     * @see #fromNormalizedQuaternion(Quaternion)
+     */
     private UnitQuaternion( Quaternion theQuaternion )
     {
         this.q = theQuaternion;

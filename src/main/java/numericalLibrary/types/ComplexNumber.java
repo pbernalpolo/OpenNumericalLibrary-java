@@ -84,11 +84,10 @@ public class ComplexNumber
     /**
      * {@inheritDoc}
      */
-    public ComplexNumber setTo( ComplexNumber other )
+    public boolean isNaN()
     {
-        this.x = other.re();
-        this.y = other.im();
-        return this;
+        return (  Double.isNaN( this.re() )  ||
+                  Double.isNaN( this.im() )  );
     }
     
     
@@ -98,6 +97,17 @@ public class ComplexNumber
     public ComplexNumber copy()
     {
         return new ComplexNumber( this.re() , this.im() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ComplexNumber setTo( ComplexNumber other )
+    {
+        this.x = other.re();
+        this.y = other.im();
+        return this;
     }
     
     
@@ -379,8 +389,6 @@ public class ComplexNumber
     public ComplexNumber log() {
         return new ComplexNumber( Math.log( this.re() ) , this.argument() );
     }
-
-    
     
     
     public double dot( ComplexNumber other )
@@ -412,15 +420,18 @@ public class ComplexNumber
     {
         return this.scaleInplace( 1.0/this.norm() );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( ComplexNumber other )
     {
         ComplexNumber delta = this.subtract( other );
         return delta.norm();
     }
     
-
+    
 /*    public Complex real()
     {
         return new Complex( this.re() , 0.0 );
