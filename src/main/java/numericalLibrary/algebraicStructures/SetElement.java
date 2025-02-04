@@ -43,14 +43,11 @@ public interface SetElement<T extends SetElement<T>>
     
     
     /**
-     * Sets {@code this} to be equal to {@code other}.
-     * <p>
-     * After using {@link #setTo(SetElement)} with {@code other} as argument, {@code this.equals(other)} must return {@code true}.
+     * Returns true if {@code this} contains some NaN value; returns {@code false} otherwise.
      * 
-     * @param other     instance to which {@code this} will be equal.
-     * @return  {@code this}.
+     * @return  true if {@code this} contains some NaN value; false otherwise.
      */
-    T setTo( T other );
+    boolean isNaN();
     
     
     /**
@@ -61,6 +58,17 @@ public interface SetElement<T extends SetElement<T>>
      * @return  copy of {@code this}.
      */
     T copy();
+    
+    
+    /**
+     * Sets {@code this} to be equal to {@code other}.
+     * <p>
+     * After using {@link #setTo(SetElement)} with {@code other} as argument, {@code this.equals(other)} must return {@code true}.
+     * 
+     * @param other     instance to which {@code this} will be equal.
+     * @return  {@code this}.
+     */
+    T setTo( T other );
     
     
     
