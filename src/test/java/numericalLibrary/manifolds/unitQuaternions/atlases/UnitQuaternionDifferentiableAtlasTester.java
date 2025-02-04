@@ -1,6 +1,7 @@
 package numericalLibrary.manifolds.unitQuaternions.atlases;
 
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -63,7 +64,7 @@ abstract class UnitQuaternionDifferentiableAtlasTester
      * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} transforms elements in the neighborhood of the element that defines the new chart in a consistent way.
      */
     @Test
-    public void transitionMapMatrixIsConsistentWithTransitionMap()
+    public void jacobianOfTransitionMapIsConsistentWithTransitionMap()
     {
         UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
         List<UnitQuaternion> manifoldElementList = this.getManifoldElementList();
@@ -167,8 +168,56 @@ abstract class UnitQuaternionDifferentiableAtlasTester
             // Check that first is the opposite of second.
             //jacobianChartPlus.print();
             //jacobianChartMinus.print();
-            assertTrue( jacobianChartMinus.equalsApproximately( jacobianChartPlus.inverseAdditive() , 1.0e-17 ) );
+            assertTrue( jacobianChartMinus.equalsApproximately( jacobianChartPlus.inverseAdditive() , 1.0e-100 ) );
         }
     }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} is defined for quaternions close to the border.
+     */
+    @Test
+    public void jacobianOfTransitionMapIsDefinedInBorder()
+    {
+        // Get the atlas.
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        // Get a list of chart elements.
+        List<Vector3> chartElementList = this.getChartElementList();
+        // For each chart element,
+        for( Vector3 chartElement : chartElementList ) {
+            // get a chart element pointing in its direction, but far away from the origin, 
+            Vector3 chartElementCloseToBorder = chartElement.normalize().scaleInplace( 1.0e30 );
+            // so that the unit quaternion mapped through the chart is close to the border.
+            UnitQuaternion manifoldElementCloseToBorder = atlas.toManifoldFromChartCenteredAtIdentity( chartElementCloseToBorder );
+            // Check that the Jacobian of the transition map for such manifold element is not NaN.
+            assertFalse( atlas.jacobianOfTransitionMap( manifoldElementCloseToBorder ).isNaN() );
+        }
+    }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfChartInverse(Vector3)} clips the input to the chart image.
+     */
+    /*@Test
+    public void jacobianOfChartInverseClipsVectorsNotContainedInChartImage()
+    {
+        // Get the atlas.
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        // Get a list of chart elements.
+        List<Vector3> chartElementList = this.getChartElementList();
+        // For each chart element,
+        for( Vector3 chartElement : chartElementList ) {
+            // get 2 chart elements pointing in its direction, but far away from the origin, 
+            Vector3 chartElementBeyondBorder1 = chartElement.normalize().scaleInplace( 1.0e30 );
+            Vector3 chartElementBeyondBorder2 = chartElementBeyondBorder1.scale( 2.0 );
+            // Get the Jacobian of the inverse chart for each one of them.
+            MatrixReal jacobian1 = atlas.jacobianOfChartInverse( chartElementBeyondBorder1 );
+            MatrixReal jacobian2 = atlas.jacobianOfChartInverse( chartElementBeyondBorder2 );
+            // Check that both are the same because the chart elements are being clipped to the chart image.
+            //jacobian1.print();
+            //jacobian2.print();
+            assertTrue( jacobian1.equalsApproximately( jacobian2 , 1.0e-30 ) );
+        }
+    }*/
     
 }
