@@ -1051,6 +1051,16 @@ public class MatrixReal
     }
     
     
+    /**
+     * Creates a {@link MatrixReal} with random entries.
+     * <p>
+     * The entries of the {@link MatrixReal} are normally distributed with mean {@code 0.0} and standard deviation {@code 1.0}.
+     * 
+     * @param numberOfRows  number of rows for the returned matrix.
+     * @param numberOfColumns   number of columns for the returned matrix.
+     * @param randomNumberGenerator     {@link Random} used to generate the entries of the returned {@link MatrixReal}.
+     * @return  {@link MatrixReal} with random entries.
+     */
     public static MatrixReal random( int numberOfRows , int numberOfColumns , Random randomNumberGenerator )
     {
         MatrixReal output = MatrixReal.empty( numberOfRows , numberOfColumns );

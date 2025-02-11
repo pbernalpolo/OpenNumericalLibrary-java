@@ -645,7 +645,7 @@ public class Quaternion
     /**
      * Returns a random {@link Quaternion} stored in a new instance.
      * <p>
-     * The random {@link Quaternion} is extracted from a Gaussian distribution with mean 0 and standard distribution 1.
+     * The components of the {@link Quaternion} are extracted from a Gaussian distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
      * 
      * @param randomNumberGenerator     random number generator used to extract the next normally distributed sample.
      * @return  random {@link Quaternion} stored in a new instance.

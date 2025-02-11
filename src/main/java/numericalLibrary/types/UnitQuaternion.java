@@ -458,6 +458,20 @@ public class UnitQuaternion
     
     
     /**
+     * Returns a new random {@link UnitQuaternion} uniformly distributed in the unit sphere S^3.
+     * <p>
+     * The uniform distribution is the result of normalizing {@link Quaternion}s whose components are extracted from a normal distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
+     * 
+     * @param randomNumberGenerator     {@link Random} used to generate the components of the random {@link UnitQuaternion}.
+     * @return  new random {@link UnitQuaternion} uniformly distributed in the unit sphere S^3.
+     */
+    public static UnitQuaternion random( Random randomNumberGenerator )
+    {
+        return new UnitQuaternion( Quaternion.random( randomNumberGenerator ).normalizeInplace() );
+    }
+    
+    
+    /**
      * Returns a new {@link UnitQuaternion} that wraps a normalized {@link Quaternion}.
      * <p>
      * Note that no checks are performed on the input {@link Quaternion},
@@ -580,12 +594,6 @@ public class UnitQuaternion
         UnitQuaternion qy = UnitQuaternion.fromAngleAndUnitVector( theta , Vector3.j() );
         UnitQuaternion qx = UnitQuaternion.fromAngleAndUnitVector( phi , Vector3.i() );
         return qz.multiplyInplace( qy ).multiplyInplace( qx );
-    }
-    
-    
-    public static UnitQuaternion random( Random randomNumberGenerator )
-    {
-        return new UnitQuaternion( Quaternion.random( randomNumberGenerator ).normalizeInplace() );
     }
     
     

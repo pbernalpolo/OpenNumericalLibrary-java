@@ -537,7 +537,7 @@ public class ComplexNumber
     /**
      * Returns a random {@link ComplexNumber} stored in a new instance.
      * <p>
-     * The random {@link ComplexNumber} is extracted from a Gaussian distribution with mean 0 and standard distribution 1.
+     * The components of the {@link ComplexNumber} are extracted from a Gaussian distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
      * 
      * @param randomNumberGenerator     random number generator used to extract the next normally distributed sample.
      * @return  random {@link ComplexNumber} stored in a new instance.

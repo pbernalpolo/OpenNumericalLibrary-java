@@ -455,7 +455,7 @@ public class DualNumber
     /**
      * Returns a random {@link DualNumber} stored in a new instance.
      * <p>
-     * The random {@link DualNumber} is extracted from a Gaussian distribution with mean 0 and standard distribution 1.
+     * The components of the {@link DualNumber} are extracted from a Gaussian distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
      * 
      * @param randomNumberGenerator     random number generator used to extract the next normally distributed sample.
      * @return  random {@link DualNumber} stored in a new instance.

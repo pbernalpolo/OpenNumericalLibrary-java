@@ -354,6 +354,14 @@ public class Vector2
     }
     
     
+    /**
+     * Returns a new random {@link Vector2} with normally distributed components sampled from {@link Random}.
+     * <p>
+     * The components of the {@link Vector2} are normally distributed with mean {@code 0.0} and standard deviation {@code 1.0}.
+     * 
+     * @param randomNumberGenerator     {@link Random} used to generate the components of the returned {@link Vector2}.
+     * @return  new random new random {@link Vector2} with normally distributed components sampled from {@link Random}.
+     */
     public static Vector2 random( Random randomNumberGenerator )
     {
         return new Vector2(
