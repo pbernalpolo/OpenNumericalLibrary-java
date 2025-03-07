@@ -786,6 +786,18 @@ public class MatrixReal
     }
     
     
+    /**
+     * Sets a block of {@code this} using {@code other} {@link MatrixReal}.
+     * <p>
+     * Operation done in-place.
+     * 
+     * @param i0    row index of {@code this} from which values ​​of {@code other} are set.
+     * @param j0    column index of {@code this} from which values of {@code other} are set.
+     * @param other     {@link MatrixReal} to be set in a block of {@code this}.
+     * @return  modified {@link MatrixReal}. Result is stored in {@code this}.
+     * 
+     * @throws IllegalArgumentException if an attempt to set a value outside the index range of {@code this} is made.
+     */
     public MatrixReal setSubmatrix( int i0 , int j0 , MatrixReal other )
     {
         this.assertIndexBounds( i0 , j0 );
@@ -793,6 +805,52 @@ public class MatrixReal
         for( int i=0; i<other.rows(); i++ ) {
             for( int j=0; j<other.columns(); j++ ) {
                 this.setEntryUnchecked( i0+i , j0+j , other.entryUnchecked(i,j) );
+            }
+        }
+        return this;
+    }
+    
+    
+    /**
+     * Adds {@code other} to a block of {@code this}.
+     * 
+     * @param i0    row index of {@code this} that defines the start of the block from which values of {@code other} are added.
+     * @param j0    column index of {@code this} that defines the start of the block from which values of {@code other} are added.
+     * @param other     {@link MatrixReal} to be added to a block of {@code this}.
+     * @return  modified {@link MatrixReal}. Result is stored in {@code this}.
+     * 
+     * @throws IllegalArgumentException if an attempt to add a value outside the index range of {@code this} is made.
+     */
+    public MatrixReal addSubmatrix( int i0 , int j0 , MatrixReal other )
+    {
+        this.assertIndexBounds( i0 , j0 );
+        this.assertIndexBounds( i0 + other.rows() , j0 + other.columns() );
+        for( int i=0; i<other.rows(); i++ ) {
+            for( int j=0; j<other.columns(); j++ ) {
+                this.x[i0+i][j0+j] += other.entryUnchecked(i,j);
+            }
+        }
+        return this;
+    }
+    
+    
+    /**
+     * Subtracts {@code other} to a block of {@code this}.
+     * 
+     * @param i0    row index of {@code this} that defines the start of the block from which values of {@code other} are subtracted.
+     * @param j0    column index of {@code this} that defines the start of the block from which values of {@code other} are subtracted.
+     * @param other     {@link MatrixReal} to be subtracted to a block of {@code this}.
+     * @return  modified {@link MatrixReal}. Result is stored in {@code this}.
+     * 
+     * @throws IllegalArgumentException if an attempt to subtract a value outside the index range of {@code this} is made.
+     */
+    public MatrixReal subtractSubmatrix( int i0 , int j0 , MatrixReal other )
+    {
+        this.assertIndexBounds( i0 , j0 );
+        this.assertIndexBounds( i0 + other.rows() , j0 + other.columns() );
+        for( int i=0; i<other.rows(); i++ ) {
+            for( int j=0; j<other.columns(); j++ ) {
+                this.x[i0+i][j0+j] -= other.entryUnchecked(i,j);
             }
         }
         return this;
@@ -1381,6 +1439,15 @@ public class MatrixReal
     }
     
     
+    /**
+     * Checks that the index is in the range of row indices offered by {@code this}.
+     * <p>
+     * That is, it checks that the index is in the interval 0 , ... , {@code this}.{@link #rows()}-1.
+     * 
+     * @param i     row index to check.
+     * 
+     * @throws IllegalArgumentException if the index is not in bounds.
+     */
     private void assertRowIndexBounds( int i )
     {
         if(  MatrixReal.assertionsOn  &&  (  i < 0  ||  this.rows() < i  )  ) {
@@ -1389,6 +1456,15 @@ public class MatrixReal
     }
     
     
+    /**
+     * Checks that the index is in the range of column indices offered by {@code this}.
+     * <p>
+     * That is, it checks that the index is in the interval 0 , ... , {@code this}.{@link #columns()}-1.
+     * 
+     * @param j     column index to check.
+     * 
+     * @throws IllegalArgumentException if the index is not in bounds.
+     */
     private void assertColumnIndexBounds( int j )
     {
         if(  MatrixReal.assertionsOn  &&  (  j < 0  ||  this.columns() < j  )  ) {
@@ -1397,6 +1473,16 @@ public class MatrixReal
     }
     
     
+    /**
+     * Checks that the indices {@code i},{@code j} are in the range of indices offered by {@code this}.
+     * <p>
+     * That is, it checks that
+     * {@code i} is in the interval 0 , ... , {@code this}.{@link #rows()}-1, and
+     * {@code j} is in the interval 0 , ... , {@code this}.{@link #columns()}-1.
+     * 
+     * @param i     row index to check.
+     * @param j     column index to check.
+     */
     private void assertIndexBounds( int i , int j )
     {
         this.assertRowIndexBounds( i );
