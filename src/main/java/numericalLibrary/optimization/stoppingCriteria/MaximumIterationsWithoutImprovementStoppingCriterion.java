@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.stoppingCriteria;
 
 
-import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
+import numericalLibrary.optimization.lossFunctions.Loss;
 
 
 
@@ -9,7 +9,7 @@ import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
  * Implements the stopping criterion to stop iterating if the best cost obtained so far has not been improved after a number of iterations.
  */
 public class MaximumIterationsWithoutImprovementStoppingCriterion
-    implements StoppingCriterion
+    implements StoppingCriterion<Loss>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -64,9 +64,9 @@ public class MaximumIterationsWithoutImprovementStoppingCriterion
     /**
      * {@inheritDoc}
      */
-    public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm )
+    public boolean isFinished( Loss lossFunction )
     {
-        double cost = iterativeAlgorithm.getCost();
+        double cost = lossFunction.getCost();
         if( cost < this.costBest ) {
             this.costBest = cost;
             this.iterationsWithoutImprovement = 0;

@@ -2,6 +2,7 @@ package numericalLibrary.optimization.stoppingCriteria;
 
 
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
+import numericalLibrary.optimization.lossFunctions.Loss;
 
 
 
@@ -11,7 +12,7 @@ import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
  * Stopping criteria are also known as stopping rule, stopping condition, or termination condition.
  * They define when to stop iterating in an {@link IterativeOptimizationAlgorithm}.
  */
-public interface StoppingCriterion
+public interface StoppingCriterion<T extends Loss>
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
@@ -28,6 +29,6 @@ public interface StoppingCriterion
      * 
      * @return  true if the {@link IterativeOptimizationAlgorithm} has finished; false otherwise.
      */
-    public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm );
+    public boolean isFinished( T lossFunction );
     
 }

@@ -2,6 +2,7 @@ package numericalLibrary.optimization.stoppingCriteria;
 
 
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
+import numericalLibrary.optimization.lossFunctions.Loss;
 
 
 
@@ -11,7 +12,7 @@ import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
  * Stop iterating if some {@link #isFinished(IterativeOptimizationAlgorithm)} returns true.
  */
 public class OrOperatorOnStoppingCriteria
-    implements StoppingCriterion
+    implements StoppingCriterion<Loss>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -20,12 +21,12 @@ public class OrOperatorOnStoppingCriteria
     /**
      * First {@link StoppingCriterion} to check.
      */
-    private final StoppingCriterion firstStoppingCriterion;
+    private final StoppingCriterion<Loss> firstStoppingCriterion;
     
     /**
      * Second {@link StoppingCriterion} to check.
      */
-    private final StoppingCriterion secondStoppinCriterion;
+    private final StoppingCriterion<Loss> secondStoppinCriterion;
     
     
     
@@ -39,7 +40,7 @@ public class OrOperatorOnStoppingCriteria
      * @param first     first {@link StoppingCriterion} to check for {@link #isFinished(IterativeOptimizationAlgorithm)}.
      * @param second    second {@link StoppingCriterion} to check for {@link #isFinished(IterativeOptimizationAlgorithm)}.
      */
-    public OrOperatorOnStoppingCriteria( StoppingCriterion first , StoppingCriterion second )
+    public OrOperatorOnStoppingCriteria( StoppingCriterion<Loss> first , StoppingCriterion<Loss> second )
     {
         this.firstStoppingCriterion = first;
         this.secondStoppinCriterion = second;
@@ -64,10 +65,10 @@ public class OrOperatorOnStoppingCriteria
     /**
      * {@inheritDoc}
      */
-    public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm )
+    public boolean isFinished( Loss lossFunction )
     {
-        boolean isFirstFinished = this.firstStoppingCriterion.isFinished( iterativeAlgorithm );
-        boolean isSecondFinished = this.secondStoppinCriterion.isFinished( iterativeAlgorithm );
+        boolean isFirstFinished = this.firstStoppingCriterion.isFinished( lossFunction );
+        boolean isSecondFinished = this.secondStoppinCriterion.isFinished( lossFunction );
         return ( isFirstFinished || isSecondFinished );
     }
     
