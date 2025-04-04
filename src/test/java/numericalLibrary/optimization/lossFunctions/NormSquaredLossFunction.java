@@ -84,6 +84,24 @@ public class NormSquaredLossFunction
     /**
      * {@inheritDoc}
      */
+    public int degreesOfFreedomOfParameterVector()
+	{
+    	return this.x.rows();
+	}
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+	public void shift(MatrixReal deltaParameters)
+	{
+		this.x.addInplace( deltaParameters );
+	}
+    
+	
+    /**
+     * {@inheritDoc}
+     */
     public double getCost()
     {
         return this.x.normFrobeniusSquared();
