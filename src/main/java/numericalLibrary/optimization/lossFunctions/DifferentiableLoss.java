@@ -18,7 +18,7 @@ public interface DifferentiableLoss
     /**
      * Returns the gradient of the {@link DifferentiableLoss} as a column matrix.
      * <p>
-     * The gradient is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}.
+     * The gradient is evaluated at the point defined by the internally stored parameter vector.
      * 
      * @return  gradient of the {@link DifferentiableLoss} as a column matrix.
      */
