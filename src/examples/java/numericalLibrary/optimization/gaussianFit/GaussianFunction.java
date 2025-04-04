@@ -1,14 +1,12 @@
-package numericalLibrary.util;
+package numericalLibrary.optimization.gaussianFit;
 
 
-import numericalLibrary.optimization.ModelFunction;
-import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.types.MatrixReal;
 
 
 
 /**
- * Implements a Gaussian function to fit data using a {@link IterativeOptimizationAlgorithm}.
+ * Implements a parameterized Gaussian function.
  * <p>
  * Concretely, the Gaussian function is given by:
  *      a exp( -( x - b )^2/( 2 * c^2 )
@@ -16,7 +14,6 @@ import numericalLibrary.types.MatrixReal;
  * @see <a href>https://en.wikipedia.org/wiki/Gaussian_function</a>
  */
 public class GaussianFunction
-    implements ModelFunction<Double>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -69,26 +66,68 @@ public class GaussianFunction
     ////////////////////////////////////////////////////////////////
     
     /**
-     * {@inheritDoc}
+     * Sets the height of the curve's peak.
+     * 
+     * @param height	height to be set.
      */
-    public void setParameters( MatrixReal theta )
+    public void setHeight( double height )
     {
-        this.a = theta.entry( 0 , 0 );
-        this.b = theta.entry( 1 , 0 );
-        this.c = theta.entry( 2 , 0 );
+    	this.a = height;
     }
     
     
     /**
-     * {@inheritDoc}
+     * Returns the height of the curve's peak.
+     * 
+     * @return	height of the curve's peak.
      */
-    public MatrixReal getParameters()
+    public double getHeight()
     {
-        MatrixReal output = MatrixReal.empty( 3 , 1 );
-        output.setEntry( 0,0 , this.a );
-        output.setEntry( 1,0 , this.b );
-        output.setEntry( 2,0 , this.c );
-        return output;
+    	return this.a;
+    }
+    
+    
+    /**
+     * Sets the position of the peak.
+     * 
+     * @param center	position of the peak.
+     */
+    public void setCenter( double center )
+    {
+    	this.b = center;
+    }
+    
+    
+    /**
+     * Returns the position of the peak.
+     * 
+     * @return	position of the peak.
+     */
+    public double getCenter()
+    {
+    	return this.b;
+    }
+    
+    
+    /**
+     * Sets the standard deviation of the Gaussian curve.
+     * 
+     * @param standardDeviation		standard deviation of the Gaussian curve.
+     */
+    public void setStandardDeviation( double standardDeviation )
+    {
+    	this.c = standardDeviation;
+    }
+    
+    
+    /**
+     * Returns the standard deviation of the Gaussian curve.
+     * 
+     * @return	standard deviation of the Gaussian curve.
+     */
+    public double getStandardDeviation()
+    {
+    	return this.c;
     }
     
     
@@ -105,10 +144,10 @@ public class GaussianFunction
     /**
      * {@inheritDoc}
      */
-    public MatrixReal getOutput()
+    public double getOutput()
     {
         this.clean();
-        return MatrixReal.one( 1 ).scaleInplace( a * this.dfda );
+        return a * this.dfda;
     }
     
     
