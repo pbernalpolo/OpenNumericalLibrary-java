@@ -32,7 +32,7 @@ import numericalLibrary.types.MatrixReal;
  * @see <a href>https://en.wikipedia.org/wiki/Gradient_descent</a>
  */
 public class GradientDescentAlgorithm
-    extends IterativeOptimizationAlgorithm<DifferentiableLoss>
+    implements IterativeOptimizationAlgorithm<DifferentiableLoss>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -56,11 +56,9 @@ public class GradientDescentAlgorithm
      * 
      * @param lossFunction  {@link DifferentiableLoss} to be minimized.
      */
-    public GradientDescentAlgorithm( DifferentiableLoss lossFunction )
+    public GradientDescentAlgorithm()
     {
-        super( lossFunction );
-        // Default learning rate.
-        this.learningRate = 1.0e-4;
+        this.learningRate = 1.0e-3;
     }
     
     
@@ -68,17 +66,6 @@ public class GradientDescentAlgorithm
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Sets the loss function to be minimized.
-     * 
-     * @param differentiableLossFunction   loss function to be minimized.
-     */
-    public void setLossFunction( DifferentiableLoss differentiableLossFunction )
-    {
-        this.lossFunction = differentiableLossFunction;
-    }
-    
     
     /**
      * Sets the learning rate.
@@ -98,9 +85,9 @@ public class GradientDescentAlgorithm
      * <br>
      * \theta_{k+1} = \theta_k - gamma * ( d f / d theta )
      */
-    public MatrixReal getDeltaParameters()
+    public MatrixReal getDeltaParameters( DifferentiableLoss lossFunction )
     {
-        return this.lossFunction.getGradient().scaleInplace( -this.learningRate );
+        return lossFunction.getGradient().scaleInplace( -this.learningRate );
     }
     
 }

@@ -10,6 +10,7 @@ import numericalLibrary.types.MatrixReal;
  * Implements the Levenberg-Marquardt algorithm.
  * <p>
  * The Levenberg-Marquardt algorithm aims to minimize the loss function:
+ * <br>
  * L( \theta ) = F( \theta ) + \lambda || \delta ||^2
  * <br>
  * where:
@@ -42,7 +43,7 @@ import numericalLibrary.types.MatrixReal;
  * @see <a href>https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm</a>
  */
 public class LevenbergMarquardtAlgorithm
-    extends IterativeOptimizationAlgorithm<LocallyQuadraticLoss>
+    implements IterativeOptimizationAlgorithm<LocallyQuadraticLoss>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -53,7 +54,7 @@ public class LevenbergMarquardtAlgorithm
      * 
      * @see #setDampingFactor(double)
      */
-    private MatrixReal lambdaIdentity;
+    private double lambda;
     
     
     
@@ -66,9 +67,9 @@ public class LevenbergMarquardtAlgorithm
      * 
      * @param lossFunction  {@link LocallyQuadraticLoss} to be minimized.
      */
-    public LevenbergMarquardtAlgorithm( LocallyQuadraticLoss lossFunction )
+    public LevenbergMarquardtAlgorithm()
     {
-        super( lossFunction );
+    	this.setDampingFactor( 0.0 );
     }
     
     
@@ -91,8 +92,7 @@ public class LevenbergMarquardtAlgorithm
      */
     public void setDampingFactor( double dampingFactor )
     {
-        MatrixReal theta = this.lossFunction.getParameters();
-        this.lambdaIdentity = MatrixReal.one( theta.rows() ).scaleInplace( dampingFactor );
+    	this.lambda = dampingFactor;
     }
     
     
@@ -101,17 +101,17 @@ public class LevenbergMarquardtAlgorithm
      * 
      * @throws IllegalStateException if a non positive-definite {@link MatrixReal} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
      */
-    public MatrixReal getDeltaParameters()
+    public MatrixReal getDeltaParameters( LocallyQuadraticLoss lossFunction )
     {
-        MatrixReal gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
-        gaussNewtonMatrix.addInplace( this.lambdaIdentity );
+        MatrixReal gaussNewtonMatrix = lossFunction.getGaussNewtonMatrix();
+        gaussNewtonMatrix.addInplace( MatrixReal.one( gaussNewtonMatrix.rows() ).scaleInplace( this.lambda ) );
         MatrixReal L = null;
         try {
             L = gaussNewtonMatrix.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a larger damping factor with setDampingFactor method might help." );
         }
-        MatrixReal gradient = this.lossFunction.getGradient();
+        MatrixReal gradient = lossFunction.getGradient();
         return gradient.inverseAdditive().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     

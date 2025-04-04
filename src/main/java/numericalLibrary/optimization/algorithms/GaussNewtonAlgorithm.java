@@ -39,24 +39,8 @@ import numericalLibrary.types.MatrixReal;
  * @see <a href>https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm</a>
  */
 public class GaussNewtonAlgorithm
-    extends IterativeOptimizationAlgorithm<LocallyQuadraticLoss>
+    implements IterativeOptimizationAlgorithm<LocallyQuadraticLoss>
 {
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC CONSTRUCTORS
-    ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Constructs a {@link GaussNewtonAlgorithm}.
-     * 
-     * @param lossFunction  {@link LocallyQuadraticLoss} to be minimized.
-     */
-    public GaussNewtonAlgorithm( LocallyQuadraticLoss lossFunction )
-    {
-        super( lossFunction );
-    }
-    
-    
-    
     ////////////////////////////////////////////////////////////////
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
@@ -66,16 +50,16 @@ public class GaussNewtonAlgorithm
      * 
      * @throws IllegalStateException if a non positive-definite {@link MatrixReal} is obtained. In such a case, try using the {@link LevenbergMarquardtAlgorithm} instead.
      */
-    public MatrixReal getDeltaParameters()
+    public MatrixReal getDeltaParameters( LocallyQuadraticLoss lossFunction )
     {
-        MatrixReal gaussNewtonMatrix = this.lossFunction.getGaussNewtonMatrix();
+        MatrixReal gaussNewtonMatrix = lossFunction.getGaussNewtonMatrix();
         MatrixReal L = null;
         try {
             L = gaussNewtonMatrix.choleskyDecompositionInplace();
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Using the Levenberg-Marquardt algorithm with a small damping factor can help." );
         }
-        MatrixReal gradient = this.lossFunction.getGradient();
+        MatrixReal gradient = lossFunction.getGradient();
         return gradient.inverseAdditiveInplace().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     
