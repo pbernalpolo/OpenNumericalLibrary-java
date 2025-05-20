@@ -66,7 +66,7 @@ public class MaximumIterationsWithoutImprovementStoppingCriterion
      */
     public boolean isFinished( Loss lossFunction )
     {
-        double cost = lossFunction.getCost();
+        double cost = lossFunction.getLossResults().getCost();
         if( cost < this.costBest ) {
             this.costBest = cost;
             this.iterationsWithoutImprovement = 0;
