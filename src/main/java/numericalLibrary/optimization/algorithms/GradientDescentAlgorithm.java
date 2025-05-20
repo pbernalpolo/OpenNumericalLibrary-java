@@ -2,6 +2,7 @@ package numericalLibrary.optimization.algorithms;
 
 
 import numericalLibrary.optimization.lossFunctions.DifferentiableLoss;
+import numericalLibrary.optimization.lossFunctions.DifferentiableLossResults;
 import numericalLibrary.types.MatrixReal;
 
 
@@ -87,7 +88,9 @@ public class GradientDescentAlgorithm
      */
     public MatrixReal getDeltaParameters( DifferentiableLoss lossFunction )
     {
-        return lossFunction.getGradient().scaleInplace( -this.learningRate );
+    	DifferentiableLossResults results = lossFunction.getDifferentiableLossResults();
+    	MatrixReal gradient = results.getGradient();
+        return gradient.scaleInplace( -this.learningRate );
     }
     
 }

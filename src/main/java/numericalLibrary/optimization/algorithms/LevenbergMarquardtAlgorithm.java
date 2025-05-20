@@ -2,6 +2,7 @@ package numericalLibrary.optimization.algorithms;
 
 
 import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLoss;
+import numericalLibrary.optimization.lossFunctions.LocallyQuadraticLossResults;
 import numericalLibrary.types.MatrixReal;
 
 
@@ -103,7 +104,8 @@ public class LevenbergMarquardtAlgorithm
      */
     public MatrixReal getDeltaParameters( LocallyQuadraticLoss lossFunction )
     {
-        MatrixReal gaussNewtonMatrix = lossFunction.getGaussNewtonMatrix();
+    	LocallyQuadraticLossResults results = lossFunction.getLocallyQuadraticLossResults();
+        MatrixReal gaussNewtonMatrix = results.getGaussNewtonMatrix();
         gaussNewtonMatrix.addInplace( MatrixReal.one( gaussNewtonMatrix.rows() ).scaleInplace( this.lambda ) );
         MatrixReal L = null;
         try {
@@ -111,7 +113,7 @@ public class LevenbergMarquardtAlgorithm
         } catch( IllegalArgumentException e ) {
             throw new IllegalStateException( "Cholesky decomposition applied to non positive definite matrix. Setting a larger damping factor with setDampingFactor method might help." );
         }
-        MatrixReal gradient = lossFunction.getGradient();
+        MatrixReal gradient = results.getGradient();
         return gradient.inverseAdditive().divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( L );
     }
     
