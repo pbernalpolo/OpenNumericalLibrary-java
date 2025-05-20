@@ -29,13 +29,13 @@ public interface LocallyQuadraticLoss
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
-    /**
-     * Returns the approximate Hessian of the {@link LocallyQuadraticLoss}.
-     * <p>
-     * The Gauss-Newton matrix is evaluated at the point defined by the internally stored parameter vector.
-     * 
-     * @return  approximate Hessian matrix of the {@link LocallyQuadraticLoss}.
-     */
-    public abstract MatrixReal getGaussNewtonMatrix();
+	/**
+	 * Returns the {@link LocallyQuadraticLossResults} obtained from this {@link LocallyQuadraticLoss}.
+	 * <p>
+     * The loss function is evaluated at the point defined by the internally stored parameter vector.
+	 * 
+	 * @return	{@link LocallyQuadraticLossResults} obtained from this {@link LocallyQuadraticLoss}.
+	 */
+    public abstract LocallyQuadraticLossResults getLocallyQuadraticLossResults();
     
 }
