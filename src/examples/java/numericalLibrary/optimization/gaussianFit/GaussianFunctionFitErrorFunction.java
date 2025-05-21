@@ -51,7 +51,7 @@ public class GaussianFunctionFitErrorFunction
 	/**
 	 * {@inheritDoc}
 	 */
-	public int degreesOfFreedomOfParameterVector()
+	public int degreesOfFreedom()
 	{
 		return 3;
 	}

@@ -7,11 +7,10 @@ import java.util.List;
 import numericalLibrary.optimization.algorithms.GradientDescentAlgorithm;
 import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
 import numericalLibrary.optimization.algorithms.LevenbergMarquardtAlgorithm;
-import numericalLibrary.optimization.lossFunctions.PlainMeanSquaredErrorLocallyQuadraticLoss;
-import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredErrorLocallyQuadraticLoss;
+import numericalLibrary.optimization.lossFunctions.PlainMeanSquaredError;
+import numericalLibrary.optimization.lossFunctions.RobustMeanSquaredError;
 import numericalLibrary.optimization.robustFunctions.MaximumDistanceRobustFunction;
 import numericalLibrary.optimization.robustFunctions.RobustFunction;
-import numericalLibrary.types.MatrixReal;
 
 
 
@@ -53,9 +52,9 @@ class GaussianFitExample
         GaussianFunctionFitErrorFunction errorFunction = new GaussianFunctionFitErrorFunction( gaussianUnknown );
         
         // Use the error function to create the loss function to be optimized.
-        //PlainMeanSquaredErrorLocallyQuadraticLoss<GaussianFunctionFitErrorFunctionInput> loss = new PlainMeanSquaredErrorLocallyQuadraticLoss<GaussianFunctionFitErrorFunctionInput>( errorFunction );
-        RobustMeanSquaredErrorLocallyQuadraticLoss<GaussianFunctionFitErrorFunctionInput> loss = new RobustMeanSquaredErrorLocallyQuadraticLoss<GaussianFunctionFitErrorFunctionInput>( errorFunction );
-        loss.setRobustFunction( new MaximumDistanceRobustFunction( 1.0e1 ) );
+        //PlainMeanSquaredError<GaussianFunctionFitErrorFunctionInput> loss = new PlainMeanSquaredError<GaussianFunctionFitErrorFunctionInput>( errorFunction );
+        RobustFunction robustFunction = new MaximumDistanceRobustFunction( 1.0e1 );
+        RobustMeanSquaredError<GaussianFunctionFitErrorFunctionInput> loss = new RobustMeanSquaredError<GaussianFunctionFitErrorFunctionInput>( errorFunction , robustFunction );
         loss.setInputList( inputTargetList );
         
         // Find a solution using some IterativeOptimizationAlgorithm.
@@ -64,10 +63,10 @@ class GaussianFitExample
         LevenbergMarquardtAlgorithm algorithm = new LevenbergMarquardtAlgorithm();
         algorithm.setDampingFactor( 1.0e-8 );
         
-        System.out.println( "error after 0 iterations: " + loss.getCost() );
+        System.out.println( "error after 0 iterations: " + loss.getLossResults().getCost() );
         for( int i=0; i<20; i++) {
             algorithm.step( loss );
-            System.out.println( "error after " + i + " iterations: " + loss.getCost() );
+            System.out.println( "error after " + i + " iterations: " + loss.getLossResults().getCost() );
         }
         System.out.println();
         
@@ -75,7 +74,6 @@ class GaussianFitExample
         System.out.println( "Height: " + gaussianUnknown.getHeight() );
         System.out.println( "Center: " + gaussianUnknown.getCenter() );
         System.out.println( "Standard deviation: " + gaussianUnknown.getStandardDeviation() );
-        
     }
     
 }
