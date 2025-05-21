@@ -24,7 +24,8 @@ import numericalLibrary.types.MatrixReal;
  * @param <T> type of inputs to the {@link ErrorFunction}.
  */
 public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
-	extends MeanSquaredErrorLocallyQuadraticLossBase<T>
+	extends MeanSquaredErrorBase<T>
+	implements LocallyQuadraticLoss
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -70,15 +71,60 @@ public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
     }
     
     
-    
-    ////////////////////////////////////////////////////////////////
-    // PROTECTED METHODS
-    ////////////////////////////////////////////////////////////////
-    
 	/**
 	 * {@inheritDoc}
 	 */
-	protected void update()
+	public LossResults getLossResults()
+	{
+        // Initialize cost.
+		this.initializeCost();
+		// For each input...
+        for( int i=0; i<this.inputList.size(); i++ ) {
+            // Set the input.
+            T input = this.inputList.get( i );
+            this.errorFunction.setInput( input );
+            // Compute quantities involved in the cost.
+            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            double weight = this.weightList.get( i );
+            // Add contribution to cost, and gradient.
+            this.cost += weight * errorFunctionOutput.normFrobeniusSquared();
+        }
+        // Note that we do not divide by the number of inputs;
+        // the user is responsible for introducing in the weights any scaling factor dependent on the number of inputs.
+		return new LossResults( this.cost );
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public DifferentiableLossResults getDifferentiableLossResults()
+	{
+        // Initialize cost, and gradient.
+		this.initializeCostAndGradient();
+		// For each input...
+        for( int i=0; i<this.inputList.size(); i++ ) {
+            // Set the input.
+            T input = this.inputList.get( i );
+            this.errorFunction.setInput( input );
+            // Compute quantities involved in the cost and gradient.
+            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal J = this.errorFunction.getJacobian();
+            double weight = this.weightList.get( i );
+            // Add contribution to cost, and gradient.
+            this.cost += weight * errorFunctionOutput.normFrobeniusSquared();
+            this.gradient.addLeftTransposeTimesRight( J.scaleInplace( weight ) , errorFunctionOutput );
+        }
+        // Note that we do not divide by the number of inputs;
+        // the user is responsible for introducing in the weights any scaling factor dependent on the number of inputs.
+		return new DifferentiableLossResults( this.cost , this.gradient );
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public LocallyQuadraticLossResults getLocallyQuadraticLossResults()
 	{
         // Create matrix to speed up computations.
 		this.errorFunction.setInput( this.inputList.get(0) );
@@ -90,18 +136,19 @@ public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
             // Set the input.
             T input = this.inputList.get( i );
             this.errorFunction.setInput( input );
-            // Compute quantities involved in the cost and gradient.
-            MatrixReal modelFunctionOutput = this.errorFunction.getOutput();
+            // Compute quantities involved in the cost, gradient and Gauss-Newton matrix.
+            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
             MatrixReal J = this.errorFunction.getJacobian();
             double weight = this.weightList.get( i );
             JW.setTo( J ).scaleInplace( weight );
             // Add contribution to cost, and gradient.
-            this.cost += weight * modelFunctionOutput.normFrobeniusSquared();
-            this.gradient.addLeftTransposeTimesRight( JW , modelFunctionOutput );
+            this.cost += weight * errorFunctionOutput.normFrobeniusSquared();
+            this.gradient.addLeftTransposeTimesRight( JW , errorFunctionOutput );
             this.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
         }
         // Note that we do not divide by the number of inputs;
         // the user is responsible for introducing in the weights any scaling factor dependent on the number of inputs.
+		return new LocallyQuadraticLossResults( this.cost , this.gradient , this.gaussNewtonMatrix );
 	}
 	
 }

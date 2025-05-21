@@ -33,30 +33,6 @@ abstract class MeanSquaredErrorBase<T>
 	implements DifferentiableLoss
 {
     ////////////////////////////////////////////////////////////////
-    // PROTECTED ABSTRACT METHODS
-    ////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Resets matrices used by the Mean Squared Error.
-	 * This method is called to initialize matrices,
-	 * or to reset them after initialization in the event of a change in {@link #errorFunction}.
-	 * 
-	 * @see #clean()
-	 */
-	protected abstract void resetMatrices();
-	
-	
-	/**
-	 * Updates the internal variables of this {@link DifferentiableLoss}.
-	 * This includes {@link #cost}, {@link #gradient} and, in the case of a {@link LocallyQuadraticLoss}, the Gauss-Newton matrix.
-	 * 
-	 * @see #clean()
-	 */
-	protected abstract void update();
-	
-	
-	
-	////////////////////////////////////////////////////////////////
 	// PROTECTED VARIABLES
 	////////////////////////////////////////////////////////////////
 	
@@ -71,19 +47,19 @@ abstract class MeanSquaredErrorBase<T>
     protected List<T> inputList;
     
     /**
-     * Last computed gradient.
+     * Used to accumulate the contribution to the gradient from each input.
      */
     protected MatrixReal gradient;
     
     /**
-     * Last computed cost.
+     * Used to accumulate the contribution to the Gauss-Newton matrix from each input.
+     */
+    protected MatrixReal gaussNewtonMatrix;
+    
+	/**
+     * Used to accumulate the contribution to the cost from each input.
      */
     protected double cost;
-    
-    /**
-     * Flag used to implement the Dirty Flag Optimization Pattern.
-     */
-    private boolean dirtyFlag;
     
     
 	
@@ -99,7 +75,9 @@ abstract class MeanSquaredErrorBase<T>
     public MeanSquaredErrorBase( ErrorFunction<T> errorFunction )
     {
     	this.errorFunction = errorFunction;
-        this.dirtyFlag = true;
+    	int degreesOfFreedom = errorFunction.degreesOfFreedom();
+    	this.gradient = MatrixReal.empty( degreesOfFreedom , 1 );
+    	this.gaussNewtonMatrix = MatrixReal.empty( degreesOfFreedom , degreesOfFreedom );
     }
     
     
@@ -111,59 +89,91 @@ abstract class MeanSquaredErrorBase<T>
     /**
      * {@inheritDoc}
      */
-	public int degreesOfFreedomOfParameterVector()
+    public int degreesOfFreedom()
 	{
-		return this.errorFunction.degreesOfFreedomOfParameterVector();
+		return this.errorFunction.degreesOfFreedom();
 	}
 	
 	
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
 	public void shift( MatrixReal deltaParameters )
 	{
 		this.errorFunction.shift( deltaParameters );
-		this.dirtyFlag = true;
 	}
 	
-	
+    
+    
+    ////////////////////////////////////////////////////////////////
+    // PROTECTED METHODS
+    ////////////////////////////////////////////////////////////////
+    
 	/**
-	 * {@inheritDoc}
+	 * Sets the cost to zero.
 	 */
-	public double getCost()
-	{
-		this.clean();
-		return this.cost;
-	}
-	
-	
+    protected void initializeCost()
+    {
+    	this.cost = 0.0;
+    }
+    
+    
 	/**
-	 * {@inheritDoc}
+	 * Sets the cost and the gradient to zero.
 	 */
-	public MatrixReal getGradient()
+	protected void initializeCostAndGradient()
 	{
-		this.clean();
-		return this.gradient;
+		this.cost = 0.0;
+		this.gradient.setToZero();
 	}
 	
 	
 	/**
-     * Cleans in the sense of the Dirty Flag Optimization Pattern.
-     * <p>
-     * Resets the matrices such as {@link #gradient} with a new size if it is required after a change in {@link #errorFunction}.
-     * It also updates the stored cost, gradient and, in the case of a {@link LocallyQuadraticLoss}, the Gauss-Newton matrix.
-     */
-    protected void clean()
+	 * Sets the cost, the gradient, and the Gauss-Newton matrix to zero.
+	 */
+	protected void initializeCostGradientAndGaussNewtonMatrix()
 	{
-		if(  this.gradient == null  ||  this.gradient.rows() != this.errorFunction.degreesOfFreedomOfParameterVector()  ) {
-			this.resetMatrices();
-			this.dirtyFlag = true;
-		}
-		if( !this.dirtyFlag ) {
-			return;
-		}
-		this.update();
-		this.dirtyFlag = false;
+		this.cost = 0.0;
+		this.gradient.setToZero();
+		this.gaussNewtonMatrix.setToZero();
+	}
+	
+	
+	/**
+	 * Divides the cost by the size of the input list.
+	 * <p>
+	 * The operation is done in-place so, after calling this method, the cost will be scaled with the inverse of the number of inputs.
+	 */
+	protected void divideCostByNumberOfInputs()
+	{
+		this.cost /= this.inputList.size();
+	}
+	
+	
+	/**
+	 * Divides the cost and the gradient by the size of the input list.
+	 * <p>
+	 * The operation is done in-place so, after calling this method, the cost and the gradient will be scaled with the inverse of the number of inputs.
+	 */
+	protected void divideCostAndGradientByNumberOfInputs()
+	{
+		double oneOverNumberOfInputs = 1.0 / this.inputList.size();
+		this.cost *= oneOverNumberOfInputs;
+		this.gradient.scaleInplace( oneOverNumberOfInputs );
+	}
+	
+	
+	/**
+	 * Divides the cost, the gradient, and the Gauss-Newton matrix by the size of the input list.
+	 * <p>
+	 * The operation is done in-place so, after calling this method, the cost, the gradient, and the Gauss-Newton matrix will be scaled with the inverse of the number of inputs.
+	 */
+	protected void divideCostGradientAndGaussNewtonMatrixByNumberOfInputs()
+	{
+		double oneOverNumberOfInputs = 1.0 / this.inputList.size();
+		this.cost *= oneOverNumberOfInputs;
+		this.gradient.scaleInplace( oneOverNumberOfInputs );
+		this.gaussNewtonMatrix.scaleInplace( oneOverNumberOfInputs );
 	}
 	
 }
