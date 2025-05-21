@@ -75,7 +75,7 @@ public interface ErrorFunctionTester<T>
         // Get the Jacobian.
         MatrixReal jacobian = modelFunction.getJacobian();
         // Check that the Jacobian has as many columns as the number of parameters.
-        assertEquals( modelFunction.degreesOfFreedomOfParameterVector() , jacobian.columns() );
+        assertEquals( modelFunction.degreesOfFreedom() , jacobian.columns() );
     }
     
 }
