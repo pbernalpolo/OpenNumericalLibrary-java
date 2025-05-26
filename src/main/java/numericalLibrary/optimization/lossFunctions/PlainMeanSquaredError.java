@@ -72,7 +72,7 @@ public class PlainMeanSquaredError<T>
 			// Set the input.
 			this.errorFunction.setInput( input );
 			// Compute quantities involved in the cost and gradient.
-			MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+			MatrixReal errorFunctionOutput = this.errorFunction.getError();
 			// Add contribution to cost.
 			this.cost += errorFunctionOutput.normFrobeniusSquared();
 		}
@@ -93,7 +93,7 @@ public class PlainMeanSquaredError<T>
 			// Set the input.
 			this.errorFunction.setInput( input );
 			// Compute quantities involved in the cost and gradient.
-			MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+			MatrixReal errorFunctionOutput = this.errorFunction.getError();
 			MatrixReal J = this.errorFunction.getJacobian();
 			// Add contribution to cost and gradient.
 			this.cost += errorFunctionOutput.normFrobeniusSquared();
@@ -116,7 +116,7 @@ public class PlainMeanSquaredError<T>
 			// Set the input.
 			this.errorFunction.setInput( input );
 			// Compute quantities involved in the cost and gradient.
-			MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+			MatrixReal errorFunctionOutput = this.errorFunction.getError();
 			MatrixReal J = this.errorFunction.getJacobian();
 			// Add contribution to cost, gradient, and Gauss-Newton matrix.
 			this.cost += errorFunctionOutput.normFrobeniusSquared();

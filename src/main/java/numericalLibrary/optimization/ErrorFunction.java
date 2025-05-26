@@ -48,7 +48,7 @@ public interface ErrorFunction<T>
      * 
      * @return  output of the {@link ErrorFunction} as a column {@link MatrixReal}.
      */
-    public abstract MatrixReal getOutput();
+    public abstract MatrixReal getError();
     
     
     /**

@@ -87,7 +87,7 @@ public class RobustMeanSquaredError<T>
 			// Set the input.
 			this.errorFunction.setInput( input );
 			// Compute quantities involved in the cost and gradient.
-			MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+			MatrixReal errorFunctionOutput = this.errorFunction.getError();
 			// Add contribution to cost.
 			this.cost += this.robustFunction.f( errorFunctionOutput.normFrobeniusSquared() );
 		}
@@ -108,7 +108,7 @@ public class RobustMeanSquaredError<T>
             // Set the input.
 			this.errorFunction.setInput( input );
             // Compute quantities involved in the cost and gradient.
-            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal errorFunctionOutput = this.errorFunction.getError();
             double errorSquared = errorFunctionOutput.normFrobeniusSquared();
             double robustWeight = this.robustFunction.f1( errorSquared );
             MatrixReal J = this.errorFunction.getJacobian();
@@ -136,7 +136,7 @@ public class RobustMeanSquaredError<T>
             // Set the input.
 			this.errorFunction.setInput( input );
             // Compute quantities involved in the cost, gradient, and Gauss-Newton matrix.
-            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal errorFunctionOutput = this.errorFunction.getError();
             double errorSquared = errorFunctionOutput.normFrobeniusSquared();
             double robustWeight = this.robustFunction.f1( errorSquared );
             MatrixReal J = this.errorFunction.getJacobian();

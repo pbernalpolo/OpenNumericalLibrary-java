@@ -81,7 +81,7 @@ public class GaussianFunctionFitErrorFunction
     /**
      * {@inheritDoc}
      */
-    public MatrixReal getOutput()
+    public MatrixReal getError()
     {
     	return MatrixReal.one( 1 ).scaleInplace( this.f.getOutput() - this.input.getTarget() );
     }

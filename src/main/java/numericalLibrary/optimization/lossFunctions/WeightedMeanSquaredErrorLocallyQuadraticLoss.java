@@ -84,7 +84,7 @@ public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
             T input = this.inputList.get( i );
             this.errorFunction.setInput( input );
             // Compute quantities involved in the cost.
-            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal errorFunctionOutput = this.errorFunction.getError();
             double weight = this.weightList.get( i );
             // Add contribution to cost, and gradient.
             this.cost += weight * errorFunctionOutput.normFrobeniusSquared();
@@ -108,7 +108,7 @@ public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
             T input = this.inputList.get( i );
             this.errorFunction.setInput( input );
             // Compute quantities involved in the cost and gradient.
-            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal errorFunctionOutput = this.errorFunction.getError();
             MatrixReal J = this.errorFunction.getJacobian();
             double weight = this.weightList.get( i );
             // Add contribution to cost, and gradient.
@@ -137,7 +137,7 @@ public class WeightedMeanSquaredErrorLocallyQuadraticLoss<T>
             T input = this.inputList.get( i );
             this.errorFunction.setInput( input );
             // Compute quantities involved in the cost, gradient and Gauss-Newton matrix.
-            MatrixReal errorFunctionOutput = this.errorFunction.getOutput();
+            MatrixReal errorFunctionOutput = this.errorFunction.getError();
             MatrixReal J = this.errorFunction.getJacobian();
             double weight = this.weightList.get( i );
             JW.setTo( J ).scaleInplace( weight );

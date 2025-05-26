@@ -44,7 +44,7 @@ public interface ErrorFunctionTester<T>
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Tests that {@link ErrorFunction#getJacobian()} and {@link ErrorFunction#getOutput()} return {@link MatrixReal}s with same number of rows.
+     * Tests that {@link ErrorFunction#getJacobian()} and {@link ErrorFunction#getError()} return {@link MatrixReal}s with same number of rows.
      */
     @Test
     default void jacobianHasSameRowsAsOutput()
@@ -55,7 +55,7 @@ public interface ErrorFunctionTester<T>
             // Set input.
             errorFunction.setInput( input );
             // Get output.
-            MatrixReal output = errorFunction.getOutput();
+            MatrixReal output = errorFunction.getError();
             // Get jacobian.
             MatrixReal jacobian = errorFunction.getJacobian();
             // Check that jacobian and output have same number of rows.
