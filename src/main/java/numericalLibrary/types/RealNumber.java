@@ -96,10 +96,9 @@ public class RealNumber
     /**
      * {@inheritDoc}
      */
-    public RealNumber setTo( RealNumber other )
+    public boolean isNaN()
     {
-        this.x = other.toDouble();
-        return this;
+        return ( Double.isNaN( this.toDouble() ) );
     }
     
     
@@ -109,6 +108,16 @@ public class RealNumber
     public RealNumber copy()
     {
         return new RealNumber( this.toDouble() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public RealNumber setTo( RealNumber other )
+    {
+        this.x = other.toDouble();
+        return this;
     }
     
     
@@ -401,8 +410,11 @@ public class RealNumber
         this.x = Math.signum( this.toDouble() );
         return this;
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( RealNumber other )
     {
         return Math.abs( this.toDouble() - other.toDouble() );

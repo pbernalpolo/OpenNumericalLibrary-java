@@ -1,6 +1,7 @@
 package numericalLibrary.manifolds.unitQuaternions.atlases;
 
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import numericalLibrary.types.Vector3;
 /**
  * Implements test methods for {@link UnitQuaternionDifferentiableAtlas}.
  */
-public abstract class UnitQuaternionDifferentiableAtlasTester
+abstract class UnitQuaternionDifferentiableAtlasTester
     extends UnitQuaternionAtlasTester
 {
     ////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ public abstract class UnitQuaternionDifferentiableAtlasTester
      * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} transforms elements in the neighborhood of the element that defines the new chart in a consistent way.
      */
     @Test
-    public void transitionMapMatrixIsConsistentWithTransitionMap()
+    public void jacobianOfTransitionMapIsConsistentWithTransitionMap()
     {
         UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
         List<UnitQuaternion> manifoldElementList = this.getManifoldElementList();
@@ -103,5 +104,120 @@ public abstract class UnitQuaternionDifferentiableAtlasTester
             assertTrue( distance < deq.norm() );
         }
     }
-
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} is consistent with {@link UnitQuaternionDifferentiableAtlas#jacobianOfChart(UnitQuaternion)} and {@link UnitQuaternionDifferentiableAtlas#jacobianOfChartInverse(Vector3)}.
+     * <p>
+     * We compare the result of {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} to the result of applying the chain rule:
+     * e_p_r = phi( delta_p_q^* * phi^{-1}( e_q_r ) )
+     * d (e_p_r)_i / d (e_q_r)_alpha |_emean = \sum_{j k} d phi_i / d q_j ( delta_p_q^* * phi^{-1}( emean ) ) * [ delta_p_q^* ]*_{j k} * d phi^{-1}_k / d e ( emean ) =
+     *  = \sum_{j k} d phi_i / d q_j ( 1 ) * [ delta_p_q^* ]*_{j k} * d phi^{-1}_k / d e ( emean )
+     */
+    @Test
+    public void transitionMapMatrixIsConsistentWithJacobiansOfChart()
+    {
+        // Get the atlas and the chart elements that define the delta quaternion to be introduced in jacobianOfTransitionMap.
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        List<Vector3> chartElementList = this.getChartElementList();
+        // For each chart element,
+        for( Vector3 e_qInitial_qFinal : chartElementList ) {
+            // Get the delta quaternion that results from the chart update vector.
+            UnitQuaternion delta_qInitial_qFinal = atlas.toManifold( e_qInitial_qFinal );
+            // Compute the Jacobian of the transition map using the jacobianOfTransitionMap method.
+            MatrixReal transitionMapMatrix = atlas.jacobianOfTransitionMap( delta_qInitial_qFinal );
+            // Compute the Jacobian of the transition map using the jacobianOfChart and jacobianOfChartInverse methods, and the chain rule.
+            MatrixReal jacobianChart = atlas.jacobianOfChart( UnitQuaternion.one() );
+            MatrixReal jacobianChartInverse = atlas.jacobianOfChartInverse( e_qInitial_qFinal );
+            MatrixReal delta_qInitial_qFinal_conjugate_productMatrix = MatrixReal.empty( 4 , 4 );
+            delta_qInitial_qFinal_conjugate_productMatrix.setEntry( 0,0 ,
+                    delta_qInitial_qFinal.w() );
+            delta_qInitial_qFinal_conjugate_productMatrix.setSubmatrix( 0,1 ,
+                    delta_qInitial_qFinal.vectorPart().toMatrixAsRow() );
+            delta_qInitial_qFinal_conjugate_productMatrix.setSubmatrix( 1,0 ,
+                    delta_qInitial_qFinal.vectorPart().inverseAdditiveInplace().toMatrixAsColumn() );
+            delta_qInitial_qFinal_conjugate_productMatrix.setSubmatrix( 1,1 ,
+                    MatrixReal.one( 3 ).scaleInplace( delta_qInitial_qFinal.w() )
+                    .subtractInplace( delta_qInitial_qFinal.vectorPart().crossProductMatrix() ) );
+            MatrixReal transitionMapMatrixFromJacobians = jacobianChart.multiply( delta_qInitial_qFinal_conjugate_productMatrix.multiply( jacobianChartInverse ) );
+            // Check that both ways of computing the Jacobian of the transition map yield the same result.
+            //transitionMapMatrix.subtract( transitionMapMatrixFromJacobians ).print();
+            assertTrue( transitionMapMatrix.equalsApproximately( transitionMapMatrixFromJacobians , 1.0e-14 ) );
+        }
+    }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfChart(UnitQuaternion)} returns the opposite for q than for -q.
+     * <p>
+     * This steams from the chart property for unit quaternions:
+     * phi( q )  =  phi( -q )
+     * which leads to
+     * d phi / d q ( q )  =  - d phi / d q ( -q )
+     */
+    @Test
+    public void jacobianOfChartAtQIsMinusJacobianOfChartAtMinusQ()
+    {
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        List<UnitQuaternion> manifoldElementList = this.getManifoldElementList();
+        for( UnitQuaternion manifoldElement : manifoldElementList ) {
+            // Get Jacobian of chart evaluated at q.
+            MatrixReal jacobianChartPlus = atlas.jacobianOfChart( manifoldElement );
+            // Get Jacobian of chart evaluated at -q.
+            MatrixReal jacobianChartMinus = atlas.jacobianOfChart( manifoldElement.opposite() );
+            // Check that first is the opposite of second.
+            //jacobianChartPlus.print();
+            //jacobianChartMinus.print();
+            assertTrue( jacobianChartMinus.equalsApproximately( jacobianChartPlus.inverseAdditive() , 1.0e-100 ) );
+        }
+    }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfTransitionMap(UnitQuaternion)} is defined for quaternions close to the border.
+     */
+    @Test
+    public void jacobianOfTransitionMapIsDefinedInBorder()
+    {
+        // Get the atlas.
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        // Get a list of chart elements.
+        List<Vector3> chartElementList = this.getChartElementList();
+        // For each chart element,
+        for( Vector3 chartElement : chartElementList ) {
+            // get a chart element pointing in its direction, but far away from the origin, 
+            Vector3 chartElementCloseToBorder = chartElement.normalize().scaleInplace( 1.0e30 );
+            // so that the unit quaternion mapped through the chart is close to the border.
+            UnitQuaternion manifoldElementCloseToBorder = atlas.toManifoldFromChartCenteredAtIdentity( chartElementCloseToBorder );
+            // Check that the Jacobian of the transition map for such manifold element is not NaN.
+            assertFalse( atlas.jacobianOfTransitionMap( manifoldElementCloseToBorder ).isNaN() );
+        }
+    }
+    
+    
+    /**
+     * Tests that {@link UnitQuaternionDifferentiableAtlas#jacobianOfChartInverse(Vector3)} clips the input to the chart image.
+     */
+    /*@Test
+    public void jacobianOfChartInverseClipsVectorsNotContainedInChartImage()
+    {
+        // Get the atlas.
+        UnitQuaternionDifferentiableAtlas atlas = this.getAtlas();
+        // Get a list of chart elements.
+        List<Vector3> chartElementList = this.getChartElementList();
+        // For each chart element,
+        for( Vector3 chartElement : chartElementList ) {
+            // get 2 chart elements pointing in its direction, but far away from the origin, 
+            Vector3 chartElementBeyondBorder1 = chartElement.normalize().scaleInplace( 1.0e30 );
+            Vector3 chartElementBeyondBorder2 = chartElementBeyondBorder1.scale( 2.0 );
+            // Get the Jacobian of the inverse chart for each one of them.
+            MatrixReal jacobian1 = atlas.jacobianOfChartInverse( chartElementBeyondBorder1 );
+            MatrixReal jacobian2 = atlas.jacobianOfChartInverse( chartElementBeyondBorder2 );
+            // Check that both are the same because the chart elements are being clipped to the chart image.
+            //jacobian1.print();
+            //jacobian2.print();
+            assertTrue( jacobian1.equalsApproximately( jacobian2 , 1.0e-30 ) );
+        }
+    }*/
+    
 }

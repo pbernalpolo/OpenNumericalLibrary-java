@@ -12,6 +12,23 @@ import numericalLibrary.types.Vector3;
  * Implements the Orthographic projection that maps {@link UnitQuaternion}s in the S3 sphere to {@link Vector3}s in the Euclidean space.
  * <p>
  * The Orthographic projection is a particular case of a stereographic projection in which the center of projection is at infinity in the direction of the bottom of the sphere.
+ * <p>
+ * The chart is defined as:
+ * <br>
+ * phi( q ) = 2 q_v
+ * <p>
+ * The inverse chart is given by:
+ * <br>
+ * phi^{-1}( e ) = ( sqrt( 1 - ||e||^2/4 )  )
+ *                 ( e / 2                  )
+ * <p>
+ * The domain of the chart is:
+ * <br>
+ * { q in S^3 : q_0 >= 0 }
+ * <p>
+ * The image of the chart is:
+ * <br>
+ * { e in R^3 : ||e|| <= 2 }
  * 
  * @see "Kalman Filtering for Attitude Estimation with Quaternions and Concepts from Manifold Theory" (<a href="https://www.mdpi.com/1424-8220/19/1/149">https://www.mdpi.com/1424-8220/19/1/149</a>)
  * @see <a href>https://en.wikipedia.org/wiki/Stereographic_projection</a>
@@ -53,6 +70,10 @@ public class OrthographicS3
     /**
      * {@inheritDoc}
      * <p>
+     * The chart is defined as:
+     * <br>
+     * phi( q ) = 2 q_v
+     * <p>
      * Any {@link UnitQuaternion} can be mapped to an element in the chart.
      * This is possible because both q and -q represent the same rotation transformation.
      */
@@ -65,6 +86,11 @@ public class OrthographicS3
     
     /**
      * {@inheritDoc}
+     * <p>
+     * The inverse chart is given by:
+     * <br>
+     * phi^{-1}( e ) = ( sqrt( 1 - ||e||^2/4 )  )
+     *                 ( e / 2                  )
      * <p>
      * The image of the chart is the ball of radius 2.
      * Any input outside of the chart image will be saturated.
@@ -114,6 +140,44 @@ public class OrthographicS3
     
     /**
      * {@inheritDoc}
+     * <p>
+     * The Jacobian of the chart is given by:
+     * <br>
+     * d phi / d q  =  2 (  0  |  I  )
+     */
+    public MatrixReal jacobianOfChart( UnitQuaternion q )
+    {
+        MatrixReal output = MatrixReal.zero( 3 , 4 );
+        output.setSubmatrix( 0,1 , MatrixReal.one( 3 ).scaleInplace( 2.0 * Math.signum( q.w() ) ) );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The Jacobian of the inverse chart is given by:
+     * <br>
+     * d phi^{-1} / d e =   1 / 2  ( - e / sqrt( 4 - ||e||^2 )  )
+     *                             (  I                         )
+     */
+    public MatrixReal jacobianOfChartInverse( Vector3 e )
+    {
+        MatrixReal output = MatrixReal.zero( 4 , 3 );
+        output.setSubmatrix( 0,0 , e.scale( -1.0/Math.sqrt( 4.0 - e.normSquared() ) ).toMatrixAsRow() );
+        output.setSubmatrix( 1,0 , MatrixReal.one( 3 ) );
+        output.scaleInplace( 0.5 );
+        return output;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The Jacobian of the transition map is given by:
+     * <br>
+     * T( delta )  =  delta_0 I - [ delta_v ]_x + delta_v delta_v^T / delta_0
+     * with delta_0 > 0.
      */
     public MatrixReal jacobianOfTransitionMap( UnitQuaternion delta )
     {

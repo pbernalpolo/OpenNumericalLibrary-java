@@ -16,7 +16,7 @@ import numericalLibrary.types.RealNumber;
 /**
  * Implements test methods for {@link UnitComplexNumberDifferentiableAtlas}.
  */
-public abstract class UnitComplexNumberDifferentiableAtlasTester
+abstract class UnitComplexNumberDifferentiableAtlasTester
     extends UnitComplexNumberAtlasTester
 {
     ////////////////////////////////////////////////////////////////

@@ -84,6 +84,24 @@ public class NormSquaredLossFunction
     /**
      * {@inheritDoc}
      */
+    public int degreesOfFreedom()
+	{
+    	return this.x.rows();
+	}
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+	public void shift(MatrixReal deltaParameters)
+	{
+		this.x.addInplace( deltaParameters );
+	}
+    
+	
+    /**
+     * {@inheritDoc}
+     */
     public double getCost()
     {
         return this.x.normFrobeniusSquared();
@@ -111,5 +129,37 @@ public class NormSquaredLossFunction
     {
         return this.gaussNewtonMatrix;
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+	public LossResults getLossResults()
+	{
+		return new LossResults( this.getCost() );
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public DifferentiableLossResults getDifferentiableLossResults()
+	{
+		return new DifferentiableLossResults(
+				this.getCost() ,
+				this.getGradient() );
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public LocallyQuadraticLossResults getLocallyQuadraticLossResults()
+	{
+		return new LocallyQuadraticLossResults(
+				this.getCost() ,
+				this.getGradient() ,
+				this.getGaussNewtonMatrix() );
+	}
     
 }

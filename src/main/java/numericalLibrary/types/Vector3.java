@@ -9,6 +9,9 @@ import numericalLibrary.algebraicStructures.VectorSpaceElement;
 
 
 
+/**
+ * Implements 3d vectors.
+ */
 public class Vector3
     implements
         AdditiveAbelianGroupElement<Vector3>,
@@ -18,8 +21,20 @@ public class Vector3
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
+    
+    /**
+     * First component of the 3d vector.
+     */
     private double vx;
+    
+    /**
+     * Second component of the 3d vector.
+     */
     private double vy;
+    
+    /**
+     * Third component of the 3d vector.
+     */
     private double vz;
     
     
@@ -28,6 +43,13 @@ public class Vector3
     // PUBLIC CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Constructs a 3d vector.
+     * 
+     * @param x     first component of the 3d vector.
+     * @param y     second component of the 3d vector.
+     * @param z     third component of the 3d vector.
+     */
     public Vector3( double x , double y , double z )
     {
         this.vx = x;
@@ -41,61 +63,124 @@ public class Vector3
     // PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Sets the x component of the {@link Vector3}.
+     * 
+     * @param x     value for the x component to be set.
+     */
     public void setX( double x )
     {
         this.vx = x;
     }
     
     
+    /**
+     * Sets the y component of the {@link Vector3}.
+     * 
+     * @param y     value for the y component to be set.
+     */
     public void setY( double y )
     {
         this.vy = y;
     }
     
     
+    /**
+     * Sets the z component of the {@link Vector3}.
+     * 
+     * @param z     value for the z component to be set.
+     */
     public void setZ( double z )
     {
         this.vz = z;
     }
     
     
+    /**
+     * Returns the value of the x component.
+     * 
+     * @return  value of the x component.
+     */
     public double x()
     {
         return vx;
     }
     
     
+    /**
+     * Returns the value of the y component.
+     * 
+     * @return  value of the y component.
+     */
     public double y()
     {
         return vy;
     }
     
     
+    /**
+     * Returns the value of the z component.
+     * 
+     * @return  value of the z component.
+     */
     public double z()
     {
         return vz;
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return String.format( "( %2.16f , %2.16f , %2.16f )" , this.x() , this.y() , this.z() );
     }
     
     
-    public Vector3 print()
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals( Vector3 other )
     {
-        System.out.println( this.toString() );
-        return this;
+        return (  this.x() == other.x()  &&
+                  this.y() == other.y()  &&
+                  this.z() == other.z()  );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equalsApproximately( Vector3 other , double tolerance )
+    {
+        return ( this.distanceFrom( other ) < tolerance );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNaN()
+    {
+        return (  Double.isNaN( this.x() )  ||
+                  Double.isNaN( this.y() )  ||
+                  Double.isNaN( this.z() )  );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 copy()
     {
         return new Vector3( this.x() , this.y() , this.z() );
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 setTo( Vector3 other )
     {
         this.vx = other.x();
@@ -114,28 +199,20 @@ public class Vector3
     }
     
     
-    public boolean equals( Vector3 other )
-    {
-        return (  this.x() == other.x()  &&
-                  this.y() == other.y()  &&
-                  this.z() == other.z()  );
-    }
-    
-    
-    public boolean equalsApproximately( Vector3 other , double tolerance )
-    {
-        return ( this.distanceFrom( other ) < tolerance );
-    }
-    
-    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 add( Vector3 other )
     {
         return new Vector3( this.x() + other.x() ,
                                 this.y() + other.y() ,
                                 this.z() + other.z() );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 addInplace( Vector3 other )
     {
         this.vx += other.x();
@@ -145,18 +222,27 @@ public class Vector3
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 identityAdditive()
     {
         return Vector3.zero();
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 inverseAdditive()
     {
         return new Vector3( -this.x() , -this.y() , -this.z() );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 inverseAdditiveInplace()
     {
         this.vx = -this.x();
@@ -164,16 +250,22 @@ public class Vector3
         this.vz = -this.z();
         return this;
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 subtract( Vector3 other )
     {
         return new Vector3( this.x() - other.x() ,
                                 this.y() - other.y() ,
                                 this.z() - other.z() );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 subtractInplace( Vector3 other )
     {
         this.vx -= other.x();
@@ -183,14 +275,20 @@ public class Vector3
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 scale( double scalar )
     {
         return new Vector3( this.x() * scalar ,
                                 this.y() * scalar ,
                                 this.z() * scalar );
     }
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public Vector3 scaleInplace( double scalar )
     {
         this.vx *= scalar;
@@ -230,9 +328,11 @@ public class Vector3
     {
         return this.scaleInplace( 1.0/this.norm() );
     }
-
-
-
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( Vector3 other )
     {
         return this.subtract( other ).norm();
@@ -303,24 +403,52 @@ public class Vector3
     // PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
+    /**
+     * Returns the zero element stored in a new instance.
+     * <p>
+     * That is the vector (0,0,0).
+     * 
+     * @return   zero element stored in a new instance.
+     */
     public static Vector3 zero()
     {
         return new Vector3( 0.0 , 0.0 , 0.0 );
     }
     
     
+    /**
+     * Returns the i unit vector stored in a new instance.
+     * <p>
+     * That is the vector (1,0,0).
+     * 
+     * @return   i unit vector stored in a new instance.
+     */
     public static Vector3 i()
     {
         return new Vector3( 1.0 , 0.0 , 0.0 );
     }
-
-
+    
+    
+    /**
+     * Returns the j unit vector stored in a new instance.
+     * <p>
+     * That is the vector (0,1,0).
+     * 
+     * @return   j unit vector stored in a new instance.
+     */
     public static Vector3 j()
     {
         return new Vector3( 0.0 , 1.0 , 0.0 );
     }
 
 
+    /**
+     * Returns the k unit vector stored in a new instance.
+     * <p>
+     * That is the vector (0,0,1).
+     * 
+     * @return   k unit vector stored in a new instance.
+     */
     public static Vector3 k()
     {
         return new Vector3( 0.0 , 0.0 , 1.0 );
@@ -342,6 +470,14 @@ public class Vector3
     }
     
     
+    /**
+     * Returns a new random {@link Vector3} with normally distributed components sampled from {@link Random}.
+     * <p>
+     * The components of the {@link Vector3} are normally distributed with mean {@code 0.0} and standard deviation {@code 1.0}.
+     * 
+     * @param randomNumberGenerator {@link Random} used to generate the components of the returned {@link Vector3}.
+     * @return  new random {@link Vector3} with normally distributed components sampled from {@link Random}.
+     */
     public static Vector3 random( Random randomNumberGenerator )
     {
         return new Vector3(

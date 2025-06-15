@@ -11,7 +11,7 @@ import numericalLibrary.algebraicStructures.VectorSpaceElement;
 /**
  * Example that shows how to set up and use the Levenberg-Marquardt algorithm to fit a Gaussian function to empirical data.
  */
-public class TypesExample
+class TypesExample
 {
     ////////////////////////////////////////////////////////////////
     // ENTRY POINT

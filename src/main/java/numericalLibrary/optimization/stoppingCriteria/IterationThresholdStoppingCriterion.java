@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.stoppingCriteria;
 
 
-import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
+import numericalLibrary.optimization.lossFunctions.Loss;
 
 
 
@@ -9,7 +9,7 @@ import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
  * Implements the stopping criterion to stop iterating if an iteration threshold is reached.
  */
 public class IterationThresholdStoppingCriterion
-    implements StoppingCriterion
+    implements StoppingCriterion<Loss>
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
@@ -19,6 +19,8 @@ public class IterationThresholdStoppingCriterion
      * Iteration threshold that defines when to stop iterating.
      */
     private final int iterationThreshold;
+    
+    private int iteration;
     
     
     
@@ -47,16 +49,17 @@ public class IterationThresholdStoppingCriterion
      */
     public void initialize()
     {
-        // There is nothing to do.
+        this.iteration = 0;
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public boolean isFinished( IterativeOptimizationAlgorithm<?> iterativeAlgorithm )
+    public boolean isFinished( Loss lossFunction )
     {
-        return ( iterativeAlgorithm.getIteration() >= this.iterationThreshold );
+    	this.iteration++;
+        return ( this.iteration >= this.iterationThreshold );
     }
     
 }

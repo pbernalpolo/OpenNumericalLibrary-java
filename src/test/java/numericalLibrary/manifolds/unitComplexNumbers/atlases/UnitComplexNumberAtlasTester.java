@@ -20,7 +20,7 @@ import numericalLibrary.types.RealNumber;
 /**
  * Implements test methods for {@link UnitComplexNumberAtlas}.
  */
-public abstract class UnitComplexNumberAtlasTester
+abstract class UnitComplexNumberAtlasTester
     implements AtlasTester<ComplexNumber, RealNumber>
 {
     ////////////////////////////////////////////////////////////////

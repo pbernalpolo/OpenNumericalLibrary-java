@@ -1,45 +1,30 @@
 package numericalLibrary.optimization.lossFunctions;
 
 
-import numericalLibrary.optimization.algorithms.IterativeOptimizationAlgorithm;
-import numericalLibrary.types.MatrixReal;
+import numericalLibrary.optimization.Shiftable;
 
 
 
 /**
  * Represents a loss function.
+ * <p>
+ * Each loss is responsible for storing and managing its parameter vector,
+ * and it is {@link Shiftable} in the sense of its parameter vector.
  */
 public interface Loss
+	extends Shiftable
 {
     ////////////////////////////////////////////////////////////////
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
-    /**
-     * Sets the parameters of the {@link Loss}.
-     * 
-     * @param theta     column {@link MatrixReal} containing the parameters of the {@link Loss}.
-     */
-    public abstract void setParameters( MatrixReal theta );
-    
-    
-    /**
-     * Returns the current parameters of the {@link Loss} represented as a column {@link MatrixReal}.
+	/**
+     * Returns the {@link LossResults} obtained from this {@link Loss}.
      * <p>
-     * Used to get the initial point in the solution space from which a {@link IterativeOptimizationAlgorithm} starts.
+     * The loss function is evaluated at the point defined by the internally stored parameter vector.
      * 
-     * @return  current parameters of the {@link Loss} represented as a column {@link MatrixReal}.
+     * @return  {@link LossResults} obtained from this {@link Loss}.
      */
-    public abstract MatrixReal getParameters();
-    
-    
-    /**
-     * Returns the output of the {@link Loss}.
-     * <p>
-     * The loss function is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}.
-     * 
-     * @return  output of the {@link Loss}.
-     */
-    public abstract double getCost();
+    public abstract LossResults getLossResults();
     
 }

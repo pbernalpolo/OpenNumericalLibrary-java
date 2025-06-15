@@ -1,7 +1,7 @@
 package numericalLibrary.optimization.lossFunctions;
 
 
-import numericalLibrary.optimization.ModelFunction;
+import numericalLibrary.optimization.ErrorFunction;
 import numericalLibrary.types.MatrixReal;
 
 
@@ -11,15 +11,16 @@ import numericalLibrary.types.MatrixReal;
  * <p>
  * An example of this type of losses has the form:
  * <br>
- * L(\theta) = \sum_i || f( x_i , \theta ) ||^2
+ * L(\theta) = \sum_i || e( x_i , \theta ) ||^2
  * <br>
  * where:
  * <ul>
- *  <li> f is a {@link ModelFunction} to be optimized,
- *  <li> x_i is the i-th input to the {@link ModelFunction},
+ *  <li> e is an {@link ErrorFunction} to be optimized,
+ *  <li> x_i is the i-th input to the {@link ErrorFunction},
  *  <li> \theta is the parameter vector, represented as a column {@link MatrixReal}.
  * </ul>
- * In such case, the Hessian of L(\theta) can be approximated using the Jacobian of f, J, as J^T * J.
+ * In such case, the Hessian of L(\theta) can be approximated using the Jacobian of e, J, as J^T * J.
+ * Such approximate Hessian is called Gauss-Newton matrix.
  */
 public interface LocallyQuadraticLoss
     extends DifferentiableLoss
@@ -28,13 +29,13 @@ public interface LocallyQuadraticLoss
     // PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
-    /**
-     * Returns the approximate Hessian of the {@link LocallyQuadraticLoss}.
-     * <p>
-     * The approximate Hessian matrix is evaluated at the point defined by the parameters set by {@link #setParameters(MatrixReal)}.
-     * 
-     * @return  approximate Hessian matrix of the {@link LocallyQuadraticLoss}.
-     */
-    public abstract MatrixReal getGaussNewtonMatrix();
+	/**
+	 * Returns the {@link LocallyQuadraticLossResults} obtained from this {@link LocallyQuadraticLoss}.
+	 * <p>
+     * The loss function is evaluated at the point defined by the internally stored parameter vector.
+	 * 
+	 * @return	{@link LocallyQuadraticLossResults} obtained from this {@link LocallyQuadraticLoss}.
+	 */
+    public abstract LocallyQuadraticLossResults getLocallyQuadraticLossResults();
     
 }

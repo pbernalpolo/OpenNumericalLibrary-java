@@ -101,11 +101,10 @@ public class DualNumber
     /**
      * {@inheritDoc}
      */
-    public DualNumber setTo( DualNumber other )
+    public boolean isNaN()
     {
-        this.a = other.re();
-        this.b = other.im();
-        return this;
+        return (  Double.isNaN( this.re() )  ||
+                  Double.isNaN( this.im() )  );
     }
     
     
@@ -115,6 +114,17 @@ public class DualNumber
     public DualNumber copy()
     {
         return new DualNumber( this.re() , this.im() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DualNumber setTo( DualNumber other )
+    {
+        this.a = other.re();
+        this.b = other.im();
+        return this;
     }
     
     
@@ -445,7 +455,7 @@ public class DualNumber
     /**
      * Returns a random {@link DualNumber} stored in a new instance.
      * <p>
-     * The random {@link DualNumber} is extracted from a Gaussian distribution with mean 0 and standard distribution 1.
+     * The components of the {@link DualNumber} are extracted from a Gaussian distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
      * 
      * @param randomNumberGenerator     random number generator used to extract the next normally distributed sample.
      * @return  random {@link DualNumber} stored in a new instance.

@@ -144,13 +144,12 @@ public class Quaternion
     /**
      * {@inheritDoc}
      */
-    public Quaternion setTo( Quaternion other )
+    public boolean isNaN()
     {
-        this.qw = other.w();
-        this.qx = other.x();
-        this.qy = other.y();
-        this.qz = other.z();
-        return this;
+        return (  Double.isNaN( this.w() )  ||
+                  Double.isNaN( this.x() )  ||
+                  Double.isNaN( this.y() )  ||
+                  Double.isNaN( this.z() )  );
     }
     
     
@@ -160,6 +159,19 @@ public class Quaternion
     public Quaternion copy()
     {
         return new Quaternion( this.w() , this.x() , this.y() , this.z() );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Quaternion setTo( Quaternion other )
+    {
+        this.qw = other.w();
+        this.qx = other.x();
+        this.qy = other.y();
+        this.qz = other.z();
+        return this;
     }
     
     
@@ -400,6 +412,9 @@ public class Quaternion
     }
     
     
+    /**
+     * {@inheritDoc}
+     */
     public double distanceFrom( Quaternion other )
     {
         Quaternion delta = this.subtract( other );
@@ -476,12 +491,22 @@ public class Quaternion
     }
     
     
+    /**
+     * Returns the vector part of {@code this} stored in a new {@link Vector3}.
+     * 
+     * @return  vector part of {@code this} stored in a new {@link Vector3}.
+     */
     public Vector3 vectorPart()
     {
         return new Vector3( this.x() , this.y() , this.z() );
     }
     
     
+    /**
+     * Returns the norm of the vector part of {@code this} {@link Quaternion}.
+     * 
+     * @return  norm of the vector part of {@code this} {@link Quaternion}.
+     */
     public double vectorPartNorm() {
         return Math.sqrt(  this.x() * this.x()  +  this.y() * this.y()  +  this.z() * this.z()  );
     }
@@ -576,8 +601,8 @@ public class Quaternion
     {
         return new Quaternion( 0.0 , 1.0 , 0.0 , 0.0 );
     }
-
-
+    
+    
     /**
      * Returns the j {@link Quaternion} stored in a new instance.
      * <p>
@@ -589,8 +614,8 @@ public class Quaternion
     {
         return new Quaternion( 0.0 , 0.0 , 1.0 , 0.0 );
     }
-
-
+    
+    
     /**
      * Returns the k {@link Quaternion} stored in a new instance.
      * <p>
@@ -620,7 +645,7 @@ public class Quaternion
     /**
      * Returns a random {@link Quaternion} stored in a new instance.
      * <p>
-     * The random {@link Quaternion} is extracted from a Gaussian distribution with mean 0 and standard distribution 1.
+     * The components of the {@link Quaternion} are extracted from a Gaussian distribution with mean {@code 0.0} and standard deviation {@code 1.0}.
      * 
      * @param randomNumberGenerator     random number generator used to extract the next normally distributed sample.
      * @return  random {@link Quaternion} stored in a new instance.
