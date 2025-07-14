@@ -764,6 +764,34 @@ public class MatrixReal
     }
     
     
+    /**
+     * Returns the squared Mahalanobis distance of {@code this} column vector using the covariance matrix S = L L^T.
+     * <p>
+     * The Mahalanobis distance is computed knowing that
+     * <br>
+     * d^2 = x^T S^{-1} x = x^T ( L L^T )^{-1} x = x^T (L^T)^{-1} L^{-1} x = ( L^{-1} x )^T ( L^{-1} x ) = y^T y
+     * <br>
+     * so if the system  L y = x  is solved, the resulting  column vector  y  satisfies  d^2 = y^T y.
+     * 
+     * @param L		Cholesky decomposition of the positive definite matrix S, so that L L^T = S.
+     * @return	squared Mahalanobis distance of a vector x using the covariance matrix S = L L^T.
+     */
+    public double distanceMahalanobis2( MatrixReal L )
+    {
+    	double[] y = new double[ this.rows() ];
+        double distance2 = 0.0;
+        for( int i=0; i<L.rows(); i++ ) {
+        	double sum = this.x[i][0];
+        	for( int j=0; j<i; j++ ) {
+        		sum -= L.x[i][j] * y[j];
+        	}
+          	y[i] = sum / L.x[i][i];
+          	distance2 += y[i] * y[i];
+        }
+        return distance2;
+    }
+    
+    
     public double[] diagonalElements()
     {
         int nElements = ( this.rows() < this.columns() )? this.rows() : this.columns() ;
