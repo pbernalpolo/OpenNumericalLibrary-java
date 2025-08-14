@@ -4,9 +4,11 @@ package numericalLibrary.optimization.robustFunctions;
 
 /**
  * {@link RobustFunction} defined as:
- * f( ||e||^2 ) = k^2 / 2 ( 1 - exp( -||e||^2 / k^2 ) )
- * and derivative
- * f'( ||e||^2 ) = exp( - ||e||^2 / k^2 ) / 2
+ * f( x ) = k^2 / 2 ( 1 - exp( -x^2 / k^2 ) )
+ * with derivative:
+ * f'( x ) = x exp( - x^2 / k^2 )
+ * and weight function:
+ * w( x ) = exp( -x^2 / k^2 )
  * 
  * @see https://arxiv.org/abs/1810.01474
  */
@@ -22,6 +24,12 @@ public class WelschRobustFunction
      */
     private double kSquared;
     
+    /**
+     * Square of parameter k of the Welsch function divided by 2.
+     */
+    private double kSquaredOver2;
+    
+    
     
     ////////////////////////////////////////////////////////////////
     // PUBLIC CONSTRUCTORS
@@ -35,6 +43,7 @@ public class WelschRobustFunction
     public WelschRobustFunction( double kParameter )
     {
         this.kSquared = kParameter * kParameter;
+        this.kSquaredOver2 = 0.5 * this.kSquared;
     }
     
     
@@ -46,18 +55,18 @@ public class WelschRobustFunction
     /**
      * {@inheritDoc}
      */
-    public double f( double xSquared )
+    public double rho( double xSquared )
     {
-        return this.kSquared / 2.0 * ( 1.0 - Math.exp( - xSquared / this.kSquared ) );
+        return this.kSquaredOver2 * ( 1.0 - Math.exp( - xSquared / this.kSquared ) );
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public double f1( double xSquared )
+    public double weight( double xSquared )
     {
-        return Math.exp( - xSquared / this.kSquared ) / 2.0;
+        return Math.exp( - xSquared / this.kSquared );
     }
     
 }
