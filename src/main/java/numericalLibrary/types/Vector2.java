@@ -310,6 +310,20 @@ public class Vector2
     }
     
     
+    /**
+     * Returns the {@link Vector2} as a flat array.
+     * <p>
+     * The output is:
+     * new double[] { this.x() , this.y() };
+     * 
+     * @return  {@link Vector2} as a flat array.
+     */
+    public double[] toFlatArray()
+    {
+        return new double[] { this.x() , this.y() };
+    }
+    
+    
     
     ////////////////////////////////////////////////////////////////
     // PUBLIC STATIC METHODS
