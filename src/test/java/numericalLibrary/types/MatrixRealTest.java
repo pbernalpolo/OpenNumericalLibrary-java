@@ -357,15 +357,15 @@ class MatrixRealTest
     	double distance;
     	MatrixReal x = MatrixReal.fromVector3AsColumn( Vector3.i() );
     	distance = Math.sqrt( x.distanceMahalanobis2( L ) );
-    	System.out.println( distance );
+    	//System.out.println( distance );
     	assertEquals( distance , 1.0 , 1.0e-20 );
     	MatrixReal y = MatrixReal.fromVector3AsColumn( Vector3.j() );
     	distance = Math.sqrt( y.distanceMahalanobis2( L ) );
-    	System.out.println( distance );
+    	//System.out.println( distance );
     	assertEquals( distance , 0.5 , 1.0e-20 );
     	MatrixReal z = MatrixReal.fromVector3AsColumn( Vector3.k() );
     	distance = Math.sqrt( z.distanceMahalanobis2( L ) );
-    	System.out.println( distance );
+    	//System.out.println( distance );
     	assertEquals( distance , 1.0/3.0 , 1.0e-20 );
     }
     
