@@ -75,7 +75,7 @@ public class ModifiedRodriguesParametersS3
     public Vector3 toChartCenteredAtIdentity( UnitQuaternion q )
     {
         q = q.positiveScalarPartForm();
-        return new Vector3( q.x() , q.y() , q.z() ).scaleInplace( 4.0/( 1.0 + q.w() ) );
+        return q.vectorPart().scaleInplace( 4.0/( 1.0 + q.w() ) );
     }
     
     

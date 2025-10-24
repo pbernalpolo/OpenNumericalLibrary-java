@@ -34,7 +34,7 @@ class TypesExample
         // Create a list of quaternions.
         List<Quaternion> quaternionList = new ArrayList<Quaternion>();
         for( int i=0; i<3; i++ ) {
-            quaternionList.add( Quaternion.fromScalarAndVectorPart( i , new Vector3( -2 * i , 3 * i , 5 * i ) ) );
+            quaternionList.add( Quaternion.fromScalarAndVectorPart( i , Vector3.fromComponents( -2 * i , 3 * i , 5 * i ) ) );
         }
         
         // Create a list of matrices.

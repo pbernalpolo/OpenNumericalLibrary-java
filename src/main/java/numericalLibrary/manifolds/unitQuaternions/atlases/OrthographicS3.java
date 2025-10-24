@@ -80,7 +80,7 @@ public class OrthographicS3
     public Vector3 toChartCenteredAtIdentity( UnitQuaternion q )
     {
         q = q.positiveScalarPartForm();
-        return new Vector3( q.x() , q.y() , q.z() ).scaleInplace( 2.0 );
+        return q.vectorPart().scaleInplace( 2.0 );
     }
     
     
