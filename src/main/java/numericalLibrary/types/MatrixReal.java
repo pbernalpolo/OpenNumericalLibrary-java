@@ -769,7 +769,13 @@ public class MatrixReal
      * <p>
      * The Mahalanobis distance is computed knowing that
      * <br>
-     * d^2 = x^T S^{-1} x = x^T ( L L^T )^{-1} x = x^T (L^T)^{-1} L^{-1} x = ( L^{-1} x )^T ( L^{-1} x ) = y^T y
+     * d^2 = x^T S^{-1} x =
+     * 	   = x^T ( L L^T )^{-1} x =
+     *     = x^T (L^T)^{-1} L^{-1} x =
+     *     = x^T (L^{-1})^T L^{-1} x =
+     *     = ( L^{-1} x )^T ( L^{-1} x ) =
+     *     = y^T y
+     *     = ||y||^2
      * <br>
      * so if the system  L y = x  is solved, the resulting  column vector  y  satisfies  d^2 = y^T y.
      * 
