@@ -4,19 +4,19 @@ package numericalLibrary.optimization.robustFunctions;
 
 /**
  * {@link RobustFunction} defined as:
- * f( x ) = x^2/2	if x < k
- *        = k^2/2   if x >= k
+ * f( x ) = k^2/6 ( 1 - ( 1 - x^2 / k^2 )^3 )	if x < k
+ *        = k^2/6   							if x >= k
  * where k is the value after which the function is constant.
  * The derivative is:
- * f'( x ) = x	if x < k
- * 		   = 0 	if x >= k
+ * f'( x ) = x ( 1 - x^2 / k^2 )^2	if x < k
+ * 		   = 0 						if x >= k
  * and its weight function
- * w( x ) = 1	if x < k
- * 		  = 0	if x >= k
+ * w( x ) = ( 1 - x^2 / k^2 )^2		if x < k
+ * 		  = 0						if x >= k
  * 
  * @see https://arxiv.org/abs/1810.01474
  */
-public class MaximumDistanceRobustFunction
+public class TukeyRobustFunction
     implements RobustFunction
 {
     ////////////////////////////////////////////////////////////////
@@ -29,9 +29,9 @@ public class MaximumDistanceRobustFunction
     private double kSquared;
     
     /**
-     * Square of parameter k after which the function is constant divided by 2.
+     * Square of parameter k of the Tukey function divided by 6.
      */
-    private double kSquaredOver2;
+    private double kSquaredOver6;
     
     
     
@@ -40,14 +40,14 @@ public class MaximumDistanceRobustFunction
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Constructs a {@link MaximumDistanceRobustFunction}.
+     * Constructs a {@link TukeyRobustFunction}.
      * 
      * @param kParameter    value after which the function is constant.
      */
-    public MaximumDistanceRobustFunction( double kParameter )
+    public TukeyRobustFunction( double kParameter )
     {
         this.kSquared = kParameter * kParameter;
-        this.kSquaredOver2 = 0.5 * this.kSquared;
+        this.kSquaredOver6 = this.kSquared / 6.0;
     }
     
     
@@ -62,9 +62,10 @@ public class MaximumDistanceRobustFunction
     public double rho( double xSquared )
     {
         if( xSquared < this.kSquared ) {
-            return xSquared/2.0;
+        	double y = 1.0 - xSquared / this.kSquared;
+            return this.kSquaredOver6 * ( 1.0 - y * y * y );
         } else {
-            return this.kSquaredOver2;
+            return this.kSquaredOver6;
         }
     }
     
@@ -75,7 +76,8 @@ public class MaximumDistanceRobustFunction
     public double weight( double xSquared )
     {
         if( xSquared < this.kSquared ) {
-            return 1.0;
+        	double y = 1.0 - xSquared / this.kSquared;
+            return this.kSquaredOver6 * ( 1.0 - y * y );
         } else {
             return 0.0;
         }

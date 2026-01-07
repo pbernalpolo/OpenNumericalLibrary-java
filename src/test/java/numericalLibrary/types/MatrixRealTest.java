@@ -19,7 +19,7 @@ import numericalLibrary.algebraicStructures.VectorSpaceElementTester;
 /**
  * Implements test methods for {@link MatrixReal}.
  */
-class MatrixTest
+class MatrixRealTest
     implements
         AdditiveAbelianGroupElementTester<MatrixReal>,
         VectorSpaceElementTester<MatrixReal>,
@@ -41,7 +41,7 @@ class MatrixTest
     // PUBLIC CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
-    public MatrixTest()
+    public MatrixRealTest()
     {
         this.randomNumberGenerator = new Random( 42 );
     }
@@ -77,7 +77,7 @@ class MatrixTest
     @Test
     void setAndGet()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal m = MatrixReal.zero(2,2);
             double value = 123.0;
             m.setEntry( 0,0 , value );
@@ -89,7 +89,7 @@ class MatrixTest
     @Test
     void multiplyBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal a = createMatrixA();
             MatrixReal b = createMatrixB();
             MatrixReal ab = a.multiply( b );
@@ -107,7 +107,7 @@ class MatrixTest
     @Test
     void choleskyDecompositionBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Obtain the Cholesky decomposition.
             MatrixReal L = A.choleskyDecomposition();
@@ -125,7 +125,7 @@ class MatrixTest
     @Test
     void choleskyDecompositionInplaceBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Obtain the Cholesky decomposition.
             MatrixReal L = A.copy().choleskyDecompositionInplace();
@@ -180,7 +180,7 @@ class MatrixTest
     @Test
     void LDLTBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we obtain the LDLT decomposition
             MatrixReal LD = A.LDLTDecomposition();
@@ -197,7 +197,7 @@ class MatrixTest
     @Test
     void LDLTAssignBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we obtain the LDLT decomposition
             MatrixReal LD = A.copy().LDLTDecompositionInplace();
@@ -220,7 +220,7 @@ class MatrixTest
     @Test
     void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 5 x 10.
@@ -244,7 +244,7 @@ class MatrixTest
     @Test
     void divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplaceBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 5 x 10.
@@ -268,7 +268,7 @@ class MatrixTest
     @Test
     void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 10 x 5.
@@ -292,7 +292,7 @@ class MatrixTest
     @Test
     void divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplaceBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             // Get random positive definite matrix of dimension 10 x 10.
             MatrixReal X = this.randomPositiveDefiniteMatrix( 10 );
             // Generate random matrix of dimension 10 x 5.
@@ -310,7 +310,7 @@ class MatrixTest
     @Test
     void divideRightByPositiveDefiniteUsingItsLDLTDecompositionBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we generate a random matrix
             MatrixReal M = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
@@ -326,7 +326,7 @@ class MatrixTest
     @Test
     void divideRightByPositiveDefiniteUsingItsLDLTDecompositionAssignBehavior()
     {
-        for(int n=0; n<MatrixTest.N_SAMPLES_TO_TEST; n++) {
+        for(int n=0; n<MatrixRealTest.N_SAMPLES_TO_TEST; n++) {
             MatrixReal A = this.randomPositiveDefiniteMatrix( 10 );
             // we generate a random matrix
             MatrixReal M = MatrixReal.random( 5 , 10 , this.randomNumberGenerator );
@@ -336,6 +336,37 @@ class MatrixTest
             MA.divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( A.LDLTDecompositionInplace() );
             assertTrue( MA.equalsApproximately( M , 1.0e-4 ) );
         }
+    }
+    
+    
+    /**
+     * Tests the behavior of {@link MatrixReal#distanceMahalanobis2(MatrixReal)}.
+     * <p>
+     * Taking a 3x3 matrix with diagonal (1,2,3), the distance of a unit vector is
+     * <ul>
+     * 	<li> 1 if it points in the x direction
+     * 	<li> 1/2 if it points in the y direction
+     * 	<li> 1/3 if it points in the z direction
+     * <ul\>
+     */
+    @Test
+    void distanceMahalanobisBehavior()
+    {
+    	MatrixReal S = MatrixReal.diagonal( new double[] { 1.0 , 2.0 * 2.0 , 3.0 * 3.0 } );
+    	MatrixReal L = S.choleskyDecomposition();
+    	double distance;
+    	MatrixReal x = MatrixReal.fromVector3AsColumn( Vector3.i() );
+    	distance = Math.sqrt( x.distanceMahalanobis2( L ) );
+    	//System.out.println( distance );
+    	assertEquals( distance , 1.0 , 1.0e-20 );
+    	MatrixReal y = MatrixReal.fromVector3AsColumn( Vector3.j() );
+    	distance = Math.sqrt( y.distanceMahalanobis2( L ) );
+    	//System.out.println( distance );
+    	assertEquals( distance , 0.5 , 1.0e-20 );
+    	MatrixReal z = MatrixReal.fromVector3AsColumn( Vector3.k() );
+    	distance = Math.sqrt( z.distanceMahalanobis2( L ) );
+    	//System.out.println( distance );
+    	assertEquals( distance , 1.0/3.0 , 1.0e-20 );
     }
     
     

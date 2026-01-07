@@ -3,33 +3,38 @@ package numericalLibrary.optimization.robustFunctions;
 
 
 /**
- * {@link RobustFunction} defined as:
- * f( x ) = x^2/2	if x < k
- *        = k^2/2   if x >= k
+ * The Huber {@link RobustFunction} defined as:
+ * f( x ) = x^2/2			if x < k
+ *        = k |x| - k^2/2   if x >= k
  * where k is the value after which the function is constant.
  * The derivative is:
- * f'( x ) = x	if x < k
- * 		   = 0 	if x >= k
+ * f'( x ) = x			if x < k
+ * 		   = k x/|x|	if x >= k
  * and its weight function
- * w( x ) = 1	if x < k
- * 		  = 0	if x >= k
+ * w( x ) = 1		if x < k
+ * 		  = k/|x|	if x >= k
  * 
  * @see https://arxiv.org/abs/1810.01474
  */
-public class MaximumDistanceRobustFunction
+public class HuberRobustFunction
     implements RobustFunction
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
+	
+	/**
+     * Parameter k of the Huber function.
+     */
+    private double k;
     
     /**
-     * Square of parameter k after which the function is constant.
+     * Square of parameter k of the Huber function.
      */
     private double kSquared;
     
     /**
-     * Square of parameter k after which the function is constant divided by 2.
+     * {@link #k}^2/2.
      */
     private double kSquaredOver2;
     
@@ -40,14 +45,15 @@ public class MaximumDistanceRobustFunction
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Constructs a {@link MaximumDistanceRobustFunction}.
+     * Constructs a {@link HuberRobustFunction}.
      * 
-     * @param kParameter    value after which the function is constant.
+     * @param kParameter    k parameter of the Huber function.
      */
-    public MaximumDistanceRobustFunction( double kParameter )
+    public HuberRobustFunction( double kParameter )
     {
-        this.kSquared = kParameter * kParameter;
-        this.kSquaredOver2 = 0.5 * this.kSquared;
+    	this.k = kParameter;
+    	this.kSquared = kParameter * kParameter;
+    	this.kSquaredOver2 = 0.5 * this.kSquared;
     }
     
     
@@ -61,11 +67,11 @@ public class MaximumDistanceRobustFunction
      */
     public double rho( double xSquared )
     {
-        if( xSquared < this.kSquared ) {
-            return xSquared/2.0;
-        } else {
-            return this.kSquaredOver2;
-        }
+    	if( xSquared < this.kSquared ) {
+    		return xSquared/2.0;
+    	} else {
+    		return this.k * Math.sqrt( xSquared ) - this.kSquaredOver2;
+    	}
     }
     
     
@@ -74,11 +80,11 @@ public class MaximumDistanceRobustFunction
      */
     public double weight( double xSquared )
     {
-        if( xSquared < this.kSquared ) {
-            return 1.0;
-        } else {
-            return 0.0;
-        }
+    	if( xSquared < this.kSquared ) {
+    		return 1.0;
+    	} else {
+    		return this.k / Math.sqrt( xSquared );
+    	}
     }
     
 }

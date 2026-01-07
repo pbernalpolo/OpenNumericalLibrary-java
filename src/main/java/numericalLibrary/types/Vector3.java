@@ -19,7 +19,7 @@ public class Vector3
         MetricSpaceElement<Vector3>
 {
     ////////////////////////////////////////////////////////////////
-    // PRIVATE VARIABLES
+    /// PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -40,27 +40,7 @@ public class Vector3
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC CONSTRUCTORS
-    ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Constructs a 3d vector.
-     * 
-     * @param x     first component of the 3d vector.
-     * @param y     second component of the 3d vector.
-     * @param z     third component of the 3d vector.
-     */
-    public Vector3( double x , double y , double z )
-    {
-        this.vx = x;
-        this.vy = y;
-        this.vz = z;
-    }
-    
-    
-    
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
+    /// PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -400,7 +380,7 @@ public class Vector3
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC STATIC METHODS
+    /// PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -456,9 +436,23 @@ public class Vector3
     
     
     /**
+     * Returns a new {@link Vector3} constructed from its components.
+     * 
+     * @param xComponent	x-component of the {@link Vector3}.
+     * @param yComponent	y-component of the {@link Vector3}.
+     * @param zComponent	z-component of the {@link Vector3}.
+     * @return	new {@link Vector3} constructed from its components.
+     */
+    public static Vector3 fromComponents( double xComponent , double yComponent , double zComponent )
+    {
+    	return new Vector3( xComponent , yComponent , zComponent );
+    }
+    
+    
+    /**
      * Returns a new {@link Vector3} constructed from a flat array.
      * 
-     * @param flatArray     array that contains the {@link Vector3} elements.
+     * @param flatArray     array that contains the {@link Vector3} elements as {@code double[] { v.x() , v.y() , v.z() }}.
      * @return  new {@link Vector3} constructed from a flat array.
      */
     public static Vector3 fromFlatArray( double[] flatArray )
@@ -484,6 +478,25 @@ public class Vector3
                 randomNumberGenerator.nextGaussian() ,
                 randomNumberGenerator.nextGaussian() ,
                 randomNumberGenerator.nextGaussian() );
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////
+    /// PRIVATE CONSTRUCTORS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Constructs a 3d vector.
+     * 
+     * @param x     first component of the 3d vector.
+     * @param y     second component of the 3d vector.
+     * @param z     third component of the 3d vector.
+     */
+    private Vector3( double x , double y , double z )
+    {
+        this.vx = x;
+        this.vy = y;
+        this.vz = z;
     }
     
 }

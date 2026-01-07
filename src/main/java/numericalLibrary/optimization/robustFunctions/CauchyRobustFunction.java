@@ -3,10 +3,12 @@ package numericalLibrary.optimization.robustFunctions;
 
 
 /**
- * {@link RobustFunction} defined as:
- * f( ||e||^2 ) = k^2 / 2 log( 1 + ||e||^2/k^2 )
+ * The Cauchy {@link RobustFunction} defined as:
+ * f( x ) = k^2 / 2 log( 1 + x^2 / k^2 )
  * Its derivative is
- * f'( ||e||^2 ) = 1/2 1/( 1 + ||e||^2/k^2 )
+ * f'( x ) = x / ( 1 + x^2 / k^2 )
+ * and its weight function
+ * w( x ) = 1 / ( 1 + x^2 / k^2 )
  * 
  * @see https://arxiv.org/abs/1810.01474
  */
@@ -22,6 +24,11 @@ public class CauchyRobustFunction
      */
     private double kSquared;
     
+    /**
+     * Square of parameter k of the Cauchy function divided by 2.
+     */
+    private double kSquaredOver2;
+    
     
     
     ////////////////////////////////////////////////////////////////
@@ -36,6 +43,7 @@ public class CauchyRobustFunction
     public CauchyRobustFunction( double kParameter )
     {
         this.kSquared = kParameter * kParameter;
+        this.kSquaredOver2 = 0.5 * this.kSquared;
     }
     
     
@@ -47,18 +55,18 @@ public class CauchyRobustFunction
     /**
      * {@inheritDoc}
      */
-    public double f( double xSquared )
+    public double rho( double xSquared )
     {
-    	return this.kSquared/2.0 * Math.log( 1.0 + xSquared / this.kSquared );
+    	return this.kSquaredOver2 * Math.log( 1.0 + xSquared / this.kSquared );
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public double f1( double xSquared )
+    public double weight( double xSquared )
     {
-    	return 0.5 / ( 1.0 + xSquared / this.kSquared );
+    	return 1.0 / ( 1.0 + xSquared / this.kSquared );
     }
     
 }

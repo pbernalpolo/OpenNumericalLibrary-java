@@ -89,7 +89,7 @@ public class RobustMeanSquaredError<T>
 			// Compute quantities involved in the cost and gradient.
 			MatrixReal errorFunctionOutput = this.errorFunction.getError();
 			// Add contribution to cost.
-			this.cost += this.robustFunction.f( errorFunctionOutput.normFrobeniusSquared() );
+			this.cost += this.robustFunction.rho( errorFunctionOutput.normFrobeniusSquared() );
 		}
 		this.divideCostByNumberOfInputs();
 		return new LossResults( this.cost );
@@ -110,10 +110,10 @@ public class RobustMeanSquaredError<T>
             // Compute quantities involved in the cost and gradient.
             MatrixReal errorFunctionOutput = this.errorFunction.getError();
             double errorSquared = errorFunctionOutput.normFrobeniusSquared();
-            double robustWeight = this.robustFunction.f1( errorSquared );
+            double robustWeight = this.robustFunction.weight( errorSquared );
             MatrixReal J = this.errorFunction.getJacobian();
             // Add contribution to cost, and gradient.
-            this.cost += this.robustFunction.f( errorSquared );
+            this.cost += this.robustFunction.rho( errorSquared );
             this.gradient.addLeftTransposeTimesRight( J , errorFunctionOutput.scaleInplace( robustWeight ) );
 		}
 		this.divideCostAndGradientByNumberOfInputs();
@@ -138,11 +138,11 @@ public class RobustMeanSquaredError<T>
             // Compute quantities involved in the cost, gradient, and Gauss-Newton matrix.
             MatrixReal errorFunctionOutput = this.errorFunction.getError();
             double errorSquared = errorFunctionOutput.normFrobeniusSquared();
-            double robustWeight = this.robustFunction.f1( errorSquared );
+            double robustWeight = this.robustFunction.weight( errorSquared );
             MatrixReal J = this.errorFunction.getJacobian();
             JW.setTo( J ).scaleInplace( robustWeight );
             // Add contribution to cost, gradient, and Gauss-Newton matrix.
-            this.cost += this.robustFunction.f( errorSquared );
+            this.cost += this.robustFunction.rho( errorSquared );
             this.gradient.addLeftTransposeTimesRight( JW , errorFunctionOutput );
             this.gaussNewtonMatrix.addLeftTransposeTimesRight( JW , J );
 		}

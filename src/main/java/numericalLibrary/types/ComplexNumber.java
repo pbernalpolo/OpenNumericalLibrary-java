@@ -21,7 +21,7 @@ public class ComplexNumber
         MetricSpaceElement<ComplexNumber>
 {
     ////////////////////////////////////////////////////////////////
-    // PRIVATE VARIABLES
+    /// PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -37,7 +37,7 @@ public class ComplexNumber
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
+    /// PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -462,11 +462,25 @@ public class ComplexNumber
     {
         return Math.atan2( this.im() , this.re() );
     }
-
-
+    
+    
+    /**
+     * Returns the {@link ComplexNumber} as a flat array.
+     * <p>
+     * The output is:
+     * new double[] { this.re() , this.im() };
+     * 
+     * @return  {@link ComplexNumber} as a flat array.
+     */
+    public double[] toFlatArray()
+    {
+        return new double[] { this.re() , this.im() };
+    }
+    
+    
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC STATIC METHODS
+    /// PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -530,7 +544,22 @@ public class ComplexNumber
      */
     public static ComplexNumber fromModulusAndArgument( double modulus , double argument )
     {
-        return new ComplexNumber( Math.cos( argument ) , Math.sin( argument ) ).scaleInplace( modulus );
+        return ComplexNumber.fromRealPartAndImaginaryPart( Math.cos( argument ) , Math.sin( argument ) ).scaleInplace( modulus );
+    }
+    
+    
+    /**
+     * Returns a new {@link ComplexNumber} constructed from a flat array.
+     * 
+     * @param flatArray     array that contains the {@link ComplexNumber} elements as {@code double[] { complex.re() , complex.im() }}.
+     * @return  new {@link ComplexNumber} constructed from a flat array.
+     */
+    public static ComplexNumber fromFlatArray( double[] flatArray )
+    {
+        if( flatArray.length < 2 ) {
+            throw new IllegalArgumentException( "Not enough elements in flatArray; found " + flatArray.length + "; expected 2 or more." );
+        }
+        return ComplexNumber.fromRealPartAndImaginaryPart( flatArray[0] , flatArray[1] );
     }
     
     
@@ -552,7 +581,7 @@ public class ComplexNumber
     
     
     ////////////////////////////////////////////////////////////////
-    // PRIVATE CONSTRUCTORS
+    /// PRIVATE CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
     /**

@@ -25,7 +25,7 @@ public class Quaternion
         MetricSpaceElement<Quaternion>
 {
     ////////////////////////////////////////////////////////////////
-    // PRIVATE VARIABLES
+    /// PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -49,31 +49,10 @@ public class Quaternion
     private double qz;
     
     
-    
-    ////////////////////////////////////////////////////////////////
-    // PUBLIC CONSTRUCTORS
-    ////////////////////////////////////////////////////////////////
-    
-    /**
-     * Constructs a {@link Quaternion}.
-     * 
-     * @param qr    real part of the {@link Quaternion}.
-     * @param qi    first imaginary part of the {@link Quaternion}.
-     * @param qj    second imaginary part of the {@link Quaternion}.
-     * @param qk    third imaginary part of the {@link Quaternion}.
-     */
-    public Quaternion( double qr , double qi , double qj , double qk )
-    {
-        this.qw = qr;
-        this.qx = qi;
-        this.qy = qj;
-        this.qz = qk;
-    }
-
 
 
     ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
+    /// PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -498,7 +477,7 @@ public class Quaternion
      */
     public Vector3 vectorPart()
     {
-        return new Vector3( this.x() , this.y() , this.z() );
+        return Vector3.fromComponents( this.x() , this.y() , this.z() );
     }
     
     
@@ -561,7 +540,7 @@ public class Quaternion
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC STATIC METHODS
+    /// PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -630,6 +609,21 @@ public class Quaternion
     
     
     /**
+     * Returns a new {@link Quaternion} from its components.
+     * 
+     * @param qr	real part of the {@link Quaternion}.
+     * @param qi	first imaginary part of the {@link Quaternion}.
+     * @param qj	second imaginary part of the {@link Quaternion}.
+     * @param qk	third imaginary part of the {@link Quaternion}.
+     * @return	new {@link Quaternion} from its components.
+     */
+    public static Quaternion fromComponents( double qr , double qi , double qj , double qk )
+    {
+        return new Quaternion( qr , qi , qj , qk );
+    }
+    
+    
+    /**
      * Returns a new {@link Quaternion} from a scalar and a {@link Vector3}.
      * 
      * @param scalar    scalar part of the {@link Quaternion}.
@@ -657,6 +651,28 @@ public class Quaternion
                 randomNumberGenerator.nextGaussian() ,
                 randomNumberGenerator.nextGaussian() ,
                 randomNumberGenerator.nextGaussian() );
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    /// PRIVATE CONSTRUCTORS
+    ////////////////////////////////////////////////////////////////
+    
+    /**
+     * Constructs a {@link Quaternion}.
+     * 
+     * @param qr    real part of the {@link Quaternion}.
+     * @param qi    first imaginary part of the {@link Quaternion}.
+     * @param qj    second imaginary part of the {@link Quaternion}.
+     * @param qk    third imaginary part of the {@link Quaternion}.
+     */
+    private Quaternion( double qr , double qi , double qj , double qk )
+    {
+        this.qw = qr;
+        this.qx = qi;
+        this.qy = qj;
+        this.qz = qk;
     }
     
 }

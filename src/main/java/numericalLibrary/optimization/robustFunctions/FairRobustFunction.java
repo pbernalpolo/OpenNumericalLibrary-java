@@ -3,31 +3,29 @@ package numericalLibrary.optimization.robustFunctions;
 
 
 /**
- * {@link RobustFunction} defined as:
- * f( x ) = k^2 / 2 ( 1 - exp( -x^2 / k^2 ) )
- * with derivative:
- * f'( x ) = x exp( - x^2 / k^2 )
- * and weight function:
- * w( x ) = exp( -x^2 / k^2 )
- * 
- * @see https://arxiv.org/abs/1810.01474
+ * The Fair {@link RobustFunction} defined as:
+ * f( x ) = k^2 ( |x|/k - log( 1 + |x|/k ) )
+ * Its derivative is
+ * f'( x ) = x / ( 1 + |x| / k )
+ * with weight function
+ * w( x ) = 1 / ( 1 + |x| / k )
  */
-public class WelschRobustFunction
+public class FairRobustFunction
     implements RobustFunction
 {
     ////////////////////////////////////////////////////////////////
     // PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
-    /**
-     * Square parameter k of the Welsch function.
+	/**
+     * Parameter k of the Fair robust function.
      */
-    private double kSquared;
+    private double k;
     
     /**
-     * Square of parameter k of the Welsch function divided by 2.
+     * Square of parameter k of the Fair robust function.
      */
-    private double kSquaredOver2;
+    private double kSquared;
     
     
     
@@ -36,14 +34,14 @@ public class WelschRobustFunction
     ////////////////////////////////////////////////////////////////
     
     /**
-     * Constructs a {@link WelschRobustFunction}.
+     * Constructs a {@link FairRobustFunction}.
      * 
-     * @param kParameter    k parameter of the Welsch function.
+     * @param kParameter    k parameter of the Cauchy function.
      */
-    public WelschRobustFunction( double kParameter )
+    public FairRobustFunction( double kParameter )
     {
+    	this.k = kParameter;
         this.kSquared = kParameter * kParameter;
-        this.kSquaredOver2 = 0.5 * this.kSquared;
     }
     
     
@@ -57,7 +55,8 @@ public class WelschRobustFunction
      */
     public double rho( double xSquared )
     {
-        return this.kSquaredOver2 * ( 1.0 - Math.exp( - xSquared / this.kSquared ) );
+    	double xAbsOver_k = Math.sqrt( xSquared ) / this.k;
+    	return this.kSquared * ( xAbsOver_k - Math.log( 1.0 + xAbsOver_k ) );
     }
     
     
@@ -66,7 +65,7 @@ public class WelschRobustFunction
      */
     public double weight( double xSquared )
     {
-        return Math.exp( - xSquared / this.kSquared );
+    	return 1.0 / ( 1.0 + Math.sqrt( xSquared ) / this.k );
     }
     
 }

@@ -21,7 +21,7 @@ public class UnitQuaternion
         MetricSpaceElement<UnitQuaternion>
 {
     ////////////////////////////////////////////////////////////////
-    // PRIVATE VARIABLES
+    /// PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -32,7 +32,7 @@ public class UnitQuaternion
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC METHODS
+    /// PUBLIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -402,7 +402,7 @@ public class UnitQuaternion
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC STATIC METHODS
+    /// PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -547,28 +547,32 @@ public class UnitQuaternion
         Quaternion q = null;
         switch( index ) {
             case 0:
-                q = new Quaternion( 1.0 + trace ,
-                                    R.entry(2,1) - R.entry(1,2) ,
-                                    R.entry(0,2) - R.entry(2,0) ,
-                                    R.entry(1,0) - R.entry(0,1) );
+                q = Quaternion.fromComponents(
+                		1.0 + trace ,
+                        R.entry(2,1) - R.entry(1,2) ,
+                        R.entry(0,2) - R.entry(2,0) ,
+                        R.entry(1,0) - R.entry(0,1) );
                 break;
             case 1:
-                q = new Quaternion( R.entry(2,1) - R.entry(1,2) ,
-                                    1.0 + R11 - R22 - R33 ,
-                                    R.entry(1,0) + R.entry(0,1) ,
-                                    R.entry(2,0) + R.entry(0,2) );
+                q = Quaternion.fromComponents(
+                		R.entry(2,1) - R.entry(1,2) ,
+                        1.0 + R11 - R22 - R33 ,
+                        R.entry(1,0) + R.entry(0,1) ,
+                        R.entry(2,0) + R.entry(0,2) );
                 break;
             case 2:
-                q = new Quaternion( R.entry(0,2) - R.entry(2,0) ,
-                                    R.entry(1,0) + R.entry(0,1) ,
-                                    1.0 - R11 + R22 - R33 ,
-                                    R.entry(2,1) + R.entry(1,2) );
+                q = Quaternion.fromComponents(
+                		R.entry(0,2) - R.entry(2,0) ,
+                        R.entry(1,0) + R.entry(0,1) ,
+                        1.0 - R11 + R22 - R33 ,
+                        R.entry(2,1) + R.entry(1,2) );
                 break;
             case 3:
-                q = new Quaternion( R.entry(1,0) - R.entry(0,1) ,
-                                    R.entry(2,0) + R.entry(0,2) ,
-                                    R.entry(2,1) + R.entry(1,2) ,
-                                    1.0 - R11 - R22 + R33 );
+                q = Quaternion.fromComponents(
+                		R.entry(1,0) - R.entry(0,1) ,
+                        R.entry(2,0) + R.entry(0,2) ,
+                        R.entry(2,1) + R.entry(1,2) ,
+                        1.0 - R11 - R22 + R33 );
                 break;
         }
         UnitQuaternion.normalizeInplace( q );
@@ -647,7 +651,7 @@ public class UnitQuaternion
             // https://www.xarg.org/proof/quaternion-from-two-vectors/
             Quaternion q = Quaternion.fromScalarAndVectorPart(
                     v.z() + v.norm() ,
-                    new Vector3( -v.y() , v.x() , 0.0 )  );
+                    Vector3.fromComponents( -v.y() , v.x() , 0.0 )  );
             double qnorm = q.norm();
             if( qnorm > 0.0 ) {
                 return UnitQuaternion.fromNormalizedQuaternion( q.scaleInplace( 1.0/qnorm ) );
@@ -795,7 +799,7 @@ public class UnitQuaternion
     
     
     ////////////////////////////////////////////////////////////////
-    // PRIVATE STATIC METHODS
+    /// PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -816,7 +820,7 @@ public class UnitQuaternion
     private static UnitQuaternion thatRotatesPiAroundAxisOrthogonalTo( Vector3 v )
     {
         double unorm = Math.sqrt( v.x() * v.x() + v.y() * v.y() );
-        Vector3 u = new Vector3( v.y()/unorm , -v.x()/unorm , 0.0 );
+        Vector3 u = Vector3.fromComponents( v.y()/unorm , -v.x()/unorm , 0.0 );
         Quaternion q = Quaternion.fromScalarAndVectorPart( 0.0 , u );
         return UnitQuaternion.fromNormalizedQuaternion( q );
     }
@@ -849,9 +853,9 @@ public class UnitQuaternion
             // that can generate a vector in R3 that is orthogonal to a given one for all vector inputs.
             // This makes the following branching necessary.
             if( Math.abs( v1.x() ) < Math.abs( v1.y() ) ) {
-                return new Vector3( 0.0 , v1.z() , -v1.y() ).normalizeInplace();
+                return Vector3.fromComponents( 0.0 , v1.z() , -v1.y() ).normalizeInplace();
             } else {
-                return new Vector3( v1.z() , 0.0 , -v1.x() ).normalizeInplace();
+                return Vector3.fromComponents( v1.z() , 0.0 , -v1.x() ).normalizeInplace();
             }
         }
     }

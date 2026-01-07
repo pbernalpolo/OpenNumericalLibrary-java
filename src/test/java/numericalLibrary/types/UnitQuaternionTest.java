@@ -343,12 +343,12 @@ class UnitQuaternionTest
         luq.add( UnitQuaternion.i().inverseMultiplicativeInplace() );
         luq.add( UnitQuaternion.j().inverseMultiplicativeInplace() );
         luq.add( UnitQuaternion.k().inverseMultiplicativeInplace() );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 1.0 , 0.0 ).scaleInplace( Math.PI/2.0 ) ) );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 0.0 , 1.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 0.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 1.0 , 0.0 ).scaleInplace( -Math.PI/2.0 ) ) );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 0.0 , 1.0 , 1.0 ).scaleInplace( -Math.PI/2.0 ) ) );
-        luq.add( UnitQuaternion.fromRotationVector( new Vector3( 1.0 , 0.0 , 1.0 ).scaleInplace( -Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 1.0 , 1.0 , 0.0 ).scaleInplace( Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 0.0 , 1.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 1.0 , 0.0 , 1.0 ).scaleInplace( Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 1.0 , 1.0 , 0.0 ).scaleInplace( -Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 0.0 , 1.0 , 1.0 ).scaleInplace( -Math.PI/2.0 ) ) );
+        luq.add( UnitQuaternion.fromRotationVector( Vector3.fromComponents( 1.0 , 0.0 , 1.0 ).scaleInplace( -Math.PI/2.0 ) ) );
         for( int n=0; n<10000; n++ ) {
             luq.add( UnitQuaternion.random( this.randomNumberGenerator ) );
         }

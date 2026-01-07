@@ -52,7 +52,7 @@ public class RodriguesParametersS3
      */
     public Vector3 toChartCenteredAtIdentity( UnitQuaternion q )
     {
-        return new Vector3( q.x() , q.y() , q.z() ).scaleInplace( 2.0/q.w() );
+        return q.vectorPart().scaleInplace( 2.0/q.w() );
     }
     
     

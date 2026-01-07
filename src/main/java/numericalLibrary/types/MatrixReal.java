@@ -20,14 +20,14 @@ public class MatrixReal
         MetricSpaceElement<MatrixReal>
 {
     ////////////////////////////////////////////////////////////////
-    // PRIVATE VARIABLES
+    /// PRIVATE VARIABLES
     ////////////////////////////////////////////////////////////////
     private final double[][] x;  // matrix values
     private final int nRows;
     private final int nCols;
     
     ////////////////////////////////////////////////////////////////
-    // PRIVATE STATIC VARIABLES
+    /// PRIVATE STATIC VARIABLES
     ////////////////////////////////////////////////////////////////
     private static boolean assertionsOn = true;
     
@@ -764,6 +764,40 @@ public class MatrixReal
     }
     
     
+    /**
+     * Returns the squared Mahalanobis distance of {@code this} column vector using the covariance matrix S = L L^T.
+     * <p>
+     * The Mahalanobis distance is computed knowing that
+     * <br>
+     * d^2 = x^T S^{-1} x =
+     * 	   = x^T ( L L^T )^{-1} x =
+     *     = x^T (L^T)^{-1} L^{-1} x =
+     *     = x^T (L^{-1})^T L^{-1} x =
+     *     = ( L^{-1} x )^T ( L^{-1} x ) =
+     *     = y^T y
+     *     = ||y||^2
+     * <br>
+     * so if the system  L y = x  is solved, the resulting  column vector  y  satisfies  d^2 = y^T y.
+     * 
+     * @param L		Cholesky decomposition of the positive definite matrix S, so that L L^T = S.
+     * @return	squared Mahalanobis distance of a vector x using the covariance matrix S = L L^T.
+     */
+    public double distanceMahalanobis2( MatrixReal L )
+    {
+    	double[] y = new double[ this.rows() ];
+        double distance2 = 0.0;
+        for( int i=0; i<L.rows(); i++ ) {
+        	double sum = this.x[i][0];
+        	for( int j=0; j<i; j++ ) {
+        		sum -= L.x[i][j] * y[j];
+        	}
+          	y[i] = sum / L.x[i][i];
+          	distance2 += y[i] * y[i];
+        }
+        return distance2;
+    }
+    
+    
     public double[] diagonalElements()
     {
         int nElements = ( this.rows() < this.columns() )? this.rows() : this.columns() ;
@@ -907,7 +941,7 @@ public class MatrixReal
     {
         this.assertIndexBounds( i , j );
         this.assertIndexBounds( i+2 , j );
-        return new Vector2( this.entryUnchecked(i,j) , this.entryUnchecked(i+1,j) );
+        return Vector2.fromComponents( this.entryUnchecked(i,j) , this.entryUnchecked(i+1,j) );
     }
     
     
@@ -915,7 +949,7 @@ public class MatrixReal
     {
         this.assertIndexBounds( i , j );
         this.assertIndexBounds( i+3 , j );
-        return new Vector3( this.entryUnchecked(i,j) , this.entryUnchecked(i+1,j) , this.entryUnchecked(i+2,j) );
+        return Vector3.fromComponents( this.entryUnchecked(i,j) , this.entryUnchecked(i+1,j) , this.entryUnchecked(i+2,j) );
     }
     
     
@@ -963,7 +997,7 @@ public class MatrixReal
     public Vector2 applyToVector2( Vector2 v )
     {
         this.assertSize( 2 , 2 );
-        return new Vector2(
+        return Vector2.fromComponents(
                 this.entryUnchecked(0,0) * v.x() + this.entryUnchecked(0,1) * v.y() ,
                 this.entryUnchecked(1,0) * v.x() + this.entryUnchecked(1,1) * v.y() );
     }
@@ -978,7 +1012,7 @@ public class MatrixReal
     public Vector3 applyToVector3( Vector3 v )
     {
         this.assertSize( 3 , 3 );
-        return new Vector3(
+        return Vector3.fromComponents(
                 this.entryUnchecked(0,0) * v.x() + this.entryUnchecked(0,1) * v.y() + this.entryUnchecked(0,2) * v.z() ,
                 this.entryUnchecked(1,0) * v.x() + this.entryUnchecked(1,1) * v.y() + this.entryUnchecked(1,2) * v.z() ,
                 this.entryUnchecked(2,0) * v.x() + this.entryUnchecked(2,1) * v.y() + this.entryUnchecked(2,2) * v.z() );
@@ -1052,7 +1086,7 @@ public class MatrixReal
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC STATIC METHODS
+    /// PUBLIC STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -1393,7 +1427,7 @@ public class MatrixReal
     
     
     ////////////////////////////////////////////////////////////////
-    // PRIVATE CONSTRUCTORS
+    /// PRIVATE CONSTRUCTORS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -1412,7 +1446,7 @@ public class MatrixReal
 
 
     ////////////////////////////////////////////////////////////////
-    // PRIVATE METHODS
+    /// PRIVATE METHODS
     ////////////////////////////////////////////////////////////////
     
     private void setEntryUnchecked( int i , int j , double value )
@@ -1655,7 +1689,7 @@ public class MatrixReal
     
     
     ////////////////////////////////////////////////////////////////
-    // PRIVATE STATIC METHODS
+    /// PRIVATE STATIC METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
