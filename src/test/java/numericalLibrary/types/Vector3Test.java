@@ -62,7 +62,7 @@ class Vector3Test
         Vector3 b = Vector3.random( randomNumberGenerator );
         Vector3 axb = a.crossProduct( b );
         Vector3 ax_b = a.crossProductMatrix().applyToVector3( b );
-        assertTrue( axb.equalsApproximately( ax_b , 1.0e-16 ) );
+        assertTrue( axb.equalsApproximately( ax_b , 1.0e-16 , 0.0 ) );
     }
     
 }

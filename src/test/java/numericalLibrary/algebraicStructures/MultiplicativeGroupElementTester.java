@@ -37,7 +37,7 @@ public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupE
             T c = setElements.get( i+2 );
             T product1 = a.multiply( b.multiply( c ) );  // a * ( b * c )
             T product2 = ( a.multiply( b ) ).multiply( c );  // ( a * b ) * c
-            assertTrue( product1.equalsApproximately( product2 , 1.0e-7 ) );
+            assertTrue( product1.equalsApproximately( product2 , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -54,8 +54,8 @@ public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupE
         for( T element : setElements ) {
             T identityLeft = one.multiply( element );  // 1 * e
             T identityRight = element.multiply( one );  // e * 1
-            assertTrue( identityLeft.equalsApproximately( element , 1.0e-7 ) );
-            assertTrue( identityRight.equalsApproximately( element , 1.0e-7 ) );
+            assertTrue( identityLeft.equalsApproximately( element , 1.0e-7 , 0.0 ) );
+            assertTrue( identityRight.equalsApproximately( element , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -114,8 +114,8 @@ public interface MultiplicativeGroupElementTester<T extends MultiplicativeGroupE
                 T one = element.identityMultiplicative();
                 T elementTimesInverse = element.multiply( element.inverseMultiplicative() );  // e * e^{-1}
                 T inverseTimesElement = element.inverseMultiplicative().multiply( element );  // e^{-1} * e
-                assertTrue( elementTimesInverse.equalsApproximately( one , 1.0e-10 ) );
-                assertTrue( inverseTimesElement.equalsApproximately( one , 1.0e-10 ) );
+                assertTrue( elementTimesInverse.equalsApproximately( one , 1.0e-10 , 0.0 ) );
+                assertTrue( inverseTimesElement.equalsApproximately( one , 1.0e-10 , 0.0 ) );
             } catch( IllegalArgumentException e ) {
                 // This could happen if the multiplicative inverse is undefined.
             }

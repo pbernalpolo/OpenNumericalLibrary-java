@@ -37,7 +37,7 @@ public interface FieldElementTester<T extends FieldElement<T>>
             T c = setElements.get( i+2 );
             T factorized = a.multiply( b.add( c ) );  // a * ( b + c )
             T distributed = a.multiply( b ).add( a.multiply( c ) );  // ( a * b ) + ( a * c )
-            assertTrue( factorized.equalsApproximately( distributed , 1.0e-14 ) );
+            assertTrue( factorized.equalsApproximately( distributed , 1.0e-14 , 0.0 ) );
         }
     }
     

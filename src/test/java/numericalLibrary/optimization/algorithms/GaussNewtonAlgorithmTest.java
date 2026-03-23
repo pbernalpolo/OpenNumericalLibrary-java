@@ -32,7 +32,7 @@ class GaussNewtonAlgorithmTest
         GaussNewtonAlgorithm gna = new GaussNewtonAlgorithm();
         gna.step( loss );
         MatrixReal optimizedParameters = loss.getParameters();
-        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-6 ) );
+        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-6 , 0.0 ) );
     }
     
 }

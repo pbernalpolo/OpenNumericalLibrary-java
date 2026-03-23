@@ -130,7 +130,7 @@ class UnitQuaternionTest
             UnitQuaternion q = luq.get( n );
             Vector3 axisAngle = q.axis().scale( q.angle() );
             Vector3 rv = q.toRotationVector();
-            assertTrue( axisAngle.equalsApproximately( rv , 1.0e-12 ) );
+            assertTrue( axisAngle.equalsApproximately( rv , 1.0e-12 , 0.0 ) );
         }
     }
     
@@ -162,7 +162,7 @@ class UnitQuaternionTest
             }
             UnitQuaternion q = UnitQuaternion.fromRotationVector( rv0 );
             Vector3 rv = q.toRotationVector();
-            assertTrue( rv.equalsApproximately( rv0 , 1.0e-14 ) );
+            assertTrue( rv.equalsApproximately( rv0 , 1.0e-14 , 0.0 ) );
         }
         List<UnitQuaternion> luq = this.getUnitQuaternionList( 1 );
         for( int n=0; n<luq.size(); n++ ) {
@@ -170,7 +170,7 @@ class UnitQuaternionTest
             UnitQuaternion q0 = luq.get( n );
             Vector3 rv = q0.toRotationVector();
             UnitQuaternion q = UnitQuaternion.fromRotationVector( rv );
-            assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
+            assertTrue( q.equalsApproximately( q0 , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -184,7 +184,7 @@ class UnitQuaternionTest
             double angle = q0.angle();
             Vector3 axis = q0.axis();
             UnitQuaternion q = UnitQuaternion.fromAngleAxis( angle , axis );
-            assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
+            assertTrue( q.equalsApproximately( q0 , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -197,7 +197,7 @@ class UnitQuaternionTest
             UnitQuaternion q0 = luq.get( n );
             MatrixReal R = q0.toRotationMatrix();
             UnitQuaternion q = UnitQuaternion.fromRotationMatrix( R );
-            assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
+            assertTrue( q.equalsApproximately( q0 , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -217,9 +217,9 @@ class UnitQuaternionTest
                 continue;
             }
             UnitQuaternion qMinAngle = UnitQuaternion.thatRotatesMinimumAngleFirstToSecondVector( first , second );
-            assertTrue( qMinAngle.rotate( first ).equalsApproximately( second , 1.0e-12 ) );
+            assertTrue( qMinAngle.rotate( first ).equalsApproximately( second , 1.0e-12 , 0.0 ) );
             UnitQuaternion qMaxAngle = UnitQuaternion.thatRotatesMaximumAngleFirstToSecondVector( first , second );
-            assertTrue( qMaxAngle.rotate( first ).equalsApproximately( second , 1.0e-13 ) );
+            assertTrue( qMaxAngle.rotate( first ).equalsApproximately( second , 1.0e-13 , 0.0 ) );
         }
     }
     
@@ -236,9 +236,9 @@ class UnitQuaternionTest
                 continue;
             }
             UnitQuaternion qMinAngle = UnitQuaternion.thatRotatesMinimumAngle001To( v );
-            assertTrue( qMinAngle.rotate( Vector3.k() ).equalsApproximately( v , 1.0e-13 ) );
+            assertTrue( qMinAngle.rotate( Vector3.k() ).equalsApproximately( v , 1.0e-13 , 0.0 ) );
             UnitQuaternion qMaxAngle = UnitQuaternion.thatRotatesMaximumAngle001To( v );
-            assertTrue( qMaxAngle.rotate( Vector3.k() ).equalsApproximately( v , 1.0e-13 ) );
+            assertTrue( qMaxAngle.rotate( Vector3.k() ).equalsApproximately( v , 1.0e-13 , 0.0 ) );
         }
     }
     
@@ -257,7 +257,7 @@ class UnitQuaternionTest
             // Get unit quaternion from roll, pitch, yaw.
             UnitQuaternion q = UnitQuaternion.fromRollPitchYawZYX( rollPitchYaw[0] , rollPitchYaw[1] , rollPitchYaw[2] );
             // Check that we obtain the initial quaternion.
-            assertTrue( q.equalsApproximately( q0 , 1.0e-7 ) );
+            assertTrue( q.equalsApproximately( q0 , 1.0e-7 , 0.0 ) );
         }
     }
     
@@ -322,7 +322,7 @@ class UnitQuaternionTest
                     Math.sin(psi) , Math.cos(psi) , 0 ,
                     0 , 0 , 1 );
             MatrixReal Rzyx = Rz.multiply( Ry ).multiply( Rx );
-            assertTrue( Rzyx.equalsApproximately( R0 , 1.0e-13 ) );
+            assertTrue( Rzyx.equalsApproximately( R0 , 1.0e-13 , 0.0 ) );
         }
     }
     

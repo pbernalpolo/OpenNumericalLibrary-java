@@ -35,7 +35,7 @@ class LevenbergMarquardtAlgorithmTest
         lma.iterate( loss , new IterationThresholdStoppingCriterion( 5 ) );
         MatrixReal optimizedParameters = loss.getParameters();
         //System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
-        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-18 ) );
+        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-18 , 0.0 ) );
     }
     
 }

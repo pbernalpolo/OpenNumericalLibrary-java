@@ -142,7 +142,7 @@ abstract class UnitQuaternionDifferentiableAtlasTester
             MatrixReal transitionMapMatrixFromJacobians = jacobianChart.multiply( delta_qInitial_qFinal_conjugate_productMatrix.multiply( jacobianChartInverse ) );
             // Check that both ways of computing the Jacobian of the transition map yield the same result.
             //transitionMapMatrix.subtract( transitionMapMatrixFromJacobians ).print();
-            assertTrue( transitionMapMatrix.equalsApproximately( transitionMapMatrixFromJacobians , 1.0e-14 ) );
+            assertTrue( transitionMapMatrix.equalsApproximately( transitionMapMatrixFromJacobians , 1.0e-14 , 0.0 ) );
         }
     }
     
@@ -168,7 +168,7 @@ abstract class UnitQuaternionDifferentiableAtlasTester
             // Check that first is the opposite of second.
             //jacobianChartPlus.print();
             //jacobianChartMinus.print();
-            assertTrue( jacobianChartMinus.equalsApproximately( jacobianChartPlus.inverseAdditive() , 1.0e-100 ) );
+            assertTrue( jacobianChartMinus.equalsApproximately( jacobianChartPlus.inverseAdditive() , 1.0e-100 , 0.0 ) );
         }
     }
     

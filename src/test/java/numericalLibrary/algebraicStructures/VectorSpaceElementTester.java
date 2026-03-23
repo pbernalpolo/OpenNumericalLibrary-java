@@ -85,7 +85,7 @@ public interface VectorSpaceElementTester<T extends VectorSpaceElement<T>>
             double scalar2 = rnd.nextGaussian();
             T scaleTwice = element.scale( scalar1 ).scale( scalar2 );  // scalar1 * ( scalar2 * v )
             T scaleOnce = element.scale( scalar1 * scalar2 );  // ( scalar1 * scalar2 ) * v
-            assertTrue( scaleTwice.equalsApproximately( scaleOnce , 1.0e-14 ) );
+            assertTrue( scaleTwice.equalsApproximately( scaleOnce , 1.0e-14 , 0.0 ) );
         }
     }
     
@@ -120,7 +120,7 @@ public interface VectorSpaceElementTester<T extends VectorSpaceElement<T>>
             double scalar = rnd.nextGaussian();
             T factorized = a.add( b ).scale( scalar );  // scalar * ( a + b )
             T distributed = a.scale( scalar ).add( b.scale( scalar ) );  // ( scalar * a ) + ( scalar * b )
-            assertTrue( distributed.equalsApproximately( factorized , 1.0e-14 ) );
+            assertTrue( distributed.equalsApproximately( factorized , 1.0e-14 , 0.0 ) );
         }
     }
     
@@ -139,7 +139,7 @@ public interface VectorSpaceElementTester<T extends VectorSpaceElement<T>>
             double scalar2 = rnd.nextGaussian();
             T factorized = element.scale( scalar1 + scalar2 );  // ( scalar1 + scalar2 ) * element
             T distributed = element.scale( scalar1 ).add( element.scale( scalar2 ) );  // ( scalar1 * element ) + ( scalar2 * element )
-            assertTrue( distributed.equalsApproximately( factorized , 1.0e-14 ) );
+            assertTrue( distributed.equalsApproximately( factorized , 1.0e-14 , 0.0 ) );
         }
     }
     

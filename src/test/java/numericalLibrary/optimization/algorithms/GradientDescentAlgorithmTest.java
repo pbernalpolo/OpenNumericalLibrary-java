@@ -35,7 +35,7 @@ class GradientDescentAlgorithmTest
         gd.iterate( loss , new IterationThresholdStoppingCriterion( 100 ) );
         MatrixReal optimizedParameters = loss.getParameters();
         //System.out.println( optimizedParameters.distanceFrom( Matrix.zero( 42 , 1 ) ) );
-        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-3 ) );
+        assertTrue( optimizedParameters.equalsApproximately( MatrixReal.zero( 42 , 1 ) , 1.0e-3 , 0.0 ) );
     }
     
 }

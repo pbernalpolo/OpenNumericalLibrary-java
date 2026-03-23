@@ -37,7 +37,7 @@ public interface AdditiveAbelianGroupElementTester<T extends AdditiveAbelianGrou
             T c = setElements.get( i+2 );
             T sum1 = a.add( b.add( c ) );  // a + ( b + c )
             T sum2 = ( a.add( b ) ).add( c );  // ( a + b ) + c
-            assertTrue( sum1.equalsApproximately( sum2 , 1.0e-14 ) );
+            assertTrue( sum1.equalsApproximately( sum2 , 1.0e-14 , 0.0 ) );
         }
     }
     

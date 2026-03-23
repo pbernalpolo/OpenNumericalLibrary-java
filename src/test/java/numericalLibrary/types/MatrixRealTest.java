@@ -114,7 +114,7 @@ class MatrixRealTest
             // Rebuild the matrix doing L * L^T
             MatrixReal LLT = L.multiply( L.transpose() );
             // We should obtain the same matrix we started with.
-            assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
+            assertTrue( LLT.equalsApproximately( A , 1.0e-14 , 0.0 ) );
         }
     }
 
@@ -132,7 +132,7 @@ class MatrixRealTest
             // Rebuild the matrix doing L * L^T
             MatrixReal LLT = L.multiply( L.transpose() );
             // We should obtain the same matrix we started with.
-            assertTrue( LLT.equalsApproximately( A , 1.0e-14 ) );
+            assertTrue( LLT.equalsApproximately( A , 1.0e-14 , 0.0 ) );
         }
     }
     
@@ -189,7 +189,7 @@ class MatrixRealTest
             MatrixReal D = MatrixReal.DfromLDLTDecomposition( LD );
             // we rebuild the matrix doing L * D * L^T
             MatrixReal LDLT = L.multiply( D.multiply( L.transpose() ) );
-            assertTrue( LDLT.equalsApproximately( A , 1.0e-13 ) );
+            assertTrue( LDLT.equalsApproximately( A , 1.0e-13 , 0.0 ) );
         }
     }
 
@@ -206,7 +206,7 @@ class MatrixRealTest
             MatrixReal D = MatrixReal.DfromLDLTDecomposition( LD );
             // we rebuild the matrix doing L * D * L^T
             MatrixReal LDLT = L.multiply( D.multiply( L.transpose() ) );
-            assertTrue( LDLT.equalsApproximately( A , 1.0e-13 ) );
+            assertTrue( LDLT.equalsApproximately( A , 1.0e-13 , 0.0 ) );
         }
     }
 
@@ -230,7 +230,9 @@ class MatrixRealTest
             // Divide using the Cholesky decomposition: XA * A^{-1} = X
             MatrixReal Xrecomputed = XA.divideRightByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
-            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
+            //Xrecomputed.print();
+            //X.print();
+            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-5 , 1.0e-4 ) );
         }
     }
 
@@ -254,7 +256,7 @@ class MatrixRealTest
             // Divide using the Cholesky decomposition: XA * A^{-1} = X
             XA.divideRightByPositiveDefiniteUsingItsCholeskyDecompositionInplace( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which XA was generated.
-            assertTrue( XA.equalsApproximately( X , 1.0e-4 ) );
+            assertTrue( XA.equalsApproximately( X , 1.0e-5 , 1.0e-4 ) );
         }
     }
     
@@ -278,7 +280,7 @@ class MatrixRealTest
             // Divide using the Cholesky decomposition: A^{-1} * AX = X
             MatrixReal Xrecomputed = AX.divideLeftByPositiveDefiniteUsingItsCholeskyDecomposition( A.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
-            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-4 ) );
+            assertTrue( Xrecomputed.equalsApproximately( X , 1.0e-5 , 1.0e-3 ) );
         }
     }
 
@@ -302,7 +304,7 @@ class MatrixRealTest
             // Divide using the Cholesky decomposition: A^{-1} * AX = X
             XA.divideLeftByPositiveDefiniteUsingItsCholeskyDecompositionInplace( X.choleskyDecompositionInplace() );
             // Check that the resulting matrix is approximately equal to the matrix X from which AX was generated.
-            assertTrue( XA.equalsApproximately( A , 1.0e-4 ) );
+            assertTrue( XA.equalsApproximately( A , 1.0e-5 , 1.0e-3 ) );
         }
     }
 
@@ -318,7 +320,7 @@ class MatrixRealTest
             MatrixReal MA = M.multiply( A );
             // and we divide using the LDLT decomposition
             MatrixReal Mrecomputed = MA.divideRightByPositiveDefiniteUsingItsLDLTDecomposition( A.LDLTDecompositionInplace() );
-            assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-4 ) );
+            assertTrue( Mrecomputed.equalsApproximately( M , 1.0e-5 , 1.0e-4 ) );
         }
     }
 
@@ -334,7 +336,7 @@ class MatrixRealTest
             MatrixReal MA = M.multiply( A );
             // and we divide using the LDLT decomposition
             MA.divideRightByPositiveDefiniteUsingItsLDLTDecompositionInplace( A.LDLTDecompositionInplace() );
-            assertTrue( MA.equalsApproximately( M , 1.0e-4 ) );
+            assertTrue( MA.equalsApproximately( M , 1.0e-5 , 1.0e-4 ) );
         }
     }
     
