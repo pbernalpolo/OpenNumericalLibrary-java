@@ -16,7 +16,7 @@ public interface MetricSpaceElement<T extends MetricSpaceElement<T>>
     extends SetElement<T>
 {
     ////////////////////////////////////////////////////////////////
-    // PUBLIC ABSTRACT METHODS
+    /// PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
@@ -30,15 +30,15 @@ public interface MetricSpaceElement<T extends MetricSpaceElement<T>>
     
     
     ////////////////////////////////////////////////////////////////
-    // PUBLIC DEFAULT METHODS
+    /// PUBLIC DEFAULT METHODS
     ////////////////////////////////////////////////////////////////
     
     /**
      * {@inheritDoc}
      */
-    default boolean equalsApproximately( T other , double tolerance )
+    default boolean equalsApproximately( T other , double toleranceAbsolute , double toleranceRelative )
     {
-        return ( this.distanceFrom( other ) <= tolerance );
+        return ( this.distanceFrom( other ) <= toleranceAbsolute );
     }
     
 }
