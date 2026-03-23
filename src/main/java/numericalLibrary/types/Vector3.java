@@ -131,10 +131,26 @@ public class Vector3
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, it is considered equal if for each component, the absolute error | this_i - other_i | is below one of the thresholds:
+     * <ul>
+     * <li> toleranceAbsolute
+     * <li> toleranceRelative * 0.5 * ( |this_i| + |other_i| )
+     * </ul>
      */
-    public boolean equalsApproximately( Vector3 other , double tolerance )
+    public boolean equalsApproximately( Vector3 other , double toleranceAbsolute , double toleranceRelative )
     {
-        return ( this.distanceFrom( other ) < tolerance );
+    	double dx = Math.abs( this.x() - other.x() );
+    	double dy = Math.abs( this.y() - other.y() );
+    	double dz = Math.abs( this.z() - other.z() );
+    	boolean withinAbsoluteTolerance = (  dx <= toleranceAbsolute  &&
+    									     dy <= toleranceAbsolute  &&
+    									     dz <= toleranceAbsolute  );
+    	boolean withinRelativeTolerance = (
+    			dx <= toleranceRelative * 0.5 * ( Math.abs( this.x() ) + Math.abs( other.x() ) )  &&
+    			dy <= toleranceRelative * 0.5 * ( Math.abs( this.y() ) + Math.abs( other.y() ) )  &&
+    			dz <= toleranceRelative * 0.5 * ( Math.abs( this.z() ) + Math.abs( other.z() ) )  );
+    	return ( withinAbsoluteTolerance || withinRelativeTolerance );
     }
     
     

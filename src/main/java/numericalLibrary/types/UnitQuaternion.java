@@ -110,6 +110,18 @@ public class UnitQuaternion
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, {@code this} and {@code other} are considered equal if {@link #distanceFrom(UnitQuaternion)} is below the threshold toleranceAbsolute.
+     * Since the norm of a {@link UnitQuaternion} is constraint to 1, there is no need to worry about large or small numbers.
+     */
+    public boolean equalsApproximately( UnitQuaternion other , double toleranceAbsolute , double toleranceRelative )
+    {
+        return ( this.distanceFrom( other ) <= toleranceAbsolute );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public boolean isNaN()
     {

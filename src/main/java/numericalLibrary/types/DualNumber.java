@@ -100,6 +100,27 @@ public class DualNumber
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, it is considered equal if for each component, the absolute error | this_i - other_i | is below one of the thresholds:
+     * <ul>
+     * <li> toleranceAbsolute
+     * <li> toleranceRelative * 0.5 * ( |this_i| + |other_i| )
+     * </ul>
+     */
+    public boolean equalsApproximately( ComplexNumber other , double toleranceAbsolute , double toleranceRelative )
+    {
+    	double dx = Math.abs( this.re() - other.re() );
+    	double dy = Math.abs( this.im() - other.im() );
+    	boolean withinAbsoluteTolerance = (  dx <= toleranceAbsolute  &&  dy <= toleranceAbsolute  );
+    	boolean withinRelativeTolerance = (
+    			dx <= toleranceRelative * 0.5 * ( Math.abs( this.re() ) + Math.abs( other.re() ) )  &&
+    			dy <= toleranceRelative * 0.5 * ( Math.abs( this.im() ) + Math.abs( other.im() ) )  );
+    	return ( withinAbsoluteTolerance || withinRelativeTolerance );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public boolean isNaN()
     {

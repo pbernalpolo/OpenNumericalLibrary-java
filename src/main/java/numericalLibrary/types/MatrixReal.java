@@ -146,16 +146,55 @@ public class MatrixReal
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, it is considered equal if for each component, the absolute error | this_i - other_i | is below one of the thresholds:
+     * <ul>
+     * <li> toleranceAbsolute
+     * <li> toleranceRelative * 0.5 * ( |this_i| + |other_i| )
+     * </ul>
      */
-    public boolean equalsApproximately( MatrixReal other , double tolerance )
+    public boolean equalsApproximately( MatrixReal other , double toleranceAbsolute , double toleranceRelative )
     {
         if( !this.isSameSize( other ) ) {
             return false;
         }
         for( int i=0; i<this.rows(); i++ ) {
             for( int j=0; j<this.columns(); j++ ) {
-                double dif = this.entryUnchecked(i,j) - other.entryUnchecked(i,j);
-                if( Math.abs( dif ) > tolerance ) {
+            	double differenceAbsolute = Math.abs( this.entryUnchecked(i,j) - other.entryUnchecked(i,j) );
+            	boolean withinAbsoluteTolerance = ( differenceAbsolute <= toleranceAbsolute );
+            	boolean withinRelativeTolerance = ( differenceAbsolute <=
+            			toleranceRelative * 0.5 * ( Math.abs( this.entryUnchecked(i,j) ) + Math.abs( other.entryUnchecked(i,j) ) )
+            	);
+            	if( !( withinAbsoluteTolerance || withinRelativeTolerance ) ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
+    /**
+     * Returns true if {@code other} is approximately equal to {@code this} within a given a relative tolerance; returns false otherwise.
+     * <p>
+     * In particular, the relative error that must be within the relative tolerance is:
+     * error_r = 0.5 | this_ij - other_ij | / ( | this_ij | + | other_ij | )
+     * 
+     * @param other     object to be compared with {@code this}.
+     * @param relativeTolerance     relative tolerance used to determine if the elements are approximately equal.
+     * @return  true if {@code other} is approximately equal to {@code this} within a given relative tolerance; false otherwise.
+     */
+    public boolean equalsApproximatelyRelative( MatrixReal other , double relativeTolerance )
+    {
+        if( !this.isSameSize( other ) ) {
+            return false;
+        }
+        for( int i=0; i<this.rows(); i++ ) {
+            for( int j=0; j<this.columns(); j++ ) {
+            	double t_ij = this.entryUnchecked(i,j);
+            	double o_ij = other.entryUnchecked(i,j);
+                double errorRelative = 0.5 * ( t_ij - o_ij ) / ( Math.abs( t_ij ) + Math.abs( o_ij ) );
+                if( !( Math.abs( errorRelative ) <= relativeTolerance ) ) {
                     return false;
                 }
             }

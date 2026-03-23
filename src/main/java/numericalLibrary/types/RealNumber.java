@@ -95,6 +95,24 @@ public class RealNumber
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, it is considered equal if the absolute error | this - other | is below one of the thresholds:
+     * <ul>
+     * <li> toleranceAbsolute
+     * <li> toleranceRelative * 0.5 * ( |this| + |other| )
+     * </ul>
+     */
+    public boolean equalsApproximately( RealNumber other , double toleranceAbsolute , double toleranceRelative )
+    {
+    	double dx = Math.abs( this.x - other.x );
+    	boolean withinAbsoluteTolerance = ( dx <= toleranceAbsolute );
+    	boolean withinRelativeTolerance = ( dx <= toleranceRelative * 0.5 * ( Math.abs( this.x ) + Math.abs( other.x ) ) );
+    	return ( withinAbsoluteTolerance || withinRelativeTolerance );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public boolean isNaN()
     {

@@ -122,6 +122,34 @@ public class Quaternion
     
     /**
      * {@inheritDoc}
+     * <p>
+     * In particular, it is considered equal if for each component, the absolute error | this_i - other_i | is below one of the thresholds:
+     * <ul>
+     * <li> toleranceAbsolute
+     * <li> toleranceRelative * 0.5 * ( |this_i| + |other_i| )
+     * </ul>
+     */
+    public boolean equalsApproximately( Quaternion other , double toleranceAbsolute , double toleranceRelative )
+    {
+    	double dw = Math.abs( this.w() - other.w() );
+    	double dx = Math.abs( this.x() - other.x() );
+    	double dy = Math.abs( this.y() - other.y() );
+    	double dz = Math.abs( this.z() - other.z() );
+    	boolean withinAbsoluteTolerance = ( dw <= toleranceAbsolute  &&
+    										dx <= toleranceAbsolute  &&
+    										dy <= toleranceAbsolute  &&
+    										dz <= toleranceAbsolute );
+    	boolean withinRelativeTolerance = (
+    			dw <= toleranceRelative * 0.5 * ( Math.abs( this.w() ) + Math.abs( other.w() ) )  &&
+    			dx <= toleranceRelative * 0.5 * ( Math.abs( this.x() ) + Math.abs( other.x() ) )  &&
+    			dy <= toleranceRelative * 0.5 * ( Math.abs( this.y() ) + Math.abs( other.y() ) )  &&
+    			dz <= toleranceRelative * 0.5 * ( Math.abs( this.z() ) + Math.abs( other.z() ) )  );
+    	return ( withinAbsoluteTolerance || withinRelativeTolerance );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      */
     public boolean isNaN()
     {
