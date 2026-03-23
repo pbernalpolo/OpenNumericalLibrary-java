@@ -34,12 +34,16 @@ public interface SetElement<T extends SetElement<T>>
     
     /**
      * Returns true if {@code other} is approximately equal to {@code this} within a given tolerance; returns false otherwise.
+     * <p>
+     * The tolerance is defined through both an absolute and a relative tolerance.
+     * {@code this} is approximately equal to {@code other} if it is within either the absolute or the relative tolerance.
      * 
      * @param other     object to be compared with {@code this}.
-     * @param tolerance     tolerance used to determine if the elements are approximately equal.
+     * @param toleranceAbsolute		absolute tolerance used to determine if the elements are approximately equal.
+     * @param toleranceRelative		relative tolerance used to determine if the elements are approximately equal.
      * @return  true if {@code other} is approximately equal to {@code this} within a given tolerance; false otherwise.
      */
-    boolean equalsApproximately( T other , double tolerance );
+    boolean equalsApproximately( T other , double toleranceAbsolute , double toleranceRelative );
     
     
     /**
