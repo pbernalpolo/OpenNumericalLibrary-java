@@ -35,10 +35,14 @@ public class LegendrePolynomialEvaluator
 	
 	public void evaluate( double x )
 	{
-		this.pn[1] = x;
+		final double[] p = this.pn;
+		final double[] a = this.an;
+		final double[] b = this.bn;
+		
+		p[1] = x;
 		// ( n + 1 ) P_{n+1}(x) = ( 2 n + 1 ) x P_n(x) - n P_{n-1}(x)
 		for(  int n=1, nPlus1=2;  nPlus1<this.pn.length;  n++, nPlus1++  ) {
-			this.pn[nPlus1] = this.an[n] * x * this.pn[n] - this.bn[n] * this.pn[n-1];
+			p[nPlus1] = a[n] * x * p[n] - b[n] * p[n-1];
 		}
 	}
 	

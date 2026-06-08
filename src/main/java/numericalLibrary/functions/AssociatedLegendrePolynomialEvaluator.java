@@ -42,22 +42,38 @@ public class AssociatedLegendrePolynomialEvaluator
 	}
 	
 	
-	public void evaluate( double x )
+	public void evaluate(double x)
 	{
-		double sqrt1Minus_x2 = Math.sqrt( 1.0 - x * x );
-		this.plm[1][0] = x;
-		this.plm[1][1] = - sqrt1Minus_x2;
-		// ( l - m + 1 ) P_{l+1}^m(x) = ( 2 l + 1 ) x P_l^m(x) - (l+m) P_{l-1}^m(x)
-		for(  int l=1, lPlus1=2;  lPlus1<this.plm.length;  l++, lPlus1++  ) {
-			for( int m=0; m<l; m++ ) {
-				this.plm[lPlus1][m] = this.alm[l][m] * x * this.plm[l][m] - this.blm[l][m] * this.plm[l-1][m];
-			}
-			// P_{l+1}^l(x) = ( 2 l + 1 ) x P_l^l(x)
-			// P_{l+1}^{l+1}(x) = - ( 2 l + 1 ) sqrt( 1 - x^2 ) P_l^l(x)
-			double alphaPll = ( l + l + 1 ) * this.plm[l][l];
-			this.plm[lPlus1][l] = x * alphaPll;
-			this.plm[lPlus1][lPlus1] = - sqrt1Minus_x2 * alphaPll;
-		}
+		// Cache field references locally.
+	    final double[][] plm = this.plm;
+	    final double[][] alm = this.alm;
+	    final double[][] blm = this.blm;
+	    
+	    final double sqrt1Minus_x2 = Math.sqrt( 1.0 - x * x );
+	    
+	    double[] p_1 = plm[1];
+	    p_1[0] = x;
+	    p_1[1] = - sqrt1Minus_x2;
+	    
+	    for (int l = 1, lPlus1 = 2, n = plm.length; lPlus1 < n; l++, lPlus1++) {
+	    	// Cache current l references to avoid repeated jagged-array lookups.
+	        final double[] p_lMinus1 = plm[l-1];
+	        final double[] p_l = plm[l];
+	        final double[] p_lPlus1 = plm[lPlus1];
+	        // Cache current l coefficients as well.
+	        final double[] a_l = alm[l];
+	        final double[] b_l = blm[l];
+	        // Compute polynomial P_{l+1}^m using previous l polynomials.
+			// ( l - m + 1 ) P_{l+1}^m(x) = ( 2 l + 1 ) x P_l^m(x) - (l+m) P_{l-1}^m(x)
+	        for( int m=0; m < l; m++ ) {
+	        	p_lPlus1[m] = a_l[m] * x * p_l[m] - b_l[m] * p_lMinus1[m];
+	        }
+	        // P_{l+1}^l(x) = ( 2 l + 1 ) x P_l^l(x)
+	     	// P_{l+1}^{l+1}(x) = - ( 2 l + 1 ) sqrt( 1 - x^2 ) P_l^l(x)
+	        final double alphaPll = ( l + l + 1.0 ) * p_l[l];
+	        p_lPlus1[l] = x * alphaPll;
+	        p_lPlus1[lPlus1] = - sqrt1Minus_x2 * alphaPll;
+	    }
 	}
 	
 	
