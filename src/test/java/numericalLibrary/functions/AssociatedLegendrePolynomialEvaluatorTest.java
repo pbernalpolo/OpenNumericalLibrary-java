@@ -52,7 +52,8 @@ public class AssociatedLegendrePolynomialEvaluatorTest
     		// Compare with the implemented evaluation.
     		for( int l=0; l<5; l++ ) {
     			for( int m=0; m<=l; m++ ) {
-        			assertEquals( plmAnalytical[l][m] , associatedLegendrePolynomialEvaluator.getPlmValue( l , m ) , 1.0e-13 );
+    				//System.out.println( l + " " + m );
+        			assertEquals( plmAnalytical[l][m] , associatedLegendrePolynomialEvaluator.getPolynomialValue( l , m ) , 1.0e-13 );
     				
     			}
     		}
