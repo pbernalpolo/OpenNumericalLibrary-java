@@ -3,26 +3,68 @@ package numericalLibrary.functions;
 
 
 /**
- * P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
- * P_{l+1}^{l}(x) = nu_l x P_l^l(x)
- * P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
- * 
+ * Computes associated Legendre polynomials through generalized recurrence relations.
+ * <p>
+ * The generalized recurrence relations are:
+ * <ul>
+ * <li> P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
+ * <li> P_{l+1}^{l}(x) = nu_l x P_l^l(x)
+ * <li> P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
+ * </ul>
+ * starting from a fixed constant  P_0^0 .
+ * <p>
+ * These relations have been found in a great text written by Justin Willmert:
+ * https://justinwillmert.com/articles/2020/pre-normalizing-legendre-polynomials/
  */
 abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 {
+	////////////////////////////////////////////////////////////////
+	/// PROTECTED VARIABLES
+	////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Coefficients  mu_l  that define the recurrence relation  P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x) .
+	 */
 	protected final double[] mu;
+	
+	/**
+	 * Coefficients  nu_l  that define the recurrence relation  P_{l+1}^{l}(x) = nu_l x P_l^l(x) .
+	 */
 	protected final double[] nu;
+	
+	/**
+	 * Coefficients  alpha_l^m  that together with {@link #beta} define the recurrence relation  P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x) .
+	 * First index is the polynomial degree l.
+	 * Second index is the polynomial order m.
+	 */
 	protected final double[][] alpha;
+	
+	/**
+	 * Coefficients  beta_l^m  that together with {@link #alpha} define the recurrence relation  P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x) .
+	 * First index is the polynomial degree l.
+	 * Second index is the polynomial order m.
+	 */
 	protected final double[][] beta;
 	
 	/**
-	 * Result of evaluation of P_l^m(x).
+	 * Result of evaluation of  P_l^m(x) .
+	 * First index is the polynomial degree l.
+	 * Second index is the polynomial order m.
 	 */
 	protected final double[][] p;
 	
 	
-	public GeneralizedAssociatedLegendrePolynomialEvaluator( int lMaximum )
+	
+	////////////////////////////////////////////////////////////////
+	/// PROTECTED CONSTRUCTORS
+	////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Constructs a {@link GeneralizedAssociatedLegendrePolynomialEvaluator}.
+	 * 
+	 * @param lMaximum	maximum degree  l  to be evaluated. The degree  l  will range in  l = 0 , 1 , ... , lMaximum
+	 */
+	protected GeneralizedAssociatedLegendrePolynomialEvaluator( int lMaximum )
 	{
 		if( lMaximum < 0 ) {
 			throw new IllegalArgumentException( "Found negative polynomial degree." );
@@ -44,6 +86,28 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	}
 	
 	
+	
+	////////////////////////////////////////////////////////////////
+	/// PUBLIC METHODS
+	////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Evaluates the Legendre polynomials at x.
+	 * <p>
+	 * The input x must be in the interval [-1,1].
+	 * Otherwise, an {@link IllegalArgumentException} is thrown.
+	 * <p>
+	 * The Legendre polynomials are evaluated using the recurrence relations:
+	 * <ul>
+	 * <li> P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
+	 * <li> P_{l+1}^{l}(x) = nu_l x P_l^l(x)
+	 * <li> P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
+	 * </ul>
+	 * starting from a fixed constant  P_0^0 .
+	 * 
+	 * @param x		evaluation point. It must be in the interval [-1,1].
+	 * @throws IllegalArgumentException if x is not in the interval [-1,1].
+	 */
 	public void evaluate( double x )
 	{
 		if(  x < -1.0  ||  1.0 < x  ) {
@@ -90,6 +154,15 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	}
 	
 	
+	/**
+	 * Returns the value of the Legendre polynomial P_l^m(x).
+	 * <p>
+	 * The evaluation point is set from the last {@link #evaluate(double)} call.
+	 * 
+	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
+	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
+	 * @return	value of the Legendre polynomial P_l^m(x).
+	 */
 	public double getPolynomialValue( int l , int m )
 	{
 		return this.p[ l ][ m ];

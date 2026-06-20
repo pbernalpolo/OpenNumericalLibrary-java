@@ -11,13 +11,20 @@ import numericalLibrary.types.ComplexNumber;
 
 
 
+/**
+ * Implements test methods for {@link SphericalHarmonicsEvaluator}.
+ */
 public class SphericalHarmonicsEvaluatorTest
 {
+	////////////////////////////////////////////////////////////////
+	/// TEST METHODS
+	////////////////////////////////////////////////////////////////
+	
 	/**
      * Tests {@link SphericalHarmonicsEvaluator} by comparing evaluations with analytical forms.
      */
     @Test
-    void evaluationMatchesFirstAnalyticalPolynomials()
+    void evaluationMatchesFirstAnalyticalSphericalHarmonics()
     {
     	SphericalHarmonicsEvaluator sphericalHarmonicsEvaluator = new SphericalHarmonicsEvaluator( 4 );
     	Random randomNumberGenerator = new Random(42);

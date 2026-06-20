@@ -9,8 +9,15 @@ import org.junit.jupiter.api.Test;
 
 
 
+/**
+ * Implements test methods for {@link AssociatedLegendrePolynomialEvaluator}.
+ */
 public class AssociatedLegendrePolynomialEvaluatorTest
 {
+	////////////////////////////////////////////////////////////////
+	/// TEST METHODS
+	////////////////////////////////////////////////////////////////
+	
 	/**
      * Tests {@link AssociatedLegendrePolynomialEvaluator} by comparing evaluations with analytical forms.
      */

@@ -9,8 +9,15 @@ import org.junit.jupiter.api.Test;
 
 
 
+/**
+ * Implements test methods for {@link LegendrePolynomialEvaluator}.
+ */
 public class LegendrePolynomialEvaluatorTest
 {
+	////////////////////////////////////////////////////////////////
+	/// TEST METHODS
+	////////////////////////////////////////////////////////////////
+	
 	/**
      * Tests {@link LegendrePolynomialEvaluator} by comparing evaluations with analytical forms.
      */
@@ -23,7 +30,7 @@ public class LegendrePolynomialEvaluatorTest
     	for( int i=0; i<100; i++ ) {
     		// Get a random evaluation point.
     		double x = 2.0 * randomNumberGenerator.nextDouble() - 1.0;
-    		// Evaluate the analytical form of LegendrePolynomials.
+    		// Evaluate the analytical form of Legendre Polynomials.
     		pnAnalytical[0] = 1.0;
     		pnAnalytical[1] = x;
     		double x2 = x * x;
