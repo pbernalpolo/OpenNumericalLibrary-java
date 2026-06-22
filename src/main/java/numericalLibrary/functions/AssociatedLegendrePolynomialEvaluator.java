@@ -38,22 +38,30 @@ public class AssociatedLegendrePolynomialEvaluator
 	 */
 	public AssociatedLegendrePolynomialEvaluator( int lMaximum )
 	{
-		// Allocate
+		// Allocate space for variables.
 		super( lMaximum );
+		// Set mu_l and nu_l.
 		for( int l=0; l<lMaximum; l++ ) {
-			// For each l, m ranges from -l to l.
 			int lp = l + 1;
 			double two_lp_minus_1 = lp + lp - 1.0;
+			// Set mu_l = 2l'+1  with  l'=l+1.
 			this.mu[l] = two_lp_minus_1;
+			// Set nu_l = 2l'+1  with  l'=l+1.
 			this.nu[l] = two_lp_minus_1;
 		}
+		// Set mu; when  l  is even: mu[l-1] contains the product mu_{l-1} * mu_{l-2}.
+		for( int l=1; l<lMaximum; l+=2 ) {
+			this.mu[l] = this.mu[l] * this.mu[l-1];
+		}
+		// Set values for alpha and beta.
 		for( int l=0; l<lMaximum-1; l++ ) {
-			// For each l, m ranges from -l to l.
 			int lp = l + 2;
 			double two_lp_minus_1 = lp + lp - 1.0;
 			for( int m=0; m<=l; m++ ) {
 				double lp_minus_m = lp - m;
+				// alpha_l^m = ( 2 l' - 1 ) / ( l' - m )
 				this.alpha[l][m] = two_lp_minus_1 / lp_minus_m;
+				// beta_l^m = ( l' + m - 1 ) / ( l' - m )
 				this.beta[l][m] = ( lp + m - 1.0 ) / lp_minus_m;
 			}
 		}

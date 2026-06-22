@@ -7,14 +7,21 @@ package numericalLibrary.functions;
  * <p>
  * The generalized recurrence relations are:
  * <ul>
- * <li> P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
- * <li> P_{l+1}^{l}(x) = nu_l x P_l^l(x)
- * <li> P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
+ * <li> P_l^l(x) = - mu_{l-1} sqrt( 1 - x^2 ) P_{l-1}^{l-1}(x)
+ * <li> P_l^{l-1}(x) = nu_{l-1} x P_{l-1}^{l-1}(x)
+ * <li> P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x)
  * </ul>
  * starting from a fixed constant  P_0^0 .
  * <p>
  * These relations have been found in a great text written by Justin Willmert:
  * https://justinwillmert.com/articles/2020/pre-normalizing-legendre-polynomials/
+ * 
+ * In particular, it computes 1-x^2 so that there is no catastrophic cancelation.
+ * It also exploits the fact that given the recurrence relation
+ * P_l^l(x) = - mu_{l-1} sqrt( 1 - x^2 ) P_{l-1}^{l-1}(x)
+ * we have
+ * P_l^l(x) = mu_{l-1} mu_{l-2} ( 1 - x^2 ) P_{l-2}^{l-2}(x)
+ * so we can compute terms without introducing sqrt computation errors for even l terms.
  */
 abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 {
@@ -23,24 +30,25 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Coefficients  mu_l  that define the recurrence relation  P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x) .
+	 * If  l  is odd, then {@link #mu} contains at  l-1  the value of  mu_{l-1}  defining the recurrence relation  P_l^l(x) = - mu_{l-1} sqrt( 1 - x^2 ) P_{l-1}^{l-1}(x) .
+	 * If  l  is even, then {@link #mu} contains at  l-1  the result of the product  mu_{l-1} mu_{l-2}  defining the recurrence relation  P_l^l(x) = mu_{l-1} mu_{l-2} ( 1 - x^2 ) P_{l-2}^{l-2}(x) .
 	 */
 	protected final double[] mu;
 	
 	/**
-	 * Coefficients  nu_l  that define the recurrence relation  P_{l+1}^{l}(x) = nu_l x P_l^l(x) .
+	 * Coefficients  nu_l  that define the recurrence relation  P_l^{l-1}(x) = nu_{l-1} x P_{l-1}^{l-1}(x) .
 	 */
 	protected final double[] nu;
 	
 	/**
-	 * Coefficients  alpha_l^m  that together with {@link #beta} define the recurrence relation  P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x) .
+	 * Coefficients  alpha_l^m  that together with {@link #beta} define the recurrence relation  P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x) .
 	 * First index is the polynomial degree l.
 	 * Second index is the polynomial order m.
 	 */
 	protected final double[][] alpha;
 	
 	/**
-	 * Coefficients  beta_l^m  that together with {@link #alpha} define the recurrence relation  P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x) .
+	 * Coefficients  beta_l^m  that together with {@link #alpha} define the recurrence relation  P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x) .
 	 * First index is the polynomial degree l.
 	 * Second index is the polynomial order m.
 	 */
@@ -99,9 +107,9 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	 * <p>
 	 * The Legendre polynomials are evaluated using the recurrence relations:
 	 * <ul>
-	 * <li> P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
-	 * <li> P_{l+1}^{l}(x) = nu_l x P_l^l(x)
-	 * <li> P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
+	 * <li> P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x)
+	 * <li> P_l^{l-1}(x) = nu_{l-1} x P_{l-1}^{l-1}(x) .
+	 * <li> P_l^l(x) = - mu_{l-1} sqrt( 1 - x^2 ) P_{l-1}^{l-1}(x)
 	 * </ul>
 	 * starting from a fixed constant  P_0^0 .
 	 * 
@@ -121,35 +129,43 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	    final double[] mu = this.mu;
 	    final double[] nu = this.nu;
 	    
-	    final double sqrt1Minus_x2 = Math.sqrt( 1.0 - x * x );
+		// Compute  1 - x^2  =  (1+x) * (1-x) .
+	    final double one_minus_x2 = ( 1.0 + x ) * ( 1.0 - x );
 	    
-	    // Compute p_1^m.
-	    double[] p_1 = p[1];
-	    p_1[1] = - mu[0] * sqrt1Minus_x2 * p[0][0];
-	    p_1[0] = nu[0] * x * p[0][0];
+	    // Apply  P_l^l(x) = mu_{l-1} mu_{l-2} ( 1 - x^2 ) P_{l-2}^{l-2}(x) .
+	    for( int l=2, lMinus2=0; l<p.length; l+=2, lMinus2+=2 ) {
+	    	p[l][l] = mu[l-1] * one_minus_x2 * p[lMinus2][lMinus2];
+	    }
 	    
-	    // Compute p_l^m for l>1.
-	    for( int l=1, lPlus1=2, lMinus1=0; l<this.mu.length;  l++, lPlus1++, lMinus1++ ) {
+	    // Compute  sqrt( 1 - x^2 ) .
+	    final double sqrt_one_minus_x2 = Math.sqrt( one_minus_x2 );
+	    
+    	// Apply  P_l^l(x) = - mu_{l-1} sqrt( 1 - x^2 ) P_{l-1}^{l-1}(x) .
+	    for( int l=1, lMinus1=0; l<p.length; l+=2, lMinus1+=2 ) {
+	    	p[l][l] = - mu[lMinus1] * sqrt_one_minus_x2 * p[lMinus1][lMinus1];
+	    }
+	    
+	    // Apply  P_l^{l-1}(x) = nu_{l-1} x P_{l-1}^{l-1}(x) .
+	    for( int l=1, lMinus1=0; l<p.length; l++, lMinus1++ ) {
+	    	 p[l][lMinus1] = nu[lMinus1] * x * p[lMinus1][lMinus1];
+	    }
+	    
+	    // Apply  P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x) .
+	    for( int l=2, lMinus1=1, lMinus2=0; l<this.p.length;  l++, lMinus1++, lMinus2++ ) {
 	    	// Cache current l coefficients.
-	        final double[] alpha_lMinus1 = alpha[lMinus1];
-	        final double[] beta_lMinus1 = beta[lMinus1];
+	        final double[] alpha_lMinus2 = alpha[lMinus2];
+	        final double[] beta_lMinus2 = beta[lMinus2];
 	        
 	        // Cache current l references to avoid repeated jagged-array lookups.
+	        final double[] p_lMinus2 = p[lMinus2];
 	        final double[] p_lMinus1 = p[lMinus1];
 	        final double[] p_l = p[l];
-	        final double[] p_lPlus1 = p[lPlus1];
 	        
 	        // Compute polynomial P_{l+1}^m using previous l polynomials for m=0,...,l-1 .
-	        // P_{l+1}^{m}(x) = alpha_{l-1}^m x P_l^m(x) - beta_{l-1}^m P_{l-1}^m(x)
-	        for( int m = 0;  m < l;  m++ ) {
-	        	p_lPlus1[m] = alpha_lMinus1[m] * x * p_l[m] - beta_lMinus1[m] * p_lMinus1[m];
+	        // P_l^m(x) = alpha_{l-2}^m x P_{l-1}^m(x) - beta_{l-2}^m P_{l-2}^m(x)
+	        for( int m = 0;  m < l-1;  m++ ) {
+	        	p_l[m] = alpha_lMinus2[m] * x * p_lMinus1[m] - beta_lMinus2[m] * p_lMinus2[m];
 	        }
-	        
-	        // Compute P_{l+1}^{l+1} and P_{l+1}^{l}.
-	        // P_{l+1}^{l}(x) = nu_l x P_l^l(x)
-	        p_lPlus1[l] = nu[l] * x * p_l[l];
-	        // P_{l+1}^{l+1}(x) = - mu_l sqrt( 1 - x^2 ) P_l^l(x)
-	        p_lPlus1[lPlus1] = - mu[l] * sqrt1Minus_x2 * p_l[l];
 	    }
 	}
 	

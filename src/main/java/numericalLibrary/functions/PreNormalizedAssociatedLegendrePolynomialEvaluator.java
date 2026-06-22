@@ -38,27 +38,39 @@ public class PreNormalizedAssociatedLegendrePolynomialEvaluator
 	 */
 	public PreNormalizedAssociatedLegendrePolynomialEvaluator( int lMaximum )
 	{
-		// Allocate
+		// Allocate space for variables.
 		super( lMaximum );
+		// Set mu_l and nu_l.
 		for( int l=0; l<lMaximum; l++ ) {
 			int lp = l + 1;
 			double two_lp = lp + lp;
 			double two_lp_plus_1 = two_lp + 1.0;
+			// Set mu_l = sqrt( [ 2 l' + 1 ] / [ 2 l' ] )  with  l'=l+1.
 			this.mu[l] = Math.sqrt( two_lp_plus_1 / two_lp );
+			// Set nu_l = sqrt( 2 l' + 1 )  with  l'=l+1.
 			this.nu[l] = Math.sqrt( two_lp_plus_1 );
 		}
+		// Set mu; when  l  is even: mu[l-1] contains the product mu_{l-1} * mu_{l-2}.
+		for( int l=1; l<lMaximum; l+=2 ) {
+			int lp = l + 1;
+			double mu_l_squared = ( lp + lp + 1.0 ) / ( lp + lp );
+			double mu_l_minus1_squared = ( l + l + 1.0 ) / ( l + l );
+			this.mu[l] = Math.sqrt( mu_l_squared * mu_l_minus1_squared );
+		}
+		// Set values for alpha and beta.
 		for( int l=0; l<lMaximum-1; l++ ) {
-			// For each l, m ranges from -l to l.
 			int lp = l + 2;
 			double two_lp = lp + lp;
 			for( int m=0; m<=l; m++ ) {
 				double lp_plus_m = lp + m;
 				double lp_minus_m = lp - m;
+				// alpha = sqrt( [ ( 2 l' + 1 ) ( 2 l' - 1 ) ] / [ ( l' + m ) ( l' - m ) ] )
 				this.alpha[l][m] = Math.sqrt( ( ( two_lp + 1.0 ) / lp_plus_m ) * ( ( two_lp - 1.0 ) / lp_minus_m ) );
+				// beta = sqrt( [ ( 2 l' + 1 ) ( l' + m - 1 ) ( l' - m - 1 ) ] / [ ( 2 l' - 3 ) ( l' + m ) ( l' - m ) ] )
 				this.beta[l][m] = Math.sqrt( ( ( two_lp + 1.0 ) / ( two_lp - 3.0 ) ) * ( ( lp_plus_m - 1.0 ) / lp_plus_m ) * ( ( lp_minus_m - 1.0 ) / lp_minus_m ) );
 			}
 		}
-		this.p[0][0] = 0.5 / Math.sqrt( Math.PI );
+		this.p[0][0] = 1.0 / Math.sqrt( 4.0 * Math.PI );
 	}
 	
 }
