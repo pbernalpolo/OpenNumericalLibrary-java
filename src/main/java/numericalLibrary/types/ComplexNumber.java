@@ -133,6 +133,39 @@ public class ComplexNumber
     
     
     /**
+     * Sets the real and the imaginary parts.
+     * 
+     * @param real	real part to be set.
+     * @param imag	imaginary part to be set.
+     * @return	this {@link ComplexNumber} with the real and imaginary parts set.
+     */
+    public ComplexNumber setRealPartAndImaginaryPart( double real , double imag )
+    {
+    	this.x = real;
+    	this.y = imag;
+    	return this;
+    }
+    
+    
+    /**
+     * Sets this {@link ComplexNumber} to the value defined by the given modulus and argument.
+     * <p>
+     * That is, {@code this = modulus * ( cos( argument ) + i sin( argument ) )}.
+     * This is the in-place, allocation-free counterpart of {@link #fromModulusAndArgument(double, double)}.
+     *
+     * @param modulus   modulus of the {@link ComplexNumber}.
+     * @param argument  argument of the {@link ComplexNumber}.
+     * @return  this {@link ComplexNumber} set to the value defined by the given modulus and argument.
+     */
+    public ComplexNumber setModulusAndArgument( double modulus , double argument )
+    {
+        this.x = modulus * Math.cos( argument );
+        this.y = modulus * Math.sin( argument );
+        return this;
+    }
+    
+    
+    /**
      * {@inheritDoc}
      */
     public ComplexNumber add( ComplexNumber other )
@@ -397,18 +430,24 @@ public class ComplexNumber
     public ComplexNumber sqrt()
     {
         double modulus = this.norm();
-        return new ComplexNumber( Math.sqrt( 0.5 * ( modulus + this.re() ) ) ,
-                            Math.sqrt( 0.5 * ( modulus - this.re() ) ) * Math.signum( this.im() ) );
+        // Use the sign of the imaginary part, defaulting to + when it is zero.
+        // This yields the principal square root  +i sqrt( |re| )  for negative real numbers,
+        // instead of  0  as  Math.signum( 0.0 )  would produce.
+        double imaginarySign = ( this.im() >= 0.0 ) ? 1.0 : -1.0;
+        return new ComplexNumber(
+        		Math.sqrt( 0.5 * ( modulus + this.re() ) ) ,
+                Math.sqrt( 0.5 * ( modulus - this.re() ) ) * imaginarySign );
     }
     
     
     public ComplexNumber exp() {
         return new ComplexNumber( Math.cos( this.im() ) , Math.sin( this.im() ) ).scaleInplace( Math.exp( this.re() ) );
     }
-
-
+    
+    
     public ComplexNumber log() {
-        return new ComplexNumber( Math.log( this.re() ) , this.argument() );
+        // log( z ) = ln( |z| ) + i arg( z )
+        return new ComplexNumber( Math.log( this.norm() ) , this.argument() );
     }
     
     
@@ -533,8 +572,8 @@ public class ComplexNumber
     /**
      * Returns the i {@link ComplexNumber} stored in a new instance.
      * <p>
-     * That is {@code 0  +  1 · epsilon}.
-     * 
+     * That is {@code 0  +  1 · i}.
+     *
      * @return  i {@link ComplexNumber} stored in a new instance.
      */
     public static ComplexNumber i()
