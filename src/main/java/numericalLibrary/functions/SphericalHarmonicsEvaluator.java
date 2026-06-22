@@ -6,9 +6,23 @@ import numericalLibrary.types.ComplexNumber;
 
 
 /**
- * Computes spherical harmonics.
+ * Computes spherical harmonics  Y_l^m( theta , phi ).
  * <p>
- * It is composed of a {@link PreNormalizedAssociatedLegendrePolynomialEvaluator}.
+ * They are defined as:
+ * <p>
+ *   Y_l^m( theta , phi ) = P_l^m( cos( theta ) ) e^{ i m phi }
+ * <p>
+ * where  P_l^m  are the pre-normalized associated Legendre polynomials computed by the underlying
+ * {@link PreNormalizedAssociatedLegendrePolynomialEvaluator}.
+ * As a consequence:
+ * <ul>
+ * <li> The harmonics are fully (ortho)normalized: they integrate to 1 over the unit sphere, with  Y_0^0 = 1 / sqrt( 4 pi ) .
+ * <li> The Condon-Shortley phase  (-1)^m  is included (inherited from the Legendre recurrence relations).
+ * </ul>
+ * Only non-negative orders  m = 0 , 1 , ... , l  are evaluated.
+ * Negative orders can be obtained from the symmetry relation:
+ * <p>
+ *   Y_l^{-m}( theta , phi ) = (-1)^m conjugate( Y_l^m( theta , phi ) )
  */
 public class SphericalHarmonicsEvaluator
 {
@@ -59,15 +73,22 @@ public class SphericalHarmonicsEvaluator
 	 * 
 	 * @param theta		polar angle. It must be in the interval [0,pi].
 	 * @param phi	azimuth angle. It must be in the interval [0,2pi].
+	 * @throws IllegalArgumentException if theta is not in [0,pi], or phi is not in [0,2pi].
 	 */
 	public void evaluate( double theta , double phi )
 	{
+		if(  theta < 0.0  ||  Math.PI < theta  ) {
+			throw new IllegalArgumentException( "theta must be in [0, pi]; found " + theta );
+		}
+		if(  phi < 0.0  ||  2.0 * Math.PI < phi  ) {
+			throw new IllegalArgumentException( "phi must be in [0, 2 pi]; found " + phi );
+		}
 		// Evaluate normalized associated Legendre polynomials.
 		double x = Math.cos( theta );
 		this.normalizedAssociatedLegendrePolynomialEvaluator.evaluate( x );
-		// Evaluate complex exponentials.
+		// Evaluate complex exponentials  e^{ i m phi } in place, without allocating temporaries.
 		for( int m=0; m<this.complexExponentials.length; m++ ) {
-			this.complexExponentials[m].setTo( ComplexNumber.i().scaleInplace( m * phi ).exp() );
+			this.complexExponentials[m].setModulusAndArgument( 1.0 , m * phi );
 		}
 	}
 	
