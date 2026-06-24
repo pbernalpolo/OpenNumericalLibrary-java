@@ -70,6 +70,16 @@ public class PreNormalizedAssociatedLegendrePolynomialEvaluator
 				this.beta[l][m] = Math.sqrt( ( ( two_lp + 1.0 ) / ( two_lp - 3.0 ) ) * ( ( lp_plus_m - 1.0 ) / lp_plus_m ) * ( ( lp_minus_m - 1.0 ) / lp_minus_m ) );
 			}
 		}
+		// Set the derivative-recurrence coefficient.
+		// For the pre-normalized polynomials:
+		// gamma_l^m = sqrt( ( 2 l + 1 ) ( l + m ) ( l - m ) / ( 2 l - 1 ) ), stored at index l-1.
+		for( int lMinus1=0; lMinus1<lMaximum; lMinus1++ ) {
+			int l = lMinus1 + 1;
+			double ratio = ( 2.0 * l + 1.0 ) / ( 2.0 * l - 1.0 );
+			for( int m=0; m<=lMinus1; m++ ) {
+				this.gamma[lMinus1][m] = Math.sqrt( ratio * ( l + m ) * ( l - m ) );
+			}
+		}
 		this.p[0][0] = 1.0 / Math.sqrt( 4.0 * Math.PI );
 	}
 	

@@ -60,9 +60,30 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	 * Second index is the polynomial order m.
 	 */
 	protected final double[][] p;
-	
-	
-	
+
+	/**
+	 * Coefficients  gamma_l^m  that define the derivative recurrence  ( x^2 - 1 ) dP_l^m/dx = l x P_l^m - gamma_{l-1}^m P_{l-1}^m .
+	 * The coefficient in front of  x P_l^m  is always  l  regardless of the normalization (it keeps the normalization of  P_l^m );
+	 * only  gamma , the coefficient in front of  P_{l-1}^m , is normalization-dependent and is filled by the concrete subclass.
+	 * Stored shifted by one degree (as {@link #mu} and {@link #nu} are): {@code gamma[l-1][m]} is used by the degree-l recurrence,
+	 * so the first index ranges in  l-1 = 0 , 1 , ... , lMaximum-1  and the second index is the order m.
+	 */
+	protected final double[][] gamma;
+
+	/**
+	 * Result of evaluation of  ( x^2 - 1 ) dP_l^m/dx(x) , set by {@link #evaluateDerivatives()}.
+	 * First index is the polynomial degree l.
+	 * Second index is the polynomial order m.
+	 */
+	protected final double[][] dp;
+
+	/**
+	 * Evaluation point set by the last {@link #evaluate(double)} call, needed by {@link #evaluateDerivatives()}.
+	 */
+	protected double x;
+
+
+
 	////////////////////////////////////////////////////////////////
 	/// PROTECTED CONSTRUCTORS
 	////////////////////////////////////////////////////////////////
@@ -91,6 +112,16 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 		for( int l=0; l<this.p.length; l++ ) {
 			this.p[l] = new double[ l+1 ];
 		}
+		this.gamma = new double[ lMaximum ][];
+		for( int lMinus1=0; lMinus1<this.gamma.length; lMinus1++ ) {
+			this.gamma[lMinus1] = new double[ lMinus1+1 ];
+		}
+		this.dp = new double[ lMaximum + 1 ][];
+		for( int l=0; l<this.dp.length; l++ ) {
+			this.dp[l] = new double[ l+1 ];
+		}
+		// P_0^0 is constant, so ( x^2 - 1 ) dP_0^0/dx is zero for every x; set it once here and never recompute it.
+		this.dp[0][0] = 0.0;
 	}
 	
 	
@@ -121,7 +152,8 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 		if(  x < -1.0  ||  1.0 < x  ) {
 			throw new IllegalArgumentException( "x must be in [-1, 1]" );
 		}
-		
+		this.x = x;
+
 		// Cache field references locally.
 		final double[][] alpha = this.alpha;
 	    final double[][] beta = this.beta;
@@ -183,5 +215,56 @@ abstract class GeneralizedAssociatedLegendrePolynomialEvaluator
 	{
 		return this.p[ l ][ m ];
 	}
-	
+
+
+	/**
+	 * Evaluates  ( x^2 - 1 ) dP_l^m/dx  at the point set by the last {@link #evaluate(double)} call.
+	 * <p>
+	 * It applies the derivative recurrence  ( x^2 - 1 ) dP_l^m/dx = l x P_l^m - gamma_{l-1}^m P_{l-1}^m ,
+	 * reusing the polynomial values computed by {@link #evaluate(double)}. {@link #evaluate(double)} must be called first.
+	 * <p>
+	 * The degree-0 term is left untouched: P_0^0 is constant, so  dp[0][0]  keeps the zero set at construction.
+	 */
+	public void evaluateDerivatives()
+	{
+		final double[][] p = this.p;
+		final double[][] dp = this.dp;
+		final double[][] gamma = this.gamma;
+		final double x = this.x;
+
+		// Apply  ( x^2 - 1 ) dP_l^m/dx = l x P_l^m - gamma_{l-1}^m P_{l-1}^m .
+		for( int l=1, lMinus1=0; l<dp.length; l++, lMinus1++ ) {
+			final double[] p_l = p[l];
+			final double[] p_lMinus1 = p[lMinus1];
+			final double[] dp_l = dp[l];
+			final double[] gamma_lMinus1 = gamma[lMinus1];
+			final double lx = l * x;
+			// Tesseral terms ( m < l ) use the previous degree.
+			for( int m=0; m<l; m++ ) {
+				dp_l[m] = lx * p_l[m] - gamma_lMinus1[m] * p_lMinus1[m];
+			}
+			// Sectoral term ( m = l ): P_{l-1}^l = 0 .
+			dp_l[l] = lx * p_l[l];
+		}
+	}
+
+
+	/**
+	 * Returns the value of  ( x^2 - 1 ) dP_l^m/dx .
+	 * <p>
+	 * The evaluation point is set from the last {@link #evaluate(double)} call, and the derivative must have been
+	 * computed by a subsequent {@link #evaluateDerivatives()} call.
+	 * <p>
+	 * Note that  ( x^2 - 1 ) dP_l^m/dx(cos theta) = sin( theta ) dP_l^m/dtheta(cos theta) , which is finite everywhere
+	 * (in particular at the poles, where the bare  dP_l^m/dtheta  would be a  0/0  limit).
+	 *
+	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
+	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
+	 * @return	value of  ( x^2 - 1 ) dP_l^m/dx .
+	 */
+	public double getPolynomialDerivativeTimesX2Minus1( int l , int m )
+	{
+		return this.dp[ l ][ m ];
+	}
+
 }

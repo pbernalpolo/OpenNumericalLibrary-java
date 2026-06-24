@@ -65,6 +65,15 @@ public class AssociatedLegendrePolynomialEvaluator
 				this.beta[l][m] = ( lp + m - 1.0 ) / lp_minus_m;
 			}
 		}
+		// Set the derivative-recurrence coefficient.
+		// For the unnormalized polynomials:
+		// gamma_l^m = l + m, stored at index l-1.
+		for( int lMinus1=0; lMinus1<lMaximum; lMinus1++ ) {
+			int l = lMinus1 + 1;
+			for( int m=0; m<=lMinus1; m++ ) {
+				this.gamma[lMinus1][m] = l + m;
+			}
+		}
 		this.p[0][0] = 1.0;
 	}
 	
