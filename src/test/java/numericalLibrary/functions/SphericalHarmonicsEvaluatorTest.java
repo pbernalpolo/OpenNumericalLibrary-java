@@ -62,7 +62,9 @@ public class SphericalHarmonicsEvaluatorTest
     		sphericalHarmonicsAnalytical[4][3] = ComplexNumber.i().scaleInplace( 3.0 * phi ).exp().scaleInplace( - 3.0 / 8.0 * Math.sqrt( 35.0 ) * one_over_sqrt_pi * sin3theta * cosTheta );
     		sphericalHarmonicsAnalytical[4][4] = ComplexNumber.i().scaleInplace( 4.0 * phi ).exp().scaleInplace( 3.0 / 16.0 * Math.sqrt( 35.0 / 2.0 ) * one_over_sqrt_pi * sin4theta );
     		// Evaluate the implemented version.
-    		sphericalHarmonicsEvaluator.evaluateWithThetaAndPhi( theta , phi );
+    		sphericalHarmonicsEvaluator.setTheta( theta );
+    		sphericalHarmonicsEvaluator.setPhi( phi );
+    		sphericalHarmonicsEvaluator.evaluate();
     		// Compare with the implemented evaluation.
     		for( int l=0; l<5; l++ ) {
     			for( int m=0; m<=l; m++ ) {

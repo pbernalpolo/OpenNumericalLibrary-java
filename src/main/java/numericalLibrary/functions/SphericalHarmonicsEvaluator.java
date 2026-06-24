@@ -31,8 +31,12 @@ package numericalLibrary.functions;
  * <br>
  * (using  x^2 - 1 = -sin^2( theta ) ).
  * The extra  sin( theta )  factor removes the  0/0  limit at the poles.
- * 
- * See {@link #evaluateDerivatives()}.
+ * <p>
+ * Usage: set the evaluation point with the {@code setTheta}/{@code setCosTheta} and {@code setPhi}/{@code setCosPhiAndSinPhi}
+ * methods, then call {@link #evaluate()} (for the values) and/or {@link #evaluateDerivatives()} (for the derivatives).
+ * The colatitude (theta) and azimuth (phi) parts are cached and recomputed lazily, so sweeping a row at constant
+ * colatitude while varying the azimuth only re-evaluates the inexpensive azimuth part. {@link #evaluate()} and
+ * {@link #evaluateDerivatives()} are idempotent until the point changes.
  */
 public class SphericalHarmonicsEvaluator
 {
@@ -46,14 +50,40 @@ public class SphericalHarmonicsEvaluator
 	private final PreNormalizedAssociatedLegendrePolynomialEvaluator legendre;
 
 	/**
-	 * Real part of the complex exponential  e^{ i m phi } , i.e.  cos( m phi ) , for the last {@link #evaluate(double, double, double)} call.
+	 * Real part of the complex exponential  e^{ i m phi } , i.e.  cos( m phi ) , for the current azimuth.
 	 */
 	private final double[] cos_mPhi;
 
 	/**
-	 * Imaginary part of the complex exponential  e^{ i m phi } , i.e.  sin( m phi ) , for the last {@link #evaluate(double, double, double)} call.
+	 * Imaginary part of the complex exponential  e^{ i m phi } , i.e.  sin( m phi ) , for the current azimuth.
 	 */
 	private final double[] sin_mPhi;
+
+	/**
+	 * Cosine of the current polar angle.
+	 */
+	private double cosTheta = 1.0;
+
+	/**
+	 * Cosine and sine of the current azimuth angle.
+	 */
+	private double cosPhi = 1.0;
+	private double sinPhi = 0.0;
+
+	/**
+	 * Whether the Legendre polynomial values must be recomputed because {@link #cosTheta} changed.
+	 */
+	private boolean legendreValuesDirty = true;
+
+	/**
+	 * Whether the Legendre polynomial derivatives must be recomputed because {@link #cosTheta} changed.
+	 */
+	private boolean legendreDerivativesDirty = true;
+
+	/**
+	 * Whether the azimuth exponentials must be recomputed because {@link #cosPhi} or {@link #sinPhi} changed.
+	 */
+	private boolean exponentialsDirty = true;
 
 
 
@@ -80,61 +110,107 @@ public class SphericalHarmonicsEvaluator
 	////////////////////////////////////////////////////////////////
 
 	/**
-	 * Evaluates the spherical harmonics at ( theta , phi ).
+	 * Sets the polar angle of the evaluation point.
+	 * <p>
+	 * Prefer {@link #setCosTheta(double)} when  cos( theta )  is already available: it avoids recovering  theta
+	 * with an arc-cosine only to take its cosine again, which is wasteful and ill-conditioned near the poles.
 	 *
 	 * @param theta		polar angle. It must be in the interval [0,pi].
-	 * @param phi	azimuth angle. It must be in the interval [0,2pi].
-	 * @throws IllegalArgumentException if theta is not in [0,pi], or phi is not in [0,2pi].
+	 * @throws IllegalArgumentException if theta is not in [0,pi].
 	 */
-	public void evaluateWithThetaAndPhi( double theta , double phi )
+	public void setTheta( double theta )
 	{
 		if(  theta < 0.0  ||  Math.PI < theta  ) {
 			throw new IllegalArgumentException( "theta must be in [0, pi]; found " + theta );
 		}
-		if(  phi < 0.0  ||  2.0 * Math.PI < phi  ) {
-			throw new IllegalArgumentException( "phi must be in [0, 2 pi]; found " + phi );
-		}
-		this.evaluate( Math.cos( theta ) , Math.cos( phi ) , Math.sin( phi ) );
+		this.setCosTheta( Math.cos( theta ) );
 	}
 
 
 	/**
-	 * Evaluates the spherical harmonics at ( theta , phi ), taking  cos( theta ) ,  cos( phi )  and  sin( phi )  directly.
-	 * <p>
-	 * Prefer this method when these values are already available (for example, as direction cosines): it avoids recovering
-	 * the angles only to take their cosine and sine again, which is wasteful and, for  theta , ill-conditioned near the poles.
+	 * Sets the cosine of the polar angle of the evaluation point.
 	 *
 	 * @param cosTheta	cosine of the polar angle. It must be in the interval [-1,1].
-	 * @param cosPhi	cosine of the azimuth angle.
-	 * @param sinPhi	sine of the azimuth angle.  ( cosPhi , sinPhi )  must be a unit vector.
-	 * @throws IllegalArgumentException if cosTheta is not in [-1,1], or ( cosPhi , sinPhi ) is not a unit vector.
+	 * @throws IllegalArgumentException if cosTheta is not in [-1,1].
 	 */
-	public void evaluateWithCosThetaCosPhiAndSinPhi( double cosTheta , double cosPhi , double sinPhi )
+	public void setCosTheta( double cosTheta )
 	{
 		if(  cosTheta < -1.0  ||  1.0 < cosTheta  ) {
 			throw new IllegalArgumentException( "cosTheta must be in [-1, 1]; found " + cosTheta );
 		}
-		if(  Math.abs( cosPhi * cosPhi + sinPhi * sinPhi - 1.0 ) > 1.0e-9  ) {
-			throw new IllegalArgumentException( "( cosPhi , sinPhi ) must be a unit vector; found ( " + cosPhi + " , " + sinPhi + " )" );
+		if( cosTheta == this.cosTheta ) {
+			return;
 		}
-		this.evaluate( cosTheta , cosPhi , sinPhi );
+		this.cosTheta = cosTheta;
+		this.legendreValuesDirty = true;
+		this.legendreDerivativesDirty = true;
 	}
 
 
 	/**
-	 * Evaluates the colatitude derivatives of the spherical harmonics at the point set by the last call to either:
-	 * <ul>
-	 * <li> {@link #evaluateWithThetaAndPhi(double, double)}
-	 * <li> {@link #evaluateWithCosThetaCosPhiAndSinPhi(double, double, double)}
-	 * </ul>
+	 * Sets the azimuth angle of the evaluation point.
 	 * <p>
-	 * The derivative is provided in the scaled, pole-safe form  sin( theta ) dY_l^m/dtheta = [ ( x^2 - 1 ) dP_l^m/dx(x) ]_{x=cos theta} e^{ i m phi } ,
-	 * accessed through {@link #getSphericalHarmonicsDerivativeRealPart(int, int)} and
+	 * Prefer {@link #setCosPhiAndSinPhi(double, double)} when these values are already available (for example, as direction cosines).
+	 *
+	 * @param phi	azimuth angle. It must be in the interval [0,2pi].
+	 * @throws IllegalArgumentException if phi is not in [0,2pi].
+	 */
+	public void setPhi( double phi )
+	{
+		if(  phi < 0.0  ||  2.0 * Math.PI < phi  ) {
+			throw new IllegalArgumentException( "phi must be in [0, 2 pi]; found " + phi );
+		}
+		this.setCosPhiAndSinPhi( Math.cos( phi ) , Math.sin( phi ) );
+	}
+
+
+	/**
+	 * Sets the cosine and sine of the azimuth angle of the evaluation point.
+	 *
+	 * @param cosPhi	cosine of the azimuth angle.
+	 * @param sinPhi	sine of the azimuth angle.  ( cosPhi , sinPhi )  must be a unit vector.
+	 * @throws IllegalArgumentException if ( cosPhi , sinPhi ) is not a unit vector.
+	 */
+	public void setCosPhiAndSinPhi( double cosPhi , double sinPhi )
+	{
+		if(  Math.abs( cosPhi * cosPhi + sinPhi * sinPhi - 1.0 ) > 1.0e-9  ) {
+			throw new IllegalArgumentException( "( cosPhi , sinPhi ) must be a unit vector; found ( " + cosPhi + " , " + sinPhi + " )" );
+		}
+		if(  cosPhi == this.cosPhi  &&  sinPhi == this.sinPhi  ) {
+			return;
+		}
+		this.cosPhi = cosPhi;
+		this.sinPhi = sinPhi;
+		this.exponentialsDirty = true;
+	}
+
+
+	/**
+	 * Evaluates the spherical harmonics at the current evaluation point.
+	 * <p>
+	 * Must be called before {@link #getSphericalHarmonicsRealPart(int, int)} and {@link #getSphericalHarmonicsImaginaryPart(int, int)}.
+	 * Only the parts whose inputs changed since the last call are recomputed.
+	 */
+	public void evaluate()
+	{
+		this.cleanLegendreValues();
+		this.cleanExponentials();
+	}
+
+
+	/**
+	 * Evaluates the colatitude derivatives of the spherical harmonics at the current evaluation point.
+	 * <p>
+	 * Must be called before {@link #getSphericalHarmonicsDerivativeRealPart(int, int)} and
 	 * {@link #getSphericalHarmonicsDerivativeImaginaryPart(int, int)}.
+	 * The derivative is provided in the scaled, pole-safe form  sin( theta ) dY_l^m/dtheta = [ ( x^2 - 1 ) dP_l^m/dx(x) ]_{x=cos theta} e^{ i m phi } .
+	 * Only the parts whose inputs changed since the last call are recomputed.
 	 */
 	public void evaluateDerivatives()
 	{
-		this.legendre.evaluateDerivatives();
+		this.cleanLegendreValues();
+		this.cleanLegendreDerivatives();
+		this.cleanExponentials();
 	}
 
 
@@ -142,11 +218,7 @@ public class SphericalHarmonicsEvaluator
 	 * Returns the real part of the spherical harmonic  Y_l^m( theta , phi ):
 	 * P_l^m( cos theta ) cos( m phi ) .
 	 * <p>
-	 * The evaluation point is set from the last call to either:
-	 * <ul>
-	 * <li> {@link #evaluateWithThetaAndPhi(double, double)}
-	 * <li> {@link #evaluateWithCosThetaCosPhiAndSinPhi(double, double, double)}
-	 * </ul>
+	 * Requires a previous {@link #evaluate()} call at the current point.
 	 *
 	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
 	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
@@ -162,11 +234,7 @@ public class SphericalHarmonicsEvaluator
 	 * Returns the imaginary part of the spherical harmonic  Y_l^m( theta , phi ):
 	 * P_l^m( cos theta ) sin( m phi ) .
 	 * <p>
-	 * The evaluation point is set from the last call to either:
-	 * <ul>
-	 * <li> {@link #evaluateWithThetaAndPhi(double, double)}
-	 * <li> {@link #evaluateWithCosThetaCosPhiAndSinPhi(double, double, double)}
-	 * </ul>
+	 * Requires a previous {@link #evaluate()} call at the current point.
 	 *
 	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
 	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
@@ -182,7 +250,7 @@ public class SphericalHarmonicsEvaluator
 	 * Returns the real part of the scaled colatitude derivative  sin( theta ) dY_l^m/dtheta:
 	 * {@code [ ( x^2 - 1 ) dP_l^m/dx(x) ]_{x=cos theta} cos( m phi )}.
 	 * <p>
-	 * Requires a previous {@link #evaluateDerivatives()} call.
+	 * Requires a previous {@link #evaluateDerivatives()} call at the current point.
 	 *
 	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
 	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
@@ -195,10 +263,10 @@ public class SphericalHarmonicsEvaluator
 
 
 	/**
-	 * Returns the imaginary part of the scaled colatitude derivative  sin( theta ) dY_l^m/dtheta , i.e.
+	 * Returns the imaginary part of the scaled colatitude derivative  sin( theta ) dY_l^m/dtheta:
 	 * {@code [ ( x^2 - 1 ) dP_l^m/dx(x) ]_{x=cos theta} sin( m phi )}.
 	 * <p>
-	 * Requires a previous {@link #evaluateDerivatives()} call.
+	 * Requires a previous {@link #evaluateDerivatives()} call at the current point.
 	 *
 	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
 	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
@@ -216,25 +284,47 @@ public class SphericalHarmonicsEvaluator
 	////////////////////////////////////////////////////////////////
 
 	/**
-	 * Evaluates the spherical harmonics from the already-validated direction cosines.
-	 * <p>
-	 * This is the shared core of the public {@code evaluate...} methods; it performs no argument checks.
-	 *
-	 * @param cosTheta	cosine of the polar angle, assumed to be in [-1,1].
-	 * @param cosPhi	cosine of the azimuth angle, with  ( cosPhi , sinPhi )  assumed to be a unit vector.
-	 * @param sinPhi	sine of the azimuth angle, with  ( cosPhi , sinPhi )  assumed to be a unit vector.
+	 * Recomputes the Legendre polynomial values if the polar angle changed since the last computation.
 	 */
-	private void evaluate( double cosTheta , double cosPhi , double sinPhi )
+	private void cleanLegendreValues()
 	{
-		// Evaluate normalized associated Legendre polynomials.
-		this.legendre.evaluate( cosTheta );
-		// Evaluate  cos( m phi )  and  sin( m phi )  by recurrence, without per-order trigonometric calls or temporaries.
+		if( !this.legendreValuesDirty ) {
+			return;
+		}
+		this.legendre.evaluate( this.cosTheta );
+		this.legendreValuesDirty = false;
+	}
+
+
+	/**
+	 * Recomputes the Legendre polynomial derivatives if the polar angle changed since the last computation.
+	 */
+	private void cleanLegendreDerivatives()
+	{
+		this.cleanLegendreValues();
+		if( !this.legendreDerivativesDirty ) {
+			return;
+		}
+		this.legendre.evaluateDerivatives();
+		this.legendreDerivativesDirty = false;
+	}
+
+
+	/**
+	 * Recomputes the azimuth exponentials  cos( m phi )  and  sin( m phi )  if the azimuth changed since the last computation.
+	 */
+	private void cleanExponentials()
+	{
+		if( !this.exponentialsDirty ) {
+			return;
+		}
 		this.cos_mPhi[0] = 1.0;
 		this.sin_mPhi[0] = 0.0;
 		for( int m=1; m<this.cos_mPhi.length; m++ ) {
-			this.cos_mPhi[m] = cosPhi * this.cos_mPhi[m-1] - sinPhi * this.sin_mPhi[m-1];
-			this.sin_mPhi[m] = sinPhi * this.cos_mPhi[m-1] + cosPhi * this.sin_mPhi[m-1];
+			this.cos_mPhi[m] = this.cosPhi * this.cos_mPhi[m-1] - this.sinPhi * this.sin_mPhi[m-1];
+			this.sin_mPhi[m] = this.sinPhi * this.cos_mPhi[m-1] + this.cosPhi * this.sin_mPhi[m-1];
 		}
+		this.exponentialsDirty = false;
 	}
 
 }
