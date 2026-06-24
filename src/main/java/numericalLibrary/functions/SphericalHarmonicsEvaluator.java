@@ -1,12 +1,9 @@
 package numericalLibrary.functions;
 
 
-import numericalLibrary.types.ComplexNumber;
-
-
 
 /**
- * Computes spherical harmonics  Y_l^m( theta , phi ).
+ * Computes spherical harmonics  Y_l^m( theta , phi )  and their colatitude derivatives.
  * <p>
  * They are defined as:
  * <p>
@@ -21,56 +18,70 @@ import numericalLibrary.types.ComplexNumber;
  * </ul>
  * Only non-negative orders  m = 0 , 1 , ... , l  are evaluated.
  * Negative orders can be obtained from the symmetry relation:
- * <p>
+ * <br>
  *   Y_l^{-m}( theta , phi ) = (-1)^m conjugate( Y_l^m( theta , phi ) )
+ * <p>
+ * The real and imaginary parts are exposed directly (instead of a complex type)
+ * so that callers can accumulate large sums without allocating temporaries.
+ * <p>
+ * The colatitude derivative is  dY_l^m/dtheta = - sin( theta ) [ dP_l^m/dx(x) ]_{x=cos theta} e^{ i m phi } .
+ * This evaluator exposes it in the scaled, pole-safe form (multiplied by  sin( theta ) ):
+ * <br>
+ *   sin( theta ) dY_l^m/dtheta = [ ( x^2 - 1 ) dP_l^m/dx(x) ]_{x=cos theta} e^{ i m phi }
+ * <br>
+ * (using  x^2 - 1 = -sin^2( theta ) ).
+ * The extra  sin( theta )  factor removes the  0/0  limit at the poles.
+ * 
+ * See {@link #evaluateDerivatives()}.
  */
 public class SphericalHarmonicsEvaluator
 {
 	////////////////////////////////////////////////////////////////
 	/// PRIVATE VARIABLES
 	////////////////////////////////////////////////////////////////
-	
+
 	/**
-	 * {@link PreNormalizedAssociatedLegendrePolynomialEvaluator} used to compute the Legendre polynomials contribution.
+	 * {@link PreNormalizedAssociatedLegendrePolynomialEvaluator} used to compute the Legendre polynomials contribution and its derivative.
 	 */
-	private PreNormalizedAssociatedLegendrePolynomialEvaluator normalizedAssociatedLegendrePolynomialEvaluator;
-	
+	private final PreNormalizedAssociatedLegendrePolynomialEvaluator legendre;
+
 	/**
-	 * Complex exponentials resulting from evaluating  e^{ i m phi }  being  phi  the azimuth in the interval [0,2pi].
+	 * Real part of the complex exponential  e^{ i m phi } , i.e.  cos( m phi ) , for the last {@link #evaluate(double, double)} call.
 	 */
-	private ComplexNumber[] complexExponentials;
-	
-	
-	
+	private final double[] cos_mPhi;
+
+	/**
+	 * Imaginary part of the complex exponential  e^{ i m phi } , i.e.  sin( m phi ) , for the last {@link #evaluate(double, double)} call.
+	 */
+	private final double[] sin_mPhi;
+
+
+
 	////////////////////////////////////////////////////////////////
 	/// PUBLIC CONSTRUCTORS
 	////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * Constructs a {@link SphericalHarmonicsEvaluator}.
-	 * 
+	 *
 	 * @param lMaximum		maximum degree  l  to be evaluated. The degree  l  will range in  l = 0 , 1 , ... , lMaximum
 	 */
 	public SphericalHarmonicsEvaluator( int lMaximum )
 	{
-		// Create normalized associated Legendre polynomials.
-		this.normalizedAssociatedLegendrePolynomialEvaluator = new PreNormalizedAssociatedLegendrePolynomialEvaluator( lMaximum );
-		// Create array of complex exponentials.
-		this.complexExponentials = new ComplexNumber[ lMaximum + 1 ];
-		for( int m=0; m<this.complexExponentials.length; m++ ) {
-			this.complexExponentials[m] = ComplexNumber.one();
-		}
+		this.legendre = new PreNormalizedAssociatedLegendrePolynomialEvaluator( lMaximum );
+		this.cos_mPhi = new double[ lMaximum + 1 ];
+		this.sin_mPhi = new double[ lMaximum + 1 ];
 	}
-	
-	
-	
+
+
+
 	////////////////////////////////////////////////////////////////
 	/// PUBLIC METHODS
 	////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * Evaluates the spherical harmonics at ( theta , phi ).
-	 * 
+	 *
 	 * @param theta		polar angle. It must be in the interval [0,pi].
 	 * @param phi	azimuth angle. It must be in the interval [0,2pi].
 	 * @throws IllegalArgumentException if theta is not in [0,pi], or phi is not in [0,2pi].
@@ -84,27 +95,91 @@ public class SphericalHarmonicsEvaluator
 			throw new IllegalArgumentException( "phi must be in [0, 2 pi]; found " + phi );
 		}
 		// Evaluate normalized associated Legendre polynomials.
-		double x = Math.cos( theta );
-		this.normalizedAssociatedLegendrePolynomialEvaluator.evaluate( x );
-		// Evaluate complex exponentials  e^{ i m phi } in place, without allocating temporaries.
-		for( int m=0; m<this.complexExponentials.length; m++ ) {
-			this.complexExponentials[m].setModulusAndArgument( 1.0 , m * phi );
+		this.legendre.evaluate( Math.cos( theta ) );
+		// Evaluate  cos( m phi )  and  sin( m phi )  by recurrence, without per-order trigonometric calls or temporaries.
+		double cosPhi = Math.cos( phi );
+		double sinPhi = Math.sin( phi );
+		this.cos_mPhi[0] = 1.0;
+		this.sin_mPhi[0] = 0.0;
+		for( int m=1; m<this.cos_mPhi.length; m++ ) {
+			this.cos_mPhi[m] = cosPhi * this.cos_mPhi[m-1] - sinPhi * this.sin_mPhi[m-1];
+			this.sin_mPhi[m] = sinPhi * this.cos_mPhi[m-1] + cosPhi * this.sin_mPhi[m-1];
 		}
 	}
-	
-	
+
+
 	/**
-	 * Returns the spherical harmonic  Y_l^m( theta , phi ).
+	 * Evaluates the colatitude derivatives of the spherical harmonics at the point set by the last {@link #evaluate(double, double)} call.
+	 * <p>
+	 * The derivative is provided in the scaled, pole-safe form  sin( theta ) dY_l^m/dtheta = [ ( x^2 - 1 ) dP_l^m/dx(x) ]_x=cos theta e^{ i m phi } ,
+	 * accessed through {@link #getSphericalHarmonicsDerivativeRealPart(int, int)} and
+	 * {@link #getSphericalHarmonicsDerivativeImaginaryPart(int, int)}. {@link #evaluate(double, double)} must be called first.
+	 */
+	public void evaluateDerivatives()
+	{
+		this.legendre.evaluateDerivatives();
+	}
+
+
+	/**
+	 * Returns the real part of the spherical harmonic  Y_l^m( theta , phi ) , i.e.  P_l^m( cos theta ) cos( m phi ) .
 	 * <p>
 	 * The evaluation point is set from the last {@link #evaluate(double, double)} call.
-	 * 
+	 *
 	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
 	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
-	 * @return	{@link ComplexNumber} that results from evaluating the spherical harmonic  Y_l^m( theta , phi ).
+	 * @return	real part of  Y_l^m( theta , phi ) .
 	 */
-	public ComplexNumber getSphericalHarmonicsValue( int l , int m )
+	public double getSphericalHarmonicsRealPart( int l , int m )
 	{
-		return this.complexExponentials[m].scale( this.normalizedAssociatedLegendrePolynomialEvaluator.getPolynomialValue( l , m ) );
+		return this.cos_mPhi[m] * this.legendre.getPolynomialValue( l , m );
 	}
-	
+
+
+	/**
+	 * Returns the imaginary part of the spherical harmonic  Y_l^m( theta , phi ) , i.e.  P_l^m( cos theta ) sin( m phi ) .
+	 * <p>
+	 * The evaluation point is set from the last {@link #evaluate(double, double)} call.
+	 *
+	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
+	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
+	 * @return	imaginary part of  Y_l^m( theta , phi ) .
+	 */
+	public double getSphericalHarmonicsImaginaryPart( int l , int m )
+	{
+		return this.sin_mPhi[m] * this.legendre.getPolynomialValue( l , m );
+	}
+
+
+	/**
+	 * Returns the real part of the scaled colatitude derivative  sin( theta ) dY_l^m/dtheta , i.e.
+	 * {@code [ ( x^2 - 1 ) dP_l^m/dx(x) ]_x=cos theta cos( m phi )}.
+	 * <p>
+	 * Requires a previous {@link #evaluate(double, double)} and {@link #evaluateDerivatives()} call.
+	 *
+	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
+	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
+	 * @return	real part of  sin( theta ) dY_l^m/dtheta .
+	 */
+	public double getSphericalHarmonicsDerivativeRealPart( int l , int m )
+	{
+		return this.cos_mPhi[m] * this.legendre.getPolynomialDerivativeTimesX2Minus1( l , m );
+	}
+
+
+	/**
+	 * Returns the imaginary part of the scaled colatitude derivative  sin( theta ) dY_l^m/dtheta , i.e.
+	 * {@code [ ( x^2 - 1 ) dP_l^m/dx(x) ]_x=cos theta sin( m phi )}.
+	 * <p>
+	 * Requires a previous {@link #evaluate(double, double)} and {@link #evaluateDerivatives()} call.
+	 *
+	 * @param l		polynomial degree in the range l = 0 , 1 , ... , lMaximum
+	 * @param m		polynomial order in the range m = 0 , 1 , ... , l
+	 * @return	imaginary part of  sin( theta ) dY_l^m/dtheta .
+	 */
+	public double getSphericalHarmonicsDerivativeImaginaryPart( int l , int m )
+	{
+		return this.sin_mPhi[m] * this.legendre.getPolynomialDerivativeTimesX2Minus1( l , m );
+	}
+
 }

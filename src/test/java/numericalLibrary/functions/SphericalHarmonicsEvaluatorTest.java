@@ -1,7 +1,7 @@
 package numericalLibrary.functions;
 
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Random;
 
@@ -67,9 +67,8 @@ public class SphericalHarmonicsEvaluatorTest
     		for( int l=0; l<5; l++ ) {
     			for( int m=0; m<=l; m++ ) {
     				ComplexNumber analytical = sphericalHarmonicsAnalytical[l][m];
-    				ComplexNumber evaluated = sphericalHarmonicsEvaluator.getSphericalHarmonicsValue(l,m);
-    				//System.out.println( l + " " + m + ":\t\t analytical: " + analytical.toString() + "\t\t computed:" + evaluated.toString() + "\t\t distance: " + evaluated.distanceFrom( analytical ) );
-        			assertTrue( evaluated.equalsApproximately( analytical , 1.0e-15 , 0.0 ) );
+        			assertEquals( analytical.re() , sphericalHarmonicsEvaluator.getSphericalHarmonicsRealPart( l , m ) , 1.0e-14 );
+        			assertEquals( analytical.im() , sphericalHarmonicsEvaluator.getSphericalHarmonicsImaginaryPart( l , m ) , 1.0e-14 );
     			}
     		}
     	}
