@@ -77,7 +77,7 @@ public class TukeyRobustFunction
     {
         if( xSquared < this.kSquared ) {
         	double y = 1.0 - xSquared / this.kSquared;
-            return this.kSquaredOver6 * ( 1.0 - y * y );
+            return y * y;
         } else {
             return 0.0;
         }
