@@ -6,10 +6,14 @@ import numericalLibrary.types.MatrixReal;
 
 
 /**
- * Represents a mathematical object that lives in a manifold, and can be displaced using a vector of the dimension of the manifold.
+ * Represents a mathematical object that lives in a manifold, and can be displaced using a vector with the dimension of the manifold.
  */
 public interface Shiftable
 {
+    ////////////////////////////////////////////////////////////////
+    /// PUBLIC ABSTRACT METHODS
+    ////////////////////////////////////////////////////////////////
+    
 	/**
      * Returns the degrees of freedom of the mathematical object.
      * <p>

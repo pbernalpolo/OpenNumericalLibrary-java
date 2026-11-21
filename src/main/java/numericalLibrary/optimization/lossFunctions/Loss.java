@@ -10,12 +10,16 @@ import numericalLibrary.optimization.Shiftable;
  * <p>
  * Each loss is responsible for storing and managing its parameter vector,
  * and it is {@link Shiftable} in the sense of its parameter vector.
+ * <p>
+ * It doesn't make sense to separate the parameter vector from the {@link Loss}
+ * because each loss and its derivatives will depend on the particular parameterization
+ * chosen for the parameter vector.
  */
 public interface Loss
 	extends Shiftable
 {
     ////////////////////////////////////////////////////////////////
-    // PUBLIC ABSTRACT METHODS
+    /// PUBLIC ABSTRACT METHODS
     ////////////////////////////////////////////////////////////////
     
 	/**
